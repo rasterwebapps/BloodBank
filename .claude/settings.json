@@ -47,6 +47,11 @@
         "matcher": "Write|Edit|MultiEdit",
         "command": "bash .claude/hooks/validate-no-lombok.sh",
         "description": "Validate no Lombok annotations in generated code"
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "command": "bash .claude/hooks/validate-code-patterns.sh",
+        "description": "Validate BloodBank code conventions (@PreAuthorize, constructor injection, records, etc.)"
       }
     ],
     "PrePush": [
