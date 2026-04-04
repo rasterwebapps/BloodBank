@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-BloodBank is a worldwide, multi-branch, containerized microservices blood bank management system. It manages the complete blood lifecycle from Donor Registration through Transfusion and Hemovigilance. The system is built with 24 functional modules deployed across 14 microservices, with a single shared PostgreSQL 17 database (~87 tables), 16 user roles managed by Keycloak, and a 41-agent AI orchestration system for development.
+BloodBank is a worldwide, multi-branch, containerized microservices blood bank management system. It manages the complete blood lifecycle from Donor Registration through Transfusion and Hemovigilance. The system is built with 24 functional modules deployed across 14 microservices, with a single shared PostgreSQL 17 database (~87 tables), 16 user roles managed by Keycloak, and a 20-role AI-assisted development system (13 skills, 6 commands, 3 validation hooks).
 
 ## Tech Stack (Mandatory Versions)
 

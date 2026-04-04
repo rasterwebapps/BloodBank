@@ -24,7 +24,7 @@
 - [Project Structure](#project-structure)
 - [Code Generation Rules — No Lombok](#code-generation-rules--no-lombok)
 - [RabbitMQ Event Architecture](#rabbitmq-event-architecture)
-- [Multi-Agent Orchestration System](#multi-agent-orchestration-system)
+- [AI-Assisted Development System](#ai-assisted-development-system)
 - [Development Milestones](#development-milestones)
 - [Deployment Strategy](#deployment-strategy)
 - [GitHub Copilot Prompt](#github-copilot-prompt)
@@ -583,126 +583,137 @@ Since all services share one database, RabbitMQ is used **ONLY** for:
 
 ---
 
-## Multi-Agent Orchestration System
+## AI-Assisted Development System
 
-This project uses a **41-agent orchestration system** for AI-assisted development. When any input is given, the **Orchestrator/Analyser Agent** automatically dispatches the required sub-agents.
+This project uses AI agents for code generation, validation, and development workflow automation.
 
-### How It Works
+### What's Implemented Today
 
-```
-USER INPUT (any text) ──▶ 🧠 ORCHESTRATOR AGENT ──▶ Sub-Agents ──▶ OUTPUT
-```
+The following tools are **available and working** in `.claude/`:
 
-The Orchestrator:
-1. **Analyses** the input — understands scope and intent
-2. **Classifies** the task type(s)
-3. **Selects** required sub-agent(s) from the catalog
-4. **Determines** execution order from the dependency graph
-5. **Dispatches** sub-agents (parallel where possible)
-6. **Assembles** all outputs into a coherent deliverable
+| Tool | Location | Description |
+|---|---|---|
+| 13 Skills | `.claude/skills/` | Reusable code generation templates (entity, DTO, controller, service, mapper, repository, event, migration, Angular feature, unit test, integration test, Docker/K8s, scaffold-service) |
+| 6 Commands | `.claude/commands/` | Higher-level CLI wrappers: `scaffold-service`, `create-entity`, `add-event`, `add-flyway-migration`, `add-angular-feature`, `validate-project` |
+| 3 Hooks | `.claude/hooks/` | Automated validation: `validate-no-lombok.sh` (PostToolCall), `validate-code-patterns.sh` (PostToolCall), `pre-push-checks.sh` (PrePush) |
+| Configuration | `.claude/settings.json` | Permissions, hook triggers, project metadata |
 
-### Sub-Agent Catalog (40 Agents)
+**Usage**: Invoke commands manually (e.g., `/project:scaffold-service donor-service`) or use skills as templates during AI-assisted coding sessions.
 
-| Phase | Agent | Role | Responsibility |
+### Agent Roles (20 Consolidated Agents)
+
+> **Note**: These are **role definitions** that guide AI agent behavior during development. They are not a running orchestration engine — they describe *what each role does* when invoked via the skills and commands listed above. To use a role, invoke the matching skill/command (e.g., run `/project:scaffold-service donor-service` to execute SA-09's Backend Dev role for donor-service).
+
+| Phase | Agent | Role | Responsibility | Skill(s) Used |
+|---|---|---|---|---|
+| **PLANNING** | SA-01 | 🏗️ Architect | System architecture, C4 diagrams, ADRs | — (documentation) |
+| | SA-02 | 📋 Requirements | Requirements, user stories, use cases, traceability | — (documentation) |
+| | SA-03 | 🎨 UI/UX Designer | Design system, page specs, navigation, accessibility | — (documentation) |
+| | SA-04 | 📐 API Designer | OpenAPI specs, event contracts, API versioning | — (documentation) |
+| | SA-05 | 🗄️ DBA | Schema design, Flyway migrations, ERD, indexing | `create-flyway-migration`, `create-entity` |
+| | SA-06 | 🔐 Security Architect | Threat model, RBAC matrix, compliance mapping | — (documentation) |
+| **DEVELOPMENT** | SA-07 | ⚙️ Build Engineer | Gradle build system, project skeleton, code quality | `scaffold-service` |
+| | SA-08 | 📦 Platform Developer | Shared libraries (DTOs, events, security, exceptions) | `create-dto-record`, `create-rabbitmq-event` |
+| | SA-09 | 💻 Backend Dev | **All 12 backend services** (parameterized by service name + module list) | `scaffold-service`, `create-entity`, `create-dto-record`, `create-rest-controller`, `create-service-class`, `create-repository`, `create-mapstruct-mapper`, `create-rabbitmq-event` |
+| | SA-10 | 🌐 Frontend Dev | Angular 21 — all 17 feature modules, core, shared | `create-angular-feature` |
+| | SA-11 | 🔌 Integration Dev | API Gateway, Config Server, service wiring | `scaffold-service` |
+| **TESTING** | SA-12 | 🧪 Unit Tester | JUnit 5 + Mockito for all services (>80% coverage) | `create-unit-test` |
+| | SA-13 | 🔗 Integration Tester | Testcontainers (PostgreSQL, Redis, RabbitMQ) | `create-integration-test` |
+| | SA-14 | 🌊 E2E/Perf/Security Tester | Playwright/Cypress E2E, Gatling/k6 load tests, OWASP ZAP, WCAG a11y | — (test frameworks) |
+| **DEVOPS** | SA-15 | 🐳 Docker + K8s Engineer | Dockerfiles, docker-compose, K8s manifests, Helm | `create-docker-k8s` |
+| | SA-16 | 🔧 CI/CD Engineer | Jenkinsfile, SonarQube, security scan pipeline | — (pipeline config) |
+| | SA-17 | 📊 Monitoring Engineer | Prometheus, Grafana, Loki, Tempo, alert rules | — (config files) |
+| | SA-18 | 🔑 IAM Engineer | Keycloak realm-export.json, LDAP federation config | — (Keycloak config) |
+| **DOCS & OPS** | SA-19 | 📝 Technical Writer | README, developer guides, user guides, compliance docs, SOPs, runbooks | — (documentation) |
+| | SA-20 | 🚀 Release + Deploy | Versioning, release process, deploy scripts, blue-green/canary, SLOs | — (scripts/config) |
+
+#### Service Parameter Table (for SA-09 Backend Dev)
+
+When SA-09 is invoked, it takes a `{service-name}` parameter and looks up the modules. Invoke with: `/project:scaffold-service {service-name}` or `/project:create-entity {service-name} {Entity} {table} [scope]`.
+
+| Service Name | Modules | Key Tables |
+|---|---|---|
+| donor-service | 1, 2, 9, 24 | donors, donor_health_records, collections, blood_camps |
+| inventory-service | 4, 5, 22 | blood_units, blood_components, storage_locations, transport_requests |
+| lab-service | 3 | test_orders, test_results, test_panels, lab_instruments |
+| branch-service | 8, 17 | branches, branch_operating_hours, blood_groups, component_types |
+| transfusion-service | 6, 7 | crossmatch_requests, blood_issues, transfusions, hemovigilance_reports |
+| hospital-service | 10 | hospitals, hospital_contracts, hospital_requests |
+| billing-service | 11 | rate_master, invoices, payments, credit_notes |
+| request-matching-service | 6(matching), 23 | emergency_requests, disaster_events, donor_mobilizations |
+| notification-service | 14 | notifications, notification_templates, campaigns |
+| reporting-service | 13, 18, 20 | audit_logs, report_metadata, dashboard_widgets |
+| document-service | 19 | documents, document_versions |
+| compliance-service | 12 | regulatory_frameworks, sop_documents, deviations, recall_records |
+
+### Task Classification (Intent-Based Routing)
+
+Instead of fragile keyword matching, tasks are classified by **intent type**:
+
+| Intent | Description | Agent(s) Invoked | Example Input |
 |---|---|---|---|
-| **PLANNING** | SA-01 | 🏗️ Architect | System architecture, C4 diagrams, ADRs |
-| | SA-02 | 📋 Requirements | Functional/non-functional requirements, user stories, use cases, traceability |
-| | SA-03 | 🎨 UI/UX Designer | Design system, page specifications, navigation, accessibility |
-| | SA-04 | 📐 API Designer | OpenAPI specs, event contracts, API versioning |
-| | SA-05 | 🗄️ DBA | Schema design, Flyway migrations, ERD, indexing, backup, replication, tuning |
-| | SA-06 | 🔐 Security Architect | Threat model, RBAC, security classes, compliance mapping |
-| **DEVELOPMENT** | SA-07 | ⚙️ Build Engineer | Gradle build system, project skeleton, code quality plugins |
-| | SA-08 | 📦 Platform Developer | Shared libraries (DTOs, events, security, exceptions, model) |
-| | SA-09 | 💻 Backend Dev | donor-service (Modules 1, 2, 9, 24) |
-| | SA-10 | 💻 Backend Dev | inventory-service (Modules 4, 5, 22) |
-| | SA-11 | 💻 Backend Dev | lab-service (Module 3) |
-| | SA-12 | 💻 Backend Dev | branch-service (Modules 8, 17) |
-| | SA-13 | 💻 Backend Dev | transfusion-service (Modules 6, 7) |
-| | SA-14 | 💻 Backend Dev | hospital-service (Module 10) |
-| | SA-15 | 💻 Backend Dev | billing-service (Module 11) |
-| | SA-16 | 💻 Backend Dev | request-matching-service (Module 6-matching, 23) |
-| | SA-17 | 💻 Backend Dev | notification-service (Module 14) |
-| | SA-18 | 💻 Backend Dev | reporting-service (Modules 13, 18, 20) |
-| | SA-19 | 💻 Backend Dev | document-service (Module 19) |
-| | SA-20 | 💻 Backend Dev | compliance-service (Module 12) |
-| | SA-21 | 🌐 Frontend Dev | Angular core + shared + first 8 feature modules |
-| | SA-22 | 🌐 Frontend Dev | Angular remaining 9 feature modules |
-| | SA-23 | 🔌 Integration Dev | API Gateway, Config Server, service wiring |
-| **TESTING** | SA-24 | 🧪 Unit Tester | JUnit 5 + Mockito for all services (>80% coverage) |
-| | SA-25 | 🔗 Integration Tester | Testcontainers (PostgreSQL, Redis, RabbitMQ) |
-| | SA-26 | 🌊 E2E Tester | Playwright/Cypress end-to-end workflow tests |
-| | SA-27 | ⚡ Performance Tester | Gatling/k6 load, stress, endurance tests |
-| | SA-28 | 🛡️ Security Tester | OWASP ZAP, vulnerability scanning, role escalation tests |
-| | SA-29 | ♿ Accessibility Tester | WCAG 2.1 AA, axe-core, keyboard navigation |
-| **DEVOPS** | SA-30 | 🐳 Docker Engineer | Dockerfiles, docker-compose, multi-stage builds |
-| | SA-31 | ☸️ K8s Engineer | Kubernetes manifests, Helm/Kustomize, namespaces |
-| | SA-32 | 🔧 CI/CD Engineer | Jenkinsfile, SonarQube, security scan pipeline |
-| | SA-33 | 📊 Monitoring Engineer | Prometheus, Grafana, Loki, Tempo, alert rules |
-| | SA-34 | 🔑 IAM Engineer | Keycloak realm-export.json, LDAP federation config |
-| **DOCS** | SA-35 | 📝 Technical Writer | README, developer guides, user guides, operations guides |
-| | SA-36 | 📜 Compliance Officer | HIPAA/GDPR/FDA mapping, validation plan, SOPs |
-| | SA-37 | 📚 Runbook Author | Incident playbooks, maintenance runbooks, DR procedures |
-| | SA-38 | 🏷️ Release Manager | Versioning strategy, release process, branching, rollback |
-| **DEPLOY** | SA-39 | 🚀 Deployment Engineer | Deploy scripts, blue-green/canary configs, environment setup |
-| | SA-40 | 🩺 SRE | SLOs, error budgets, chaos engineering, operational readiness |
-
-### Task Classification (Orchestrator Auto-Routing)
-
-| Input Signal | Agent(s) Invoked |
-|---|---|
-| "architecture", "design system", "tech stack" | SA-01 Architect |
-| "requirements", "user stories", "features" | SA-02 Requirements |
-| "UI", "wireframe", "dashboard design" | SA-03 UI/UX Designer |
-| "API", "endpoints", "OpenAPI" | SA-04 API Designer |
-| "database", "schema", "migration", "SQL" | SA-05 DBA |
-| "security", "roles", "permissions", "RBAC" | SA-06 Security Architect |
-| "gradle", "build", "project structure" | SA-07 Build Engineer |
-| "shared", "common", "base entity" | SA-08 Platform Developer |
-| "implement {service-name}" | SA-09 to SA-20 (specific) |
-| "angular", "frontend", "UI component" | SA-21 / SA-22 Frontend Dev |
-| "gateway", "routing", "wire services" | SA-23 Integration Dev |
-| "unit test", "coverage" | SA-24 Unit Tester |
-| "integration test", "testcontainers" | SA-25 Integration Tester |
-| "e2e", "end to end", "workflow test" | SA-26 E2E Tester |
-| "performance", "load test" | SA-27 Performance Tester |
-| "pentest", "vulnerability" | SA-28 Security Tester |
-| "accessibility", "WCAG" | SA-29 Accessibility Tester |
-| "docker", "container" | SA-30 Docker Engineer |
-| "kubernetes", "k8s", "helm" | SA-31 K8s Engineer |
-| "jenkins", "pipeline", "CI/CD" | SA-32 CI/CD Engineer |
-| "monitoring", "prometheus", "grafana" | SA-33 Monitoring Engineer |
-| "keycloak", "LDAP", "SSO" | SA-34 IAM Engineer |
-| "documentation", "README", "guide" | SA-35 Technical Writer |
-| "compliance", "HIPAA", "GDPR", "FDA" | SA-36 Compliance Officer |
-| "runbook", "playbook", "incident" | SA-37 Runbook Author |
-| "release", "version", "changelog" | SA-38 Release Manager |
-| "deploy", "production", "blue-green" | SA-39 Deployment Engineer |
-| "SLO", "chaos", "operational readiness" | SA-40 SRE |
-| "scaffold entire project" | ALL agents in dependency order |
+| `NEW_FEATURE` | Add a new capability, entity, or endpoint | SA-05 → SA-09 → SA-12/SA-13 | "Add donor loyalty points feature" |
+| `NEW_SERVICE` | Scaffold an entire microservice | SA-07 → SA-08 → SA-05 → SA-09 | "Create the inventory-service" |
+| `BUG_FIX` | Fix an existing defect | SA-09 (target service) → SA-12 | "Fix 500 error on POST /api/v1/donors" |
+| `REFACTOR` | Improve existing code without changing behavior | SA-09 → SA-12/SA-13 | "Refactor donor-service to use specifications" |
+| `FRONTEND` | UI components, pages, or Angular features | SA-10 | "Add donor registration page" |
+| `INFRA_CHANGE` | Docker, K8s, CI/CD, monitoring | SA-15/SA-16/SA-17 | "Write Kubernetes manifests" |
+| `SECURITY` | Roles, permissions, IAM, vulnerability fixes | SA-06 → SA-18 → SA-09 | "Billing returns 403 for BILLING_CLERK" |
+| `DATABASE` | Schema changes, migrations, indexing | SA-05 | "Add index on donors.blood_group" |
+| `TESTING` | Write or fix tests | SA-12/SA-13/SA-14 | "Add integration tests for lab-service" |
+| `DOCUMENTATION` | Docs, runbooks, compliance artifacts | SA-19 | "Write developer guide for donor-service" |
+| `FULL_SCAFFOLD` | Generate the entire project end-to-end | ALL agents in tier order | "Scaffold the entire project" |
 
 ### Dependency Tiers (Execution Order)
 
 ```
 TIER 0: SA-01 (Architect), SA-02 (Requirements)                 ← Start immediately
-TIER 1: SA-03, SA-04, SA-05, SA-06                              ← After Tier 0
-TIER 2: SA-07, SA-34                                             ← After Tier 0
-TIER 3: SA-08                                                    ← After Tier 2
-TIER 4: SA-09 to SA-20 (12 services), SA-21 (FE core)           ← After Tier 3 (parallel)
-TIER 5: SA-22, SA-23                                             ← After Tier 4
-TIER 6: SA-24 to SA-29 (testing), SA-30 to SA-33 (devops)       ← After Tier 4-5 (parallel)
-TIER 7: SA-35 to SA-40 (docs, compliance, deploy, SRE)          ← After Tier 6
+TIER 1: SA-05 (DBA), SA-06 (Security), SA-03 (UI/UX), SA-04 (API) ← After Tier 0
+TIER 2: SA-07 (Build), SA-08 (Platform), SA-18 (IAM)            ← After Tier 1 (IAM needs Security)
+TIER 3: SA-09 (Backend Dev ×12), SA-10 (Frontend)               ← After Tier 2 (parallel)
+TIER 4: SA-11 (Integration Dev)                                  ← After Tier 3
+TIER 5: SA-12–SA-14 (Testing), SA-15–SA-17 (DevOps), SA-19 (Docs) ← After Tier 3-4 (parallel)
+TIER 6: SA-20 (Release + Deploy)                                 ← After Tier 5
+```
+
+### Validation & Feedback Loop
+
+Generated code is validated automatically. If validation fails, the generating agent is re-invoked with error context:
+
+```
+Agent generates code
+    ↓
+validate-no-lombok.sh ──→ FAIL? ──→ Re-invoke agent with: "Remove Lombok, use records/explicit getters"
+    ↓ PASS
+validate-code-patterns.sh ──→ FAIL? ──→ Re-invoke agent with: "Add @PreAuthorize / fix injection / etc."
+    ↓ PASS
+Output accepted
+```
+
+### State Tracking (Planned)
+
+> **Status**: Not yet implemented. When built, state will be tracked in `.claude/state.json`:
+
+```json
+{
+  "generated_services": ["donor-service", "branch-service"],
+  "pending_services": ["inventory-service", "lab-service"],
+  "failed_services": [],
+  "last_migration_version": "V001",
+  "completed_tiers": [0, 1, 2]
+}
 ```
 
 ### Example Orchestration Scenarios
 
-| User Input | Orchestrator Action |
-|---|---|
-| "Generate the complete project" | ALL 40 agents, Tier 0 → Tier 7 |
-| "Create the inventory-service" | SA-07 → SA-08 → SA-05 → SA-10 |
-| "Write Kubernetes manifests" | SA-30 → SA-31 |
-| "Add Hindi language support" | SA-21/SA-22 (add hi.json) → SA-09 to SA-20 (add messages_hi.properties) |
-| "Billing returns 403 for BILLING_CLERK" | SA-06 (review) → SA-15 (fix) → SA-25 (regression test) |
-| "Prepare for production" | SA-39 → SA-40 → SA-37 → SA-33 → SA-36 |
+| User Input | Intent | Agent Flow |
+|---|---|---|
+| "Generate the complete project" | `FULL_SCAFFOLD` | ALL agents, Tier 0 → Tier 6 |
+| "Create the inventory-service" | `NEW_SERVICE` | SA-07 → SA-08 → SA-05 → SA-09(`inventory-service`) |
+| "Write Kubernetes manifests" | `INFRA_CHANGE` | SA-15 (Docker + K8s) |
+| "Add Hindi language support" | `NEW_FEATURE` | SA-10 (add hi.json) → SA-09 (add messages_hi.properties ×12) |
+| "Billing returns 403 for BILLING_CLERK" | `BUG_FIX` | SA-06 (review RBAC) → SA-09(`billing-service`) → SA-12 (regression test) |
+| "Prepare for production" | `INFRA_CHANGE` | SA-15 → SA-20 → SA-17 → SA-19 |
 
 ---
 
