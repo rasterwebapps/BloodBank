@@ -602,7 +602,7 @@ The following tools are **available and working** in `.claude/`:
 
 ### Agent Roles (20 Consolidated Agents)
 
-> **Note**: These are **role definitions** that guide AI agent behavior during development. They are not a running orchestration engine — they describe *what each role does* when invoked via skills and commands.
+> **Note**: These are **role definitions** that guide AI agent behavior during development. They are not a running orchestration engine — they describe *what each role does* when invoked via the skills and commands listed above. To use a role, invoke the matching skill/command (e.g., run `/project:scaffold-service donor-service` to execute SA-09's Backend Dev role for donor-service).
 
 | Phase | Agent | Role | Responsibility | Skill(s) Used |
 |---|---|---|---|---|
@@ -629,7 +629,7 @@ The following tools are **available and working** in `.claude/`:
 
 #### Service Parameter Table (for SA-09 Backend Dev)
 
-When SA-09 is invoked, it takes a `{service-name}` parameter and looks up the modules:
+When SA-09 is invoked, it takes a `{service-name}` parameter and looks up the modules. Invoke with: `/project:scaffold-service {service-name}` or `/project:create-entity {service-name} {Entity} {table} [scope]`.
 
 | Service Name | Modules | Key Tables |
 |---|---|---|
