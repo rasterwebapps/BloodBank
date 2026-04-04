@@ -1,1 +1,74 @@
-{\n  "permissions": {\n    "allow": [\n      "Read",\n      "Write",\n      "Edit",\n      "MultiEdit",\n      "Bash(gradle *)",\n      "Bash(./gradlew *)",\n      "Bash(npm *)",\n      "Bash(npx *)",\n      "Bash(ng *)",\n      "Bash(docker *)",\n      "Bash(docker-compose *)",\n      "Bash(kubectl *)",\n      "Bash(flyway *)",\n      "Bash(git status)",\n      "Bash(git diff *)",\n      "Bash(git log *)",\n      "Bash(find *)",\n      "Bash(grep *)",\n      "Bash(cat *)",\n      "Bash(ls *)",\n      "Bash(wc *)",\n      "Bash(head *)",\n      "Bash(tail *)",\n      "Bash(mkdir *)",\n      "Bash(cp *)",\n      "Bash(mv *)",\n      "Bash(java -version)",\n      "Bash(node -v)",\n      "WebFetch"\n    ],\n    "deny": [\n      "Bash(rm -rf /)",\n      "Bash(rm -rf /*)",\n      "Bash(sudo *)",\n      "Bash(chmod 777 *)",\n      "Bash(curl * | sh)",\n      "Bash(wget * | sh)"\n    ]\n  },\n  "model": {\n    "temperature": 0.2,\n    "max_tokens": 16000\n  },\n  "project": {\n    "name": "BloodBank",\n    "type": "microservices",\n    "language": "java",\n    "framework": "spring-boot",\n    "java_version": 21,\n    "build_tool": "gradle-kotlin-dsl",\n    "frontend": "angular-21",\n    "database": "postgresql-17",\n    "no_lombok": true\n  }\n}
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "Bash(gradle *)",
+      "Bash(./gradlew *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(ng *)",
+      "Bash(docker *)",
+      "Bash(docker-compose *)",
+      "Bash(kubectl *)",
+      "Bash(flyway *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(cat *)",
+      "Bash(ls *)",
+      "Bash(wc *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(java -version)",
+      "Bash(node -v)",
+      "Bash(bash .claude/hooks/*)",
+      "WebFetch"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf /*)",
+      "Bash(sudo *)",
+      "Bash(chmod 777 *)",
+      "Bash(curl * | sh)",
+      "Bash(wget * | sh)"
+    ]
+  },
+  "hooks": {
+    "PostToolCall": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "command": "bash .claude/hooks/validate-no-lombok.sh",
+        "description": "Validate no Lombok annotations in generated code"
+      }
+    ],
+    "PrePush": [
+      {
+        "command": "bash .claude/hooks/pre-push-checks.sh",
+        "description": "Run all pre-push validation checks"
+      }
+    ]
+  },
+  "model": {
+    "temperature": 0.2,
+    "max_tokens": 16000
+  },
+  "project": {
+    "name": "BloodBank",
+    "type": "microservices",
+    "language": "java",
+    "framework": "spring-boot",
+    "java_version": 21,
+    "build_tool": "gradle-kotlin-dsl",
+    "frontend": "angular-21",
+    "database": "postgresql-17",
+    "no_lombok": true
+  }
+}

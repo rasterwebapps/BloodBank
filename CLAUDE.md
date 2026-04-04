@@ -375,6 +375,90 @@ This is a healthcare application. All code must consider:
 - **AABB Standards** — vein-to-vein traceability, chain of custody
 - **WHO Guidelines** — blood safety, mandatory test panels
 
+## Build & Test Commands
+
+```bash
+# Build all modules
+./gradlew build
+
+# Build a specific service
+./gradlew :backend:donor-service:build
+
+# Run a specific service locally
+./gradlew :backend:donor-service:bootRun
+
+# Run all tests
+./gradlew test
+
+# Run tests for a specific service
+./gradlew :backend:donor-service:test
+
+# Run tests with coverage report
+./gradlew test jacocoTestReport
+
+# Check coverage threshold (>80%)
+./gradlew jacocoTestCoverageVerification
+
+# Run code quality checks
+./gradlew checkstyleMain spotbugsMain
+
+# Start local infrastructure (PostgreSQL, Redis, RabbitMQ, Keycloak, MinIO)
+docker-compose up -d
+
+# Stop local infrastructure
+docker-compose down
+
+# Run Flyway migrations locally
+./gradlew :shared-libs:db-migration:flywayMigrate
+
+# Build Docker images
+docker-compose build
+
+# Run validation hooks
+bash .claude/hooks/validate-no-lombok.sh
+bash .claude/hooks/validate-code-patterns.sh
+bash .claude/hooks/pre-push-checks.sh
+```
+
+## Claude Code Skills & Commands
+
+### Available Skills (`.claude/skills/`)
+
+| Skill | Description |
+|---|---|
+| `scaffold-service` | Generate a complete Spring Boot microservice |
+| `create-entity` | Create a JPA entity with base class, filters, getters/setters |
+| `create-dto-record` | Create request/response DTOs as Java 21 records |
+| `create-rest-controller` | Create a controller with @PreAuthorize and OpenAPI |
+| `create-service-class` | Create a service with constructor injection and logging |
+| `create-repository` | Create a JPA repository interface |
+| `create-mapstruct-mapper` | Create a MapStruct mapper interface |
+| `create-rabbitmq-event` | Create event record + publisher + listener |
+| `create-flyway-migration` | Create a Flyway SQL migration script |
+| `create-angular-feature` | Scaffold an Angular 21 feature module |
+| `create-unit-test` | Generate JUnit 5 + Mockito unit tests |
+| `create-integration-test` | Generate Testcontainers integration tests |
+| `create-docker-k8s` | Create Docker + Kubernetes configurations |
+
+### Available Commands (`.claude/commands/`)
+
+| Command | Usage |
+|---|---|
+| `/project:scaffold-service {name}` | Generate a complete microservice |
+| `/project:create-entity {service} {Entity} {table} [scope]` | Generate entity + repo + DTO + mapper |
+| `/project:add-event {Event} {publisher} {consumers...}` | Create event + publisher + listeners |
+| `/project:add-flyway-migration {description}` | Create a new migration script |
+| `/project:add-angular-feature {name} {service} {roles...}` | Scaffold Angular feature |
+| `/project:validate-project` | Run all validation checks |
+
+### Validation Hooks (`.claude/hooks/`)
+
+| Hook | Trigger | Description |
+|---|---|---|
+| `validate-no-lombok.sh` | Post file edit | Scans for banned Lombok annotations |
+| `validate-code-patterns.sh` | Post file edit | Checks code conventions |
+| `pre-push-checks.sh` | Pre push | Full validation suite |
+
 ## Common Mistakes to Avoid
 
 1. ❌ Using Lombok — NEVER
@@ -387,3 +471,19 @@ This is a healthcare application. All code must consider:
 8. ❌ Using `spring.flyway.enabled=true` in services — must be `false`
 9. ❌ Creating Flyway scripts inside service modules — they go in `shared-libs/db-migration/`
 10. ❌ Returning raw entities from controllers — always use DTOs (records)
+
+## Troubleshooting
+
+| Problem | Solution |
+|---|---|
+| Lombok annotation found | Remove it. Use Java 21 record for DTOs, explicit getters/setters for entities, LoggerFactory for logging |
+| `@Autowired` field injection | Replace with constructor injection — declare `final` fields and explicit constructor |
+| Entity missing `@Filter` | Add `@FilterDef` + `@Filter` on all branch-scoped entities |
+| Controller missing `@PreAuthorize` | Add `@PreAuthorize("hasAnyRole('ROLE1','ROLE2')")` to EVERY public endpoint method |
+| Flyway running in service | Set `spring.flyway.enabled=false` in application.yml — migrations run via K8s Job |
+| Event carries entity data | Refactor to carry IDs only: `UUID entityId, UUID branchId, Instant occurredAt` |
+| MapStruct not generating impl | Ensure `annotationProcessor "org.mapstruct:mapstruct-processor"` in build.gradle.kts |
+| Build fails with Java version | Ensure Java 21 — check `java.toolchain { languageVersion.set(JavaLanguageVersion.of(21)) }` |
+| Redis connection refused | Start infrastructure: `docker-compose up -d redis` |
+| RabbitMQ connection refused | Start infrastructure: `docker-compose up -d rabbitmq` |
+| Keycloak 401 Unauthorized | Check JWT token, verify Keycloak realm config, check `issuer-uri` in application.yml |
