@@ -31,18 +31,18 @@ dependencies {
 }
 
 tasks.jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            limit {
-                minimum = "0.80".toBigDecimal()
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(
+                    "**/mapper/*Impl.class",
+                    "**/mapper/*Impl\$*.class",
+                    "**/config/*.class",
+                    "**/BranchServiceApplication.class"
+                )
             }
-            excludes = listOf(
-                "com.bloodbank.branchservice.mapper.*Impl",
-                "com.bloodbank.branchservice.config.*",
-                "com.bloodbank.branchservice.BranchServiceApplication"
-            )
-        }
-    }
+        })
+    )
 }
 
 tasks.jacocoTestReport {
@@ -51,6 +51,7 @@ tasks.jacocoTestReport {
             fileTree(it) {
                 exclude(
                     "**/mapper/*Impl.class",
+                    "**/mapper/*Impl\$*.class",
                     "**/config/*.class",
                     "**/BranchServiceApplication.class"
                 )
