@@ -29,3 +29,32 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:rabbitmq")
 }
+
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.80".toBigDecimal()
+            }
+            excludes = listOf(
+                "com.bloodbank.branchservice.mapper.*Impl",
+                "com.bloodbank.branchservice.config.*",
+                "com.bloodbank.branchservice.BranchServiceApplication"
+            )
+        }
+    }
+}
+
+tasks.jacocoTestReport {
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(
+                    "**/mapper/*Impl.class",
+                    "**/config/*.class",
+                    "**/BranchServiceApplication.class"
+                )
+            }
+        })
+    )
+}
