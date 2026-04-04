@@ -246,9 +246,7 @@ public class BranchService {
         Region region = regionRepository.findById(request.regionId())
                 .orElseThrow(() -> new ResourceNotFoundException("Region", "id", request.regionId()));
 
-        BranchRegion branchRegion = new BranchRegion();
-        branchRegion.setBranch(branch);
-        branchRegion.setRegion(region);
+        BranchRegion branchRegion = new BranchRegion(branch, region);
         branchRegion.setPrimary(request.isPrimary());
         branchRegion = branchRegionRepository.save(branchRegion);
         return branchMapper.toResponse(branchRegion);
