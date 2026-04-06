@@ -99,6 +99,7 @@ public class TestOrderService {
         log.info("Creating test order from DonationCompletedEvent: donationId={}, donorId={}",
                 event.donationId(), event.donorId());
 
+        // Use donationId as both sampleId and collectionId (the donation is the collection context)
         TestOrder order = new TestOrder(
                 event.donationId(),
                 event.donationId(),
@@ -112,6 +113,9 @@ public class TestOrderService {
         List<TestPanel> mandatoryPanels = testPanelRepository.findByIsMandatoryTrue();
         if (!mandatoryPanels.isEmpty()) {
             order.setPanelId(mandatoryPanels.getFirst().getId());
+            log.info("Assigned mandatory panel '{}' to test order", mandatoryPanels.getFirst().getPanelCode());
+        } else {
+            log.warn("No mandatory test panels configured — test order will have no panel assigned");
         }
 
         testOrderRepository.save(order);

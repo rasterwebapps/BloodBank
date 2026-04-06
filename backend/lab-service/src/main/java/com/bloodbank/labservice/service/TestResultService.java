@@ -62,6 +62,10 @@ public class TestResultService {
             throw new BusinessException("Cannot add result to a cancelled test order", "ORDER_CANCELLED");
         }
 
+        if (order.getStatus() == OrderStatusEnum.COMPLETED) {
+            throw new BusinessException("Cannot add result to a completed test order", "ORDER_COMPLETED");
+        }
+
         if (testResultRepository.existsByTestOrderIdAndTestName(request.testOrderId(), request.testName())) {
             throw new ConflictException(
                     "Test result for test '" + request.testName() + "' already exists for order " + request.testOrderId());
