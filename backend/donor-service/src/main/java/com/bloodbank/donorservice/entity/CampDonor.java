@@ -38,7 +38,7 @@ public class CampDonor extends BranchScopedEntity {
     @Column(name = "status", nullable = false, length = 20)
     private CampDonorStatusEnum status;
 
-    protected CampDonor() {}
+    public CampDonor() {}
 
     public UUID getCampId() { return campId; }
     public void setCampId(UUID campId) { this.campId = campId; }

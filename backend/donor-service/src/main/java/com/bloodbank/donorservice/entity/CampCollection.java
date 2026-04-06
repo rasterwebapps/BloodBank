@@ -27,7 +27,7 @@ public class CampCollection extends BranchScopedEntity {
     @Column(name = "collection_id", nullable = false)
     private UUID collectionId;
 
-    protected CampCollection() {}
+    public CampCollection() {}
 
     public UUID getCampId() { return campId; }
     public void setCampId(UUID campId) { this.campId = campId; }

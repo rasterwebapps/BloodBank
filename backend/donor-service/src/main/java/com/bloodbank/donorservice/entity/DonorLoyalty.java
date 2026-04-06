@@ -41,7 +41,7 @@ public class DonorLoyalty extends BranchScopedEntity {
     @Column(name = "last_activity_date")
     private Instant lastActivityDate;
 
-    protected DonorLoyalty() {}
+    public DonorLoyalty() {}
 
     public UUID getDonorId() { return donorId; }
     public void setDonorId(UUID donorId) { this.donorId = donorId; }
