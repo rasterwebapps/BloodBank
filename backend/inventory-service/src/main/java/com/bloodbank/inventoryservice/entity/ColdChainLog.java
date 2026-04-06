@@ -35,7 +35,7 @@ public class ColdChainLog extends BranchScopedEntity {
     private Instant recordedAt;
 
     @Column(name = "is_within_range")
-    private boolean isWithinRange;
+    private boolean withinRange;
 
     @Column(name = "alert_triggered")
     private boolean alertTriggered;
@@ -75,8 +75,8 @@ public class ColdChainLog extends BranchScopedEntity {
     public Instant getRecordedAt() { return recordedAt; }
     public void setRecordedAt(Instant recordedAt) { this.recordedAt = recordedAt; }
 
-    public boolean isWithinRange() { return isWithinRange; }
-    public void setWithinRange(boolean withinRange) { isWithinRange = withinRange; }
+    public boolean isWithinRange() { return withinRange; }
+    public void setWithinRange(boolean withinRange) { this.withinRange = withinRange; }
 
     public boolean isAlertTriggered() { return alertTriggered; }
     public void setAlertTriggered(boolean alertTriggered) { this.alertTriggered = alertTriggered; }
