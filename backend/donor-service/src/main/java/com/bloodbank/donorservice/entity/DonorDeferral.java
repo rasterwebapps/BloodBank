@@ -49,7 +49,7 @@ public class DonorDeferral extends BranchScopedEntity {
     @Column(name = "status", nullable = false, length = 20)
     private DeferralStatusEnum status;
 
-    protected DonorDeferral() {}
+    public DonorDeferral() {}
 
     public UUID getDonorId() { return donorId; }
     public void setDonorId(UUID donorId) { this.donorId = donorId; }

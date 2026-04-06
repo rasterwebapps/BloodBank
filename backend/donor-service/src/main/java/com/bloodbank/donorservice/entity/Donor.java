@@ -93,7 +93,7 @@ public class Donor extends BranchScopedEntity {
     @Column(name = "photo_url", length = 500)
     private String photoUrl;
 
-    protected Donor() {}
+    public Donor() {}
 
     public String getDonorNumber() { return donorNumber; }
     public void setDonorNumber(String donorNumber) { this.donorNumber = donorNumber; }

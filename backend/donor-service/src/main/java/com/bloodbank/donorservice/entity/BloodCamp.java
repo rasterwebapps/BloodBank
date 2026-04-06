@@ -79,7 +79,7 @@ public class BloodCamp extends BranchScopedEntity {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
-    protected BloodCamp() {}
+    public BloodCamp() {}
 
     public String getCampCode() { return campCode; }
     public void setCampCode(String campCode) { this.campCode = campCode; }

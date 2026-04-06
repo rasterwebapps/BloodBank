@@ -33,7 +33,7 @@ public class CampResource extends BranchScopedEntity {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
-    protected CampResource() {}
+    public CampResource() {}
 
     public UUID getCampId() { return campId; }
     public void setCampId(UUID campId) { this.campId = campId; }

@@ -49,7 +49,7 @@ public class CollectionAdverseReaction extends BranchScopedEntity {
     @Column(name = "reported_by", length = 255)
     private String reportedBy;
 
-    protected CollectionAdverseReaction() {}
+    public CollectionAdverseReaction() {}
 
     public UUID getCollectionId() { return collectionId; }
     public void setCollectionId(UUID collectionId) { this.collectionId = collectionId; }

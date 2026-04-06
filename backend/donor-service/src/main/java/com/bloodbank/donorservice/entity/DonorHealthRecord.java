@@ -56,7 +56,7 @@ public class DonorHealthRecord extends BranchScopedEntity {
     @Column(name = "screened_by", length = 255)
     private String screenedBy;
 
-    protected DonorHealthRecord() {}
+    public DonorHealthRecord() {}
 
     public UUID getDonorId() { return donorId; }
     public void setDonorId(UUID donorId) { this.donorId = donorId; }

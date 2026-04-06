@@ -46,7 +46,7 @@ public class DonorConsent extends BranchScopedEntity {
     @Column(name = "revoked_at")
     private Instant revokedAt;
 
-    protected DonorConsent() {}
+    public DonorConsent() {}
 
     public UUID getDonorId() { return donorId; }
     public void setDonorId(UUID donorId) { this.donorId = donorId; }

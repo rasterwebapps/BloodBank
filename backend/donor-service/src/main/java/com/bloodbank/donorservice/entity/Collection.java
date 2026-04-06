@@ -72,7 +72,7 @@ public class Collection extends BranchScopedEntity {
     @Column(name = "camp_collection_id")
     private UUID campCollectionId;
 
-    protected Collection() {}
+    public Collection() {}
 
     public UUID getDonorId() { return donorId; }
     public void setDonorId(UUID donorId) { this.donorId = donorId; }

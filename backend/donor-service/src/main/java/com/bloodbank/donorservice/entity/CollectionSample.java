@@ -43,7 +43,7 @@ public class CollectionSample extends BranchScopedEntity {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
-    protected CollectionSample() {}
+    public CollectionSample() {}
 
     public UUID getCollectionId() { return collectionId; }
     public void setCollectionId(UUID collectionId) { this.collectionId = collectionId; }
