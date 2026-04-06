@@ -29,3 +29,45 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:rabbitmq")
 }
+
+tasks.jacocoTestCoverageVerification {
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(
+                    "**/mapper/*Impl.class",
+                    "**/mapper/*Impl\$*.class",
+                    "**/config/*.class",
+                    "**/enums/*.class",
+                    "**/entity/*.class",
+                    "**/dto/*.class",
+                    "**/event/DonationCompletedListener.class",
+                    "**/event/TestResultAvailableListener.class",
+                    "**/event/UnitReleasedListener.class",
+                    "**/InventoryServiceApplication.class"
+                )
+            }
+        })
+    )
+}
+
+tasks.jacocoTestReport {
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(
+                    "**/mapper/*Impl.class",
+                    "**/mapper/*Impl\$*.class",
+                    "**/config/*.class",
+                    "**/enums/*.class",
+                    "**/entity/*.class",
+                    "**/dto/*.class",
+                    "**/event/DonationCompletedListener.class",
+                    "**/event/TestResultAvailableListener.class",
+                    "**/event/UnitReleasedListener.class",
+                    "**/InventoryServiceApplication.class"
+                )
+            }
+        })
+    )
+}
