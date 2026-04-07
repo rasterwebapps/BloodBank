@@ -4,19 +4,21 @@
 **Dependencies:** M2 (Core), M3 (Clinical), M4 (Support)
 **Exit Gate:** All features render correctly per user role
 
-## 📊 Development Status: 🔴 NOT STARTED (0%)
+## 📊 Development Status: 🟡 IN PROGRESS (~29%)
 
-**Issues Completed:** 0/52
-- API Gateway: scaffold only (1 file)
-- Config Server: scaffold only (1 file)
-- Angular frontend: directory does not exist yet
+**Started:** 2026-04-07 | **PRs:** #15 (merged 2026-04-07)
+**Issues Completed:** 15/52
+- API Gateway: ✅ Complete (7 main files, 10 test files, 30 tests — PR #15)
+- Config Server: ✅ Complete (2 main files, 1 test file, 10 tests — PR #15)
+- Config Repository: ✅ Complete (16 YAML files in config-repo/ — PR #15)
+- Angular frontend: ❌ Not started (directory does not exist yet)
 
 ## 🔧 FIX REQUIRED
 
 | # | Issue | Severity | Description |
 |---|---|---|---|
-| 1 | **Blocked by M3** | 🔴 BLOCKER | M3 (clinical services) is only ~35% complete. hospital-service and request-matching-service must be finished before frontend clinical features can be built. transfusion-service is complete (PR #11 merged). |
-| 2 | **Blocked by M4** | 🔴 BLOCKER | M4 compliance-service is not implemented. Must be completed before this milestone can close. |
+| 1 | **Blocked by M3 for frontend clinical features** | 🔴 BLOCKER | M3 (clinical services) is only ~35% complete. hospital-service and request-matching-service must be finished before frontend clinical features can be built. transfusion-service is complete (PR #11 merged). |
+| 2 | **Blocked by M4 for frontend compliance features** | 🔴 BLOCKER | M4 compliance-service is not implemented. Must be completed before this milestone can fully close. |
 | 3 | **frontend/ directory missing** | 🟡 INFO | Angular 21 project has not been scaffolded yet. Will need `ng new bloodbank-ui` with standalone components. |
 
 ---
@@ -28,23 +30,23 @@ Implement the API Gateway with SSO integration and the complete Angular 21 front
 ## Issues
 
 ### API Gateway (Spring Cloud Gateway)
-- [ ] **M5-001**: Scaffold api-gateway project structure
-- [ ] **M5-002**: Configure route definitions for all 12 backend services
-- [ ] **M5-003**: Implement JWT validation filter (Keycloak token verification)
-- [ ] **M5-004**: Implement BranchIdExtractionFilter (extract branch_id from JWT → X-Branch-Id header)
-- [ ] **M5-005**: Configure rate limiting (Resilience4j + Redis)
-- [ ] **M5-006**: Configure CORS policies
-- [ ] **M5-007**: Implement request/response logging
-- [ ] **M5-008**: Configure circuit breaker for downstream services
-- [ ] **M5-009**: Create health check aggregation endpoint
-- [ ] **M5-010**: Write integration tests for gateway routing
+- [x] **M5-001**: Scaffold api-gateway project structure *(PR #15)*
+- [x] **M5-002**: Configure route definitions for all 12 backend services *(PR #15 — path-based predicates for ports 8081–8092)*
+- [x] **M5-003**: Implement JWT validation filter (Keycloak token verification) *(PR #15 — spring-boot-starter-oauth2-resource-server with reactive Keycloak role extraction)*
+- [x] **M5-004**: Implement BranchIdExtractionFilter (extract branch_id from JWT → X-Branch-Id header) *(PR #15 — 1st layer of 4-layer branch isolation)*
+- [x] **M5-005**: Configure rate limiting (Resilience4j + Redis) *(PR #15 — RequestRateLimiter, 100 req/sec per user)*
+- [x] **M5-006**: Configure CORS policies *(PR #15 — configurable allowed origins, defaults to localhost:4200)*
+- [x] **M5-007**: Implement request/response logging *(PR #15 — X-Request-Id propagation for distributed tracing)*
+- [x] **M5-008**: Configure circuit breaker for downstream services *(PR #15 — Resilience4j, 50% failure threshold, 10s wait)*
+- [x] **M5-009**: Create health check aggregation endpoint *(PR #15 — /actuator/health with show-details)*
+- [x] **M5-010**: Write integration tests for gateway routing *(PR #15 — 30 tests, >80% coverage)*
 
 ### Config Server (Spring Cloud Config)
-- [ ] **M5-011**: Scaffold config-server project structure
-- [ ] **M5-012**: Configure Git-backed configuration repository
-- [ ] **M5-013**: Create environment-specific configs (dev, staging, prod)
-- [ ] **M5-014**: Configure encryption for sensitive properties
-- [ ] **M5-015**: Test config refresh across services
+- [x] **M5-011**: Scaffold config-server project structure *(PR #15)*
+- [x] **M5-012**: Configure Git-backed configuration repository *(PR #15 — native profile with config-repo/ directory + classpath)*
+- [x] **M5-013**: Create environment-specific configs (dev, staging, prod) *(PR #15 — application-dev.yml, application-staging.yml, application-prod.yml)*
+- [x] **M5-014**: Configure encryption for sensitive properties *(PR #15 — ENCRYPT_KEY env var)*
+- [x] **M5-015**: Test config refresh across services *(PR #15 — 10 tests)*
 
 ### Angular Frontend — Core & Shared
 - [ ] **M5-016**: Scaffold Angular 21 project with standalone components

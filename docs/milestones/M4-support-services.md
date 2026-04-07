@@ -20,7 +20,7 @@
 |---|---|---|---|
 | 1 | **compliance-service not implemented** | 🔴 HIGH | Only Application.java exists. All 5 entities (RegulatoryFramework, SopDocument, License, Deviation, RecallRecord), DTOs, services, controllers, RecallInitiatedEvent publisher, and all tests need to be created. This blocks M5. |
 | 2 | **document-service missing tests** | 🟡 MEDIUM | 20 main source files exist (entities, services, controllers, MinIO storage), but 0 test files. Needs unit tests for DocumentService + DocumentVersionService, and controller tests for DocumentController + DocumentVersionController. Quality gate (>80% coverage) not met. |
-| 3 | **Blocks M5 (Gateway + Frontend)** | 🟡 HIGH | M5 depends on M4 completion. compliance-service prevents closing this milestone. |
+| 3 | **Blocks M5 frontend compliance features** | 🟡 HIGH | M5 API Gateway is done (PR #15), but frontend compliance feature module cannot be built until compliance-service exists. |
 
 ---
 

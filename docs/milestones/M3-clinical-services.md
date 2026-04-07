@@ -20,7 +20,7 @@
 | 1 | **hospital-service incomplete** | 🔴 HIGH | Missing 2 entities (HospitalRequest, HospitalFeedback), all DTOs, mappers, repos, services, controllers, RabbitMQ (BloodRequestCreatedEvent publisher), and all tests. Only Hospital + HospitalContract entities + 6 enums exist. |
 | 2 | **request-matching-service barely started** | 🔴 HIGH | Only Application.java exists. Missing all 3 entities (EmergencyRequest, DisasterEvent, DonorMobilization), compatibility matching algorithm, emergency/disaster workflows, all controllers/tests, RabbitMQ listeners (BloodStockUpdatedEvent, BloodRequestCreatedEvent) + publishers (BloodRequestMatchedEvent, EmergencyRequestEvent). |
 | 3 | **Cross-service clinical tests not started** | 🟡 MEDIUM | M3-041, M3-042, M3-043 integration tests are required for exit gate. |
-| 4 | **Blocks M5 (Gateway + Frontend)** | 🔴 BLOCKER | M5 depends on M3 completion. Cannot start frontend features for clinical workflows until these services exist. |
+| 4 | **Blocks M5 frontend clinical features** | 🔴 BLOCKER | M5 API Gateway and Config Server are done (PR #15). But frontend clinical feature modules cannot be built until these services exist. |
 
 ---
 
