@@ -4,12 +4,12 @@
 **Dependencies:** M2 (Core Services)
 **Exit Gate:** Clinical workflow end-to-end test passes
 
-## 📊 Development Status: 🟡 IN PROGRESS (~33%)
+## 📊 Development Status: 🟡 IN PROGRESS (~35%)
 
-**Started:** 2026-04-06 | **PR:** #11 (OPEN DRAFT — not merged to main)
-**Issues Completed:** 14/43
-- transfusion-service: ✅ Complete (in PR #11, not on main)
-- hospital-service: ⚠️ Partial scaffold (2 of 4 entities)
+**Started:** 2026-04-06 | **PRs:** #11 (merged 2026-04-07)
+**Issues Completed:** 15/43
+- transfusion-service: ✅ Complete (64 main files, 8 test files — merged to main via PR #11)
+- hospital-service: ⚠️ Partial scaffold (2 of 4 entities, 6 enums, no DTOs/services/controllers/tests)
 - request-matching-service: ❌ Minimal (Application class only)
 - Cross-service tests: ❌ Not started
 
@@ -17,11 +17,10 @@
 
 | # | Issue | Severity | Description |
 |---|---|---|---|
-| 1 | **PR #11 not merged** | 🔴 BLOCKER | transfusion-service code exists only in draft PR #11. Must complete hospital-service + request-matching-service, then merge to main. |
-| 2 | **hospital-service incomplete** | 🟡 HIGH | Missing 2 entities (HospitalRequest, HospitalFeedback), all DTOs, mappers, repos, services, controllers, RabbitMQ (BloodRequestCreatedEvent publisher), and all tests. Only Hospital + HospitalContract entities + 6 enums exist. |
-| 3 | **request-matching-service barely started** | 🔴 HIGH | Missing build.gradle.kts deps, all 3 entities (EmergencyRequest, DisasterEvent, DonorMobilization), compatibility matching algorithm, emergency/disaster workflows, all controllers/tests, RabbitMQ listeners (BloodStockUpdatedEvent, BloodRequestCreatedEvent) + publishers (BloodRequestMatchedEvent, EmergencyRequestEvent). |
-| 4 | **Cross-service clinical tests not started** | 🟡 MEDIUM | M3-041, M3-042, M3-043 integration tests are required for exit gate. |
-| 5 | **Blocks M5 (Gateway + Frontend)** | 🔴 BLOCKER | M5 depends on M3 completion. Cannot start frontend features for clinical workflows until these services exist. |
+| 1 | **hospital-service incomplete** | 🔴 HIGH | Missing 2 entities (HospitalRequest, HospitalFeedback), all DTOs, mappers, repos, services, controllers, RabbitMQ (BloodRequestCreatedEvent publisher), and all tests. Only Hospital + HospitalContract entities + 6 enums exist. |
+| 2 | **request-matching-service barely started** | 🔴 HIGH | Only Application.java exists. Missing all 3 entities (EmergencyRequest, DisasterEvent, DonorMobilization), compatibility matching algorithm, emergency/disaster workflows, all controllers/tests, RabbitMQ listeners (BloodStockUpdatedEvent, BloodRequestCreatedEvent) + publishers (BloodRequestMatchedEvent, EmergencyRequestEvent). |
+| 3 | **Cross-service clinical tests not started** | 🟡 MEDIUM | M3-041, M3-042, M3-043 integration tests are required for exit gate. |
+| 4 | **Blocks M5 (Gateway + Frontend)** | 🔴 BLOCKER | M5 depends on M3 completion. Cannot start frontend features for clinical workflows until these services exist. |
 
 ---
 
@@ -32,7 +31,7 @@ Implement the clinical workflow services: blood transfusion management, hospital
 ## Issues
 
 ### transfusion-service (Modules 6, 7)
-- [x] **M3-001**: Scaffold transfusion-service project structure *(PR #11 — draft)*
+- [x] **M3-001**: Scaffold transfusion-service project structure *(PR #11)*
 - [x] **M3-002**: Create entities — CrossMatchRequest, CrossMatchResult, BloodIssue, EmergencyIssue *(PR #11)*
 - [x] **M3-003**: Create entities — Transfusion, TransfusionReaction, HemovigilanceReport, LookBackInvestigation *(PR #11)*
 - [x] **M3-004**: Create DTOs (records) for all transfusion entities *(PR #11 — 18 records)*
