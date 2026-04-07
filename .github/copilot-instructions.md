@@ -107,6 +107,61 @@ public class DonorController {
 public record DonationCompletedEvent(UUID donationId, UUID donorId, UUID branchId, Instant occurredAt) {}
 ```
 
+## Angular 21 Frontend Rules
+
+> Full guidelines: `docs/ANGULAR_GUIDELINES.md`
+
+### ⛔ Critical Angular Rules
+
+- **Standalone components ONLY** — never create `NgModule`
+- **`ChangeDetectionStrategy.OnPush`** on EVERY component
+- **Signals** for state — never use `BehaviorSubject`
+- **`inject()` function** for DI — not constructor injection in components
+- **`input()` / `output()` signal APIs** — not `@Input()` / `@Output()` decorators
+- **`@if` / `@for` / `@switch`** control flow — not `*ngIf` / `*ngFor` / `[ngSwitch]`
+- **Every `@for` MUST have `track`**
+- **Angular Material** for interactive components — **Tailwind CSS** for layout only
+- **NEVER override Material styles with Tailwind** — use Material's color system
+- **Tailwind Preflight disabled** — conflicts with Material
+- **`roleGuard`** on EVERY route with `data: { roles: [...] }`
+- **`firstValueFrom`** for HTTP calls in services
+
+### Angular Component Pattern
+```typescript
+@Component({
+  selector: 'app-donor-list',
+  standalone: true,
+  imports: [CommonModule, MatTableModule],
+  templateUrl: './donor-list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class DonorListComponent {
+  private readonly donorService = inject(DonorService);
+  readonly donors = signal<Donor[]>([]);
+  readonly loading = signal(false);
+  readonly donorCount = computed(() => this.donors().length);
+}
+```
+
+### Angular Template Pattern
+```html
+@if (loading()) {
+  <app-loading-skeleton />
+} @else {
+  @for (donor of donors(); track donor.id) {
+    <app-donor-card [donor]="donor" />
+  } @empty {
+    <app-empty-state message="No donors found" />
+  }
+}
+```
+
+### Path Aliases
+- `@core/*` → `src/app/core/*`
+- `@shared/*` → `src/app/shared/*`
+- `@features/*` → `src/app/features/*`
+- `@env/*` → `src/environments/*`
+
 ## Architecture Rules
 
 1. **Single Shared Database** — All services connect to ONE PostgreSQL 17 database

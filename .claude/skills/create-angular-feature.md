@@ -2,13 +2,24 @@
 
 Generate an Angular 21 feature module following BloodBank UI patterns.
 
+> **Full reference:** `docs/ANGULAR_GUIDELINES.md`
+
 ## Rules
 
 1. **Standalone components** — no `NgModule`, use `standalone: true`
 2. **Signals** — use Angular signals for reactive state, not RxJS BehaviorSubject
-3. **Zoneless change detection** — `ChangeDetectionStrategy.OnPush` everywhere
-4. **Lazy loaded** — feature routes loaded via `loadChildren` in app routes
-5. Directory: `frontend/bloodbank-ui/src/app/features/{feature-name}/`
+3. **Signal inputs/outputs** — use `input()` / `output()`, not `@Input()` / `@Output()`
+4. **Zoneless change detection** — `ChangeDetectionStrategy.OnPush` everywhere
+5. **Built-in control flow** — `@if`, `@for` (with `track`), `@switch` — not `*ngIf`, `*ngFor`
+6. **inject() function** — use `inject()` for DI, not constructor injection
+7. **Lazy loaded** — feature routes loaded via `loadChildren` in app routes
+8. **Material for components** — buttons, dialogs, tables, forms, menus, snackbars
+9. **Tailwind for layout** — flex, grid, padding, margin, responsive breakpoints
+10. **NEVER override Material with Tailwind** — no `bg-*`, `text-*` on `mat-*` components
+11. **Role guard on every route** — `canActivate: [roleGuard]` with `data: { roles: [...] }`
+12. **firstValueFrom** — for HTTP calls in services
+13. **ARIA labels** — on all icon buttons and custom components
+14. Directory: `frontend/bloodbank-ui/src/app/features/{feature-name}/`
 
 ## Feature Module Structure
 
@@ -47,16 +58,20 @@ features/{feature-name}/
 ## Component Template
 
 ```typescript
-import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { {Feature}Service } from '../../services/{feature}.service';
 import { {Feature} } from '../../models/{feature}.model';
 
 @Component({
   selector: 'app-{feature}-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatTableModule, MatPaginatorModule, MatButtonModule, MatIconModule],
   templateUrl: './{feature}-list.component.html',
   styleUrl: './{feature}-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -88,6 +103,64 @@ export class {Feature}ListComponent {
       this.loading.set(false);
     }
   }
+}
+```
+
+### Component Template (HTML)
+
+```html
+<div class="bg-white rounded-lg shadow-sm">
+  <!-- Header -->
+  <div class="flex items-center justify-between p-4 border-b">
+    <h2 class="text-lg font-semibold">{Features}</h2>
+    <button mat-flat-button color="primary" routerLink="new">
+      <mat-icon>add</mat-icon> Add {Feature}
+    </button>
+  </div>
+
+  <!-- Content -->
+  @if (loading()) {
+    <app-loading-skeleton [count]="10" />
+  } @else if (isEmpty()) {
+    <app-empty-state message="No {features} found" />
+  } @else {
+    <mat-table [dataSource]="items()">
+      <!-- columns here -->
+      <mat-header-row *matHeaderRowDef="displayedColumns" />
+      <mat-row *matRowDef="let row; columns: displayedColumns" />
+    </mat-table>
+
+    <mat-paginator
+      [length]="totalItems()"
+      [pageSize]="20"
+      [pageSizeOptions]="[10, 20, 50]"
+      (page)="loadItems($event.pageIndex, $event.pageSize)" />
+  }
+</div>
+```
+
+### Signal Input/Output Component
+
+```typescript
+@Component({
+  selector: 'app-{feature}-card',
+  standalone: true,
+  imports: [CommonModule, MatCardModule, MatButtonModule],
+  template: `
+    <mat-card class="cursor-pointer" (click)="selected.emit(item())">
+      <mat-card-header>
+        <mat-card-title>{{ item().name }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <app-status-badge [status]="item().status" [label]="item().status" />
+      </mat-card-content>
+    </mat-card>
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class {Feature}CardComponent {
+  readonly item = input.required<{Feature}>();
+  readonly selected = output<{Feature}>();
 }
 ```
 
@@ -187,8 +260,31 @@ export const {FEATURE}_ROUTES: Routes = [
 
 - [ ] Standalone components (no NgModule)
 - [ ] `ChangeDetectionStrategy.OnPush` on every component
-- [ ] Signals for state management
-- [ ] `inject()` function for DI
-- [ ] Lazy-loaded routes
-- [ ] Role guards on all routes
+- [ ] Signals for state management (`signal()`, `computed()`)
+- [ ] `inject()` function for DI (not constructor injection)
+- [ ] `input()` / `output()` signal APIs (not `@Input()` / `@Output()`)
+- [ ] `@if` / `@for` / `@switch` control flow (not `*ngIf` / `*ngFor`)
+- [ ] Every `@for` has `track` expression
+- [ ] Lazy-loaded routes via `loadComponent`
+- [ ] Role guards on all routes with `data: { roles: [...] }`
 - [ ] Service uses `firstValueFrom` for HTTP calls
+- [ ] Material for interactive components (buttons, forms, tables, dialogs)
+- [ ] Tailwind for layout only (flex, grid, padding, margin, responsive)
+- [ ] No Tailwind color/style overrides on Material components
+- [ ] ARIA labels on all icon buttons and custom components
+- [ ] Loading skeleton shown during async operations
+- [ ] Empty state shown when no results
+- [ ] Error handling (snackbar or inline error)
+
+## Reference
+
+See `docs/ANGULAR_GUIDELINES.md` for comprehensive rules on:
+- Design system (colors, typography, healthcare-specific)
+- Form patterns
+- Data table patterns
+- Dashboard & chart patterns
+- Security (Keycloak, XSS, CSP)
+- Accessibility (WCAG AA)
+- i18n (en, es, fr)
+- Performance (bundle size, virtual scroll, preloading)
+- Testing standards
