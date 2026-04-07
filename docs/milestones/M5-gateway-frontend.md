@@ -4,6 +4,21 @@
 **Dependencies:** M2 (Core), M3 (Clinical), M4 (Support)
 **Exit Gate:** All features render correctly per user role
 
+## 📊 Development Status: 🔴 NOT STARTED (0%)
+
+**Issues Completed:** 0/52
+- API Gateway: scaffold only (1 file)
+- Config Server: scaffold only (1 file)
+- Angular frontend: directory does not exist yet
+
+## 🔧 FIX REQUIRED
+
+| # | Issue | Severity | Description |
+|---|---|---|---|
+| 1 | **Blocked by M3** | 🔴 BLOCKER | M3 (clinical services) is only ~33% complete. hospital-service and request-matching-service must be finished and PR #11 merged before frontend clinical features can be built. |
+| 2 | **Blocked by M4** | 🔴 BLOCKER | M4 compliance-service is not implemented. Must be completed before this milestone can close. |
+| 3 | **frontend/ directory missing** | 🟡 INFO | Angular 21 project has not been scaffolded yet. Will need `ng new bloodbank-ui` with standalone components. |
+
 ---
 
 ## Objective
