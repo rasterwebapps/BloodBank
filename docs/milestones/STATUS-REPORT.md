@@ -1,8 +1,8 @@
 # 🩸 BloodBank — Development Status Report
 
 **Report Date:** 2026-04-07
-**Data Source:** GitHub Pull Requests #1–#12 (descriptions, reviews, merge status, codebase verification)
-**Total PRs Reviewed:** 12 (11 merged, 1 open draft)
+**Data Source:** GitHub Pull Requests #1–#13 (descriptions, reviews, merge status, codebase verification)
+**Total PRs Reviewed:** 13 (all merged)
 **PR Review Comments:** 0 (no reviewer comments or review threads found on any PR)
 
 ---
@@ -14,8 +14,8 @@
 | **M0** | ✅ COMPLETE | 100% | 24/24 | #1, #2, #3 |
 | **M1** | ✅ COMPLETE | 100% | 33/33 | #4, #5, #6 |
 | **M2** | ✅ COMPLETE | 100% | 54/54 | #7, #8, #9, #10 |
-| **M3** | 🟡 IN PROGRESS | ~33% | 14/43 | #11 (draft, not merged) |
-| **M4** | 🟡 PARTIAL | ~65% | 43/66 | #12 (merged) |
+| **M3** | 🟡 IN PROGRESS | ~35% | 15/43 | #11 (merged) |
+| **M4** | 🟡 PARTIAL | ~79% | 52/66 | #12 (merged) |
 | **M5** | 🔴 NOT STARTED | 0% | 0/52 | — |
 | **M6** | 🔴 NOT STARTED | 0% | 0/30 | — |
 | **M7** | 🔴 NOT STARTED | 0% | 0/46 | — |
@@ -26,7 +26,7 @@
 | **M12** | 🔴 NOT STARTED | 0% | 0/20 | — |
 | **M13** | 🔴 NOT STARTED | 0% | 0/33 | — |
 
-**Overall Progress: ~37% of coding milestones (M0–M4), ~15% of total project**
+**Overall Progress: ~42% of coding milestones (M0–M4), ~17% of total project**
 
 ---
 
@@ -97,47 +97,46 @@
 
 ---
 
-### M3: Clinical Services — 🟡 IN PROGRESS (~33%)
+### M3: Clinical Services — 🟡 IN PROGRESS (~35%)
 
 | Service | Issues | Status | PR |
 |---|---|---|---|
-| transfusion-service (M3-001–014) | 14 | ✅ Complete (in PR #11) | #11 (draft) |
-| hospital-service (M3-015–025) | 11 | ⚠️ Partial scaffold | #11 (draft) |
-| request-matching-service (M3-026–040) | 15 | ❌ Minimal scaffold | #11 (draft) |
+| transfusion-service (M3-001–014) | 14 | ✅ Complete (merged to main) | #11 (merged) |
+| hospital-service (M3-015–025) | 11 | ⚠️ Partial scaffold | #11 (merged) |
+| request-matching-service (M3-026–040) | 15 | ❌ Minimal scaffold | — |
 | Cross-Service Tests (M3-041–043) | 3 | ❌ Not started | — |
 
-**⚠️ CRITICAL: PR #11 is OPEN DRAFT — NOT MERGED to main**
+**PR #11 — MERGED to main (2026-04-07)**
 
-**transfusion-service (in PR #11, not on main):**
+**transfusion-service (on main):**
+- 64 main files, 8 test files (4 service + 4 controller tests)
 - 8 entities, 4 services, 4 controllers, 11 enums, 18 DTOs, 8 mappers
 - ABO/Rh compatibility algorithm via BloodCompatibilityUtil
 - Emergency O-negative protocol
 - RabbitMQ: publishes TransfusionCompletedEvent, TransfusionReactionEvent
 - Unit + controller tests, >80% JaCoCo coverage
 
-**hospital-service (partial in PR #11):**
+**hospital-service (partial on main):**
+- 9 main files, 0 test files
 - 6 enums, 2 of 4 entities (Hospital, HospitalContract)
 - MISSING: HospitalRequest, HospitalFeedback entities, DTOs, mappers, repositories, services, controllers, RabbitMQ, tests
 
-**request-matching-service (minimal in PR #11):**
-- Application class only
-- MISSING: build.gradle.kts dependencies, all entities/DTOs/services/controllers/tests, RabbitMQ listeners
-
-**Codebase Reality (main branch):** All 3 M3 services are scaffold-only on main (1 Java file each).
+**request-matching-service (scaffold only on main):**
+- 1 file: Application class only
+- MISSING: all entities/DTOs/services/controllers/tests, RabbitMQ listeners
 
 #### 🔧 FIX REQUIRED
 
 | # | Issue | Severity | Description |
 |---|---|---|---|
-| 1 | **PR #11 not merged** | 🔴 BLOCKER | transfusion-service code exists only in draft PR #11. Must complete hospital-service + request-matching-service, then merge. |
-| 2 | **hospital-service incomplete** | 🟡 HIGH | Missing 2 entities (HospitalRequest, HospitalFeedback), all DTOs, mappers, repos, services, controllers, RabbitMQ (BloodRequestCreatedEvent), and all tests |
-| 3 | **request-matching-service barely started** | 🔴 HIGH | Missing build.gradle.kts, all 3 entities (EmergencyRequest, DisasterEvent, DonorMobilization), compatibility matching algorithm, emergency/disaster workflows, all controllers/tests, RabbitMQ listeners (BloodStockUpdatedEvent, BloodRequestCreatedEvent) |
-| 4 | **Cross-service clinical tests missing** | 🟡 MEDIUM | M3-041, M3-042, M3-043 integration tests not started |
-| 5 | **Dependency blocker for M5** | 🔴 BLOCKER | M5 (Gateway + Frontend) depends on M3 completion — cannot start until M3 is done |
+| 1 | **hospital-service incomplete** | 🔴 HIGH | Missing 2 entities (HospitalRequest, HospitalFeedback), all DTOs, mappers, repos, services, controllers, RabbitMQ (BloodRequestCreatedEvent), and all tests |
+| 2 | **request-matching-service barely started** | 🔴 HIGH | Missing all 3 entities (EmergencyRequest, DisasterEvent, DonorMobilization), compatibility matching algorithm, emergency/disaster workflows, all controllers/tests, RabbitMQ listeners (BloodStockUpdatedEvent, BloodRequestCreatedEvent) |
+| 3 | **Cross-service clinical tests missing** | 🟡 MEDIUM | M3-041, M3-042, M3-043 integration tests not started |
+| 4 | **Dependency blocker for M5** | 🔴 BLOCKER | M5 (Gateway + Frontend) depends on M3 completion — cannot start until M3 is done |
 
 ---
 
-### M4: Support Services — 🟡 PARTIAL (~65%)
+### M4: Support Services — 🟡 PARTIAL (~79%)
 
 | Service | Issues | Files (main/test) | Status | PR |
 |---|---|---|---|---|
@@ -178,7 +177,7 @@
 
 | # | Issue | Severity | Description |
 |---|---|---|---|
-| 1 | **Blocked by M3 and M4** | 🔴 BLOCKER | Cannot start until M3 (clinical services) and M4 (support services — compliance) are complete |
+| 1 | **Blocked by M3 and M4** | 🔴 BLOCKER | Cannot start until M3 (hospital-service + request-matching-service) and M4 (compliance-service) are complete. transfusion-service is done (PR #11 merged). |
 | 2 | **frontend/ directory missing** | 🟡 INFO | Angular 21 project not yet scaffolded |
 
 ---
@@ -229,10 +228,11 @@
 | #8 | M2: donor-service | Closed | M2 | ✅ 2026-04-06 | 92 | +7,613 |
 | #9 | M2: lab-service | Closed | M2 | ✅ 2026-04-06 | 58 | +4,277 |
 | #10 | M2: inventory-service | Closed | M2 | ✅ 2026-04-06 | 111 | +6,354 |
-| #11 | M3: transfusion (complete), hospital/matching (partial) | **OPEN DRAFT** | M3 | ❌ | 81 | +4,208 |
+| #11 | M3: transfusion (complete), hospital/matching (partial) | Closed | M3 | ✅ 2026-04-07 | 81 | +4,208 |
 | #12 | M4: billing, notification, reporting, document | Closed | M4 | ✅ 2026-04-07 | 179 | +11,359 |
+| #13 | Status report and milestone updates | Closed | — | ✅ 2026-04-07 | 16 | +1,200 |
 
-**Total Lines Added: ~50,725** | **Total Files Changed: ~766**
+**Total Lines Added: ~51,925** | **Total Files Changed: ~782**
 
 ---
 
@@ -241,8 +241,9 @@
 ### 🔴 Critical Path Blockers
 
 1. **M3 incomplete → blocks M5 → blocks M6–M13 chain**
-   - PR #11 is draft with partial work
-   - hospital-service and request-matching-service need significant implementation
+   - PR #11 is merged; transfusion-service is complete on main
+   - hospital-service needs significant implementation (2/4 entities, no DTOs/services/controllers/tests)
+   - request-matching-service needs full implementation (Application class only)
    - Estimated effort: ~1 week to complete
 
 2. **M4 compliance-service missing → blocks M5**
@@ -261,7 +262,7 @@
    - Would save 2+ weeks on critical path
 
 2. **No PR review feedback exists**
-   - All 12 PRs have 0 review comments and 0 review threads
+   - All 13 PRs have 0 review comments and 0 review threads
    - Risk: code quality issues may be accumulating without human review
    - Recommendation: conduct code review on merged PRs, especially M2 services
 
@@ -270,8 +271,8 @@
 - **M0**: 3 days (April 4)
 - **M1**: 1 day (April 4) — 3 PRs same day
 - **M2**: 2 days (April 4–6) — 4 services
-- **M3**: Started April 6 — still in progress (draft PR)
-- **M4**: 1 day (April 7) — 4 of 5 services
+- **M3**: Started April 6 — PR #11 merged April 7 (transfusion complete, hospital/matching partial)
+- **M4**: 1 day (April 7) — 4 of 5 services (PR #12)
 
 **Average throughput**: ~1 complete service per day (when actively developed)
 
@@ -279,9 +280,9 @@
 
 ## Recommendations
 
-1. **IMMEDIATE**: Complete hospital-service and request-matching-service in PR #11, merge to main
+1. **IMMEDIATE**: Complete hospital-service (DTOs, services, controllers, tests) and request-matching-service (full implementation)
 2. **IMMEDIATE**: Implement compliance-service (M4-055 to M4-066)
 3. **IMMEDIATE**: Add tests for document-service
 4. **PARALLEL**: Start M7 infrastructure work (Docker, K8s, Jenkins, Keycloak) — not blocked
-5. **PROCESS**: Establish PR review process — all 12 PRs merged without review comments
+5. **PROCESS**: Establish PR review process — all 13 PRs merged without review comments
 6. **TRACKING**: Convert milestone issues to GitHub Issues for better project tracking

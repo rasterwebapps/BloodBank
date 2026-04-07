@@ -13,8 +13,8 @@ This document defines the complete development roadmap for the BloodBank project
 | **M0** | Project Setup & Architecture | 2 weeks | None | ✅ COMPLETE | 100% (24/24) |
 | **M1** | Foundation (Build + DB + Shared Libs) | 2 weeks | M0 | ✅ COMPLETE | 100% (33/33) |
 | **M2** | Core Services | 2 weeks | M1 | ✅ COMPLETE | 100% (54/54) |
-| **M3** | Clinical Services | 2 weeks | M2 | 🟡 IN PROGRESS | ~33% (14/43) |
-| **M4** | Support Services | 2 weeks | M2 | 🟡 PARTIAL | ~65% (43/66) |
+| **M3** | Clinical Services | 2 weeks | M2 | 🟡 IN PROGRESS | ~35% (15/43) |
+| **M4** | Support Services | 2 weeks | M2 | 🟡 PARTIAL | ~79% (52/66) |
 | **M5** | API Gateway + Frontend | 3 weeks | M2, M3, M4 | 🔴 NOT STARTED | 0% (0/52) |
 | **M6** | Integration + Security | 2 weeks | M5 | 🔴 NOT STARTED | 0% (0/30) |
 | **M7** | Infrastructure (Docker/K8s/CI) | 2 weeks | M2 | 🔴 NOT STARTED | 0% (0/46) |
@@ -25,7 +25,7 @@ This document defines the complete development roadmap for the BloodBank project
 | **M12** | Worldwide Launch | 1 week | M11 | 🔴 NOT STARTED | 0% (0/20) |
 | **M13** | Post-Launch & Continuous Improvement | Ongoing | M12 | 🔴 NOT STARTED | 0% (0/33) |
 
-**Overall: 168/530 issues completed (~32%)**
+**Overall: 178/530 issues completed (~34%)**
 
 ---
 

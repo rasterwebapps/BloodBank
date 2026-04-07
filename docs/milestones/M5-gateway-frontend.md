@@ -15,7 +15,7 @@
 
 | # | Issue | Severity | Description |
 |---|---|---|---|
-| 1 | **Blocked by M3** | 🔴 BLOCKER | M3 (clinical services) is only ~33% complete. hospital-service and request-matching-service must be finished and PR #11 merged before frontend clinical features can be built. |
+| 1 | **Blocked by M3** | 🔴 BLOCKER | M3 (clinical services) is only ~35% complete. hospital-service and request-matching-service must be finished before frontend clinical features can be built. transfusion-service is complete (PR #11 merged). |
 | 2 | **Blocked by M4** | 🔴 BLOCKER | M4 compliance-service is not implemented. Must be completed before this milestone can close. |
 | 3 | **frontend/ directory missing** | 🟡 INFO | Angular 21 project has not been scaffolded yet. Will need `ng new bloodbank-ui` with standalone components. |
 
