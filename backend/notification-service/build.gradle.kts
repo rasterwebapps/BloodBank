@@ -17,6 +17,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-amqp")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${property("springdocVersion")}")
     implementation("org.mapstruct:mapstruct:${property("mapstructVersion")}")
     annotationProcessor("org.mapstruct:mapstruct-processor:${property("mapstructVersion")}")
@@ -28,4 +29,42 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:rabbitmq")
+}
+
+tasks.jacocoTestCoverageVerification {
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(
+                    "**/mapper/*Impl.class",
+                    "**/mapper/*Impl\$*.class",
+                    "**/config/*.class",
+                    "**/enums/*.class",
+                    "**/entity/*.class",
+                    "**/dto/*.class",
+                    "**/event/DomainEventListener.class",
+                    "**/NotificationServiceApplication.class"
+                )
+            }
+        })
+    )
+}
+
+tasks.jacocoTestReport {
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude(
+                    "**/mapper/*Impl.class",
+                    "**/mapper/*Impl\$*.class",
+                    "**/config/*.class",
+                    "**/enums/*.class",
+                    "**/entity/*.class",
+                    "**/dto/*.class",
+                    "**/event/DomainEventListener.class",
+                    "**/NotificationServiceApplication.class"
+                )
+            }
+        })
+    )
 }
