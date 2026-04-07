@@ -3,23 +3,26 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":shared-libs:common-model"))
-    implementation(project(":shared-libs:common-dto"))
-    implementation(project(":shared-libs:common-events"))
-    implementation(project(":shared-libs:common-exceptions"))
-    implementation(project(":shared-libs:common-security"))
-
     implementation("org.springframework.cloud:spring-cloud-starter-gateway")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:${property("springdocVersion")}")
-    implementation("io.github.resilience4j:resilience4j-spring-boot3:${property("resilience4jVersion")}")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
+    implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("io.projectreactor:reactor-test")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-// API Gateway is reactive — exclude web starter inherited from parent
+// API Gateway is reactive — exclude servlet/JPA starters inherited from parent
 configurations {
     all {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-web")
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-data-jpa")
+        exclude(group = "org.mapstruct", module = "mapstruct")
+        exclude(group = "org.mapstruct", module = "mapstruct-processor")
+        exclude(group = "org.testcontainers", module = "junit-jupiter")
+        exclude(group = "org.testcontainers", module = "postgresql")
     }
 }

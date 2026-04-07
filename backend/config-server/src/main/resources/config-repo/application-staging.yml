@@ -1,0 +1,22 @@
+# Staging profile overrides
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres-staging:5432/bloodbank_db
+    hikari:
+      maximum-pool-size: 30
+  data:
+    redis:
+      host: redis-staging
+      port: 6379
+  rabbitmq:
+    host: rabbitmq-staging
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://auth-staging.bloodbank.com/realms/bloodbank
+          jwk-set-uri: https://auth-staging.bloodbank.com/realms/bloodbank/protocol/openid-connect/certs
+
+logging:
+  level:
+    com.bloodbank: INFO

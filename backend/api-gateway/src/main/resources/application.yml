@@ -8,11 +8,228 @@ spring:
     gateway:
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      routes:
+        # Branch Service (port 8081)
+        - id: branch-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/branches/**,/api/v1/blood-groups/**,/api/v1/component-types/**,/api/v1/deferral-reasons/**,/api/v1/reaction-types/**,/api/v1/countries/**,/api/v1/regions/**,/api/v1/cities/**,/api/v1/icd-codes/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: branchServiceCB
+                fallbackUri: forward:/fallback/branch-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+
+        # Donor Service (port 8082)
+        - id: donor-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/donors/**,/api/v1/collections/**,/api/v1/blood-camps/**,/api/v1/donor-health-records/**,/api/v1/donor-deferrals/**,/api/v1/donor-consents/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: donorServiceCB
+                fallbackUri: forward:/fallback/donor-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+
+        # Lab Service (port 8083)
+        - id: lab-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/test-orders/**,/api/v1/test-results/**,/api/v1/test-panels/**,/api/v1/lab-instruments/**,/api/v1/quality-control/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: labServiceCB
+                fallbackUri: forward:/fallback/lab-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+
+        # Inventory Service (port 8084)
+        - id: inventory-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/v1/blood-units/**,/api/v1/blood-components/**,/api/v1/storage-locations/**,/api/v1/stock-transfers/**,/api/v1/transport-requests/**,/api/v1/cold-chain-logs/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: inventoryServiceCB
+                fallbackUri: forward:/fallback/inventory-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+
+        # Transfusion Service (port 8085)
+        - id: transfusion-service
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/v1/crossmatch-requests/**,/api/v1/crossmatch-results/**,/api/v1/blood-issues/**,/api/v1/transfusions/**,/api/v1/transfusion-reactions/**,/api/v1/hemovigilance-reports/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: transfusionServiceCB
+                fallbackUri: forward:/fallback/transfusion-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+
+        # Hospital Service (port 8086)
+        - id: hospital-service
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/v1/hospitals/**,/api/v1/hospital-contracts/**,/api/v1/hospital-requests/**,/api/v1/hospital-feedback/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: hospitalServiceCB
+                fallbackUri: forward:/fallback/hospital-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+
+        # Request Matching Service (port 8087)
+        - id: request-matching-service
+          uri: http://localhost:8087
+          predicates:
+            - Path=/api/v1/emergency-requests/**,/api/v1/disaster-events/**,/api/v1/donor-mobilizations/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: requestMatchingServiceCB
+                fallbackUri: forward:/fallback/request-matching-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+
+        # Billing Service (port 8088)
+        - id: billing-service
+          uri: http://localhost:8088
+          predicates:
+            - Path=/api/v1/invoices/**,/api/v1/payments/**,/api/v1/rate-master/**,/api/v1/credit-notes/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: billingServiceCB
+                fallbackUri: forward:/fallback/billing-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+
+        # Notification Service (port 8089)
+        - id: notification-service
+          uri: http://localhost:8089
+          predicates:
+            - Path=/api/v1/notifications/**,/api/v1/notification-templates/**,/api/v1/notification-preferences/**,/api/v1/campaigns/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: notificationServiceCB
+                fallbackUri: forward:/fallback/notification-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+
+        # Reporting Service (port 8090)
+        - id: reporting-service
+          uri: http://localhost:8090
+          predicates:
+            - Path=/api/v1/reports/**,/api/v1/audit-logs/**,/api/v1/dashboards/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: reportingServiceCB
+                fallbackUri: forward:/fallback/reporting-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+
+        # Document Service (port 8091)
+        - id: document-service
+          uri: http://localhost:8091
+          predicates:
+            - Path=/api/v1/documents/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: documentServiceCB
+                fallbackUri: forward:/fallback/document-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+
+        # Compliance Service (port 8092)
+        - id: compliance-service
+          uri: http://localhost:8092
+          predicates:
+            - Path=/api/v1/regulatory-frameworks/**,/api/v1/sop-documents/**,/api/v1/licenses/**,/api/v1/deviations/**,/api/v1/recalls/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: complianceServiceCB
+                fallbackUri: forward:/fallback/compliance-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/bloodbank
+          jwk-set-uri: http://localhost:8180/realms/bloodbank/protocol/openid-connect/certs
   flyway:
     enabled: false
+
+gateway:
+  cors:
+    allowed-origins: http://localhost:4200
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,gateway
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+
+logging:
+  level:
+    com.bloodbank.apigateway: DEBUG
+    org.springframework.cloud.gateway: INFO
