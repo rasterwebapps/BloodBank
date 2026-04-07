@@ -19,7 +19,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${property("springdocVersion")}")
     implementation("org.mapstruct:mapstruct:${property("mapstructVersion")}")
-    implementation("io.minio:minio:8.5.7")
+    implementation("io.minio:minio:8.6.0")
     annotationProcessor("org.mapstruct:mapstruct-processor:${property("mapstructVersion")}")
 
     runtimeOnly("org.postgresql:postgresql")
