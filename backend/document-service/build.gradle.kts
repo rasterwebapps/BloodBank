@@ -19,6 +19,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${property("springdocVersion")}")
     implementation("org.mapstruct:mapstruct:${property("mapstructVersion")}")
+    implementation("io.minio:minio:8.5.7")
     annotationProcessor("org.mapstruct:mapstruct-processor:${property("mapstructVersion")}")
 
     runtimeOnly("org.postgresql:postgresql")
@@ -28,4 +29,22 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:rabbitmq")
+}
+
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.80".toBigDecimal()
+            }
+            excludes = listOf(
+                "com.bloodbank.documentservice.DocumentServiceApplication",
+                "com.bloodbank.documentservice.config.*",
+                "com.bloodbank.documentservice.entity.*",
+                "com.bloodbank.documentservice.enums.*",
+                "com.bloodbank.documentservice.dto.*",
+                "com.bloodbank.documentservice.mapper.*"
+            )
+        }
+    }
 }
