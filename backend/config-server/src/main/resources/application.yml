@@ -17,7 +17,7 @@ spring:
     enabled: false
 
 encrypt:
-  key: bloodbank-config-encryption-key-change-in-production
+  key: ${ENCRYPT_KEY:bloodbank-config-encryption-key-change-in-production}
 
 management:
   endpoints:

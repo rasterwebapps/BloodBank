@@ -18,7 +18,7 @@ public class RateLimiterConfig {
                 .defaultIfEmpty(
                         exchange.getRequest().getRemoteAddress() != null
                                 ? exchange.getRequest().getRemoteAddress().getAddress().getHostAddress()
-                                : "anonymous"
+                                : "unknown-" + exchange.getRequest().getId()
                 );
     }
 }
