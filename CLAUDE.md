@@ -243,6 +243,158 @@ All entities extend `BaseEntity` (global) or `BranchScopedEntity` (branch-scoped
 - `BaseEntity`: id (UUID), createdAt, updatedAt, createdBy, updatedBy, version
 - `BranchScopedEntity extends BaseEntity`: branchId (UUID)
 
+## Angular 21 Frontend Patterns
+
+> **Full reference:** `docs/ANGULAR_GUIDELINES.md`
+> **Architecture decision:** `docs/architecture/adr/ADR-007-angular-frontend-architecture.md`
+
+### Frontend Tech Stack
+
+- **Angular 21** — standalone components, signals, zoneless change detection
+- **Angular Material 21** (M3 design tokens) — interactive components
+- **Tailwind CSS 4** — layout, spacing, typography (Preflight DISABLED)
+- **Keycloak JS 26+** + keycloak-angular — OIDC authentication
+- **Chart.js + ng2-charts** — dashboard charts
+- **date-fns** — date manipulation
+- **Playwright** — E2E testing
+
+### ⛔ Angular Critical Rules
+
+1. **Standalone components ONLY** — never create `NgModule`
+2. **`ChangeDetectionStrategy.OnPush`** on EVERY component
+3. **Signals** (`signal()`, `computed()`, `effect()`) for state — NEVER `BehaviorSubject`
+4. **`inject()` function** for DI in components — NOT constructor injection
+5. **`input()` / `output()` signal APIs** — NOT `@Input()` / `@Output()` decorators
+6. **`@if` / `@for` / `@switch`** built-in control flow — NOT `*ngIf` / `*ngFor`
+7. **Every `@for` MUST have `track`** — e.g., `@for (item of items(); track item.id)`
+8. **Angular Material for components, Tailwind for layout** — NEVER override Material with Tailwind
+9. **Tailwind Preflight DISABLED** — conflicts with Material
+10. **`roleGuard` on EVERY route** — `canActivate: [roleGuard]` with `data: { roles: [...] }`
+11. **`firstValueFrom`** for HTTP calls in services
+12. **NEVER store tokens in localStorage** — Keycloak manages in-memory
+
+### Angular Component Pattern
+
+```typescript
+@Component({
+  selector: 'app-donor-list',
+  standalone: true,
+  imports: [CommonModule, MatTableModule, MatPaginatorModule],
+  templateUrl: './donor-list.component.html',
+  styleUrl: './donor-list.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class DonorListComponent {
+  private readonly donorService = inject(DonorService);
+  private readonly router = inject(Router);
+
+  readonly donors = signal<Donor[]>([]);
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly donorCount = computed(() => this.donors().length);
+  readonly isEmpty = computed(() => this.donors().length === 0 && !this.loading());
+}
+```
+
+### Angular Template Pattern
+
+```html
+@if (loading()) {
+  <app-loading-skeleton />
+} @else if (isEmpty()) {
+  <app-empty-state message="No donors found" />
+} @else {
+  @for (donor of donors(); track donor.id) {
+    <app-donor-card [donor]="donor" />
+  }
+}
+```
+
+### Signal Input/Output Pattern
+
+```typescript
+// ✅ Correct — signal APIs
+export class DonorCardComponent {
+  readonly donor = input.required<Donor>();
+  readonly showActions = input(true);
+  readonly donorSelected = output<Donor>();
+}
+
+// ❌ Wrong — decorator APIs
+export class DonorCardComponent {
+  @Input() donor!: Donor;
+  @Output() donorSelected = new EventEmitter<Donor>();
+}
+```
+
+### HTTP Service Pattern
+
+```typescript
+@Injectable({ providedIn: 'root' })
+export class DonorService {
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = `${environment.apiUrl}/api/v1/donors`;
+
+  async list(page = 0, size = 20): Promise<PagedResponse<Donor>> {
+    return firstValueFrom(
+      this.http.get<PagedResponse<Donor>>(this.baseUrl, { params: { page, size } })
+    );
+  }
+}
+```
+
+### Path Aliases (tsconfig.json)
+
+```
+@core/*     → src/app/core/*
+@shared/*   → src/app/shared/*
+@features/* → src/app/features/*
+@env/*      → src/environments/*
+@models/*   → src/app/shared/models/*
+```
+
+### Frontend Directory Structure
+
+```
+frontend/bloodbank-ui/src/app/
+├── app.component.ts          # Root standalone component
+├── app.config.ts             # Providers (router, http, keycloak)
+├── app.routes.ts             # Top-level lazy routes
+├── core/                     # Auth, guards, interceptors, global services
+├── shared/                   # Reusable components, pipes, directives, models
+│   ├── components/           # data-table, status-badge, blood-group-badge, etc.
+│   ├── layout/               # shell, sidenav, topbar, breadcrumb
+│   ├── pipes/                # blood-group, date-ago, truncate
+│   ├── directives/           # has-role, auto-focus
+│   └── models/               # api-response, paged-response, branch
+└── features/                 # 17 lazy-loaded feature modules
+    ├── dashboard/
+    ├── donor/
+    ├── collection/
+    ├── lab/
+    ├── inventory/
+    └── ... (17 total)
+```
+
+### Material + Tailwind Division
+
+| Use Material For | Use Tailwind For |
+|---|---|
+| Buttons, dialogs, menus | Flexbox, grid layout |
+| Forms (mat-form-field) | Padding, margin, gap |
+| Tables (mat-table) | Width, height, max-width |
+| Snackbars, tooltips | Responsive breakpoints |
+| Tabs, expansion panels | Typography (font-size, weight) |
+| Datepickers, autocomplete | Custom colors (healthcare) |
+
+### 3 Portals (Same App, Role-Filtered)
+
+| Portal | URL | Users |
+|---|---|---|
+| Staff Portal | `/staff/*` | 12 staff roles |
+| Hospital Portal | `/hospital/*` | HOSPITAL_USER |
+| Donor Portal | `/donor/*` | DONOR |
+
 ### API Conventions
 
 - Prefix: `/api/v1/`
@@ -461,6 +613,7 @@ bash .claude/hooks/pre-push-checks.sh
 
 ## Common Mistakes to Avoid
 
+### Backend
 1. ❌ Using Lombok — NEVER
 2. ❌ Database-per-service — we use SINGLE shared DB
 3. ❌ Putting entity data in RabbitMQ events — events are thin (IDs only)
@@ -472,8 +625,23 @@ bash .claude/hooks/pre-push-checks.sh
 9. ❌ Creating Flyway scripts inside service modules — they go in `shared-libs/db-migration/`
 10. ❌ Returning raw entities from controllers — always use DTOs (records)
 
+### Frontend (Angular 21)
+11. ❌ Using `*ngIf`, `*ngFor`, `[ngSwitch]` — use `@if`, `@for`, `@switch`
+12. ❌ Using `@Input()` / `@Output()` decorators — use `input()` / `output()` signal APIs
+13. ❌ Using `BehaviorSubject` for state — use `signal()` and `computed()`
+14. ❌ Creating `NgModule` classes — use `standalone: true` components
+15. ❌ Missing `ChangeDetectionStrategy.OnPush` — required on EVERY component
+16. ❌ Constructor injection in components — use `inject()` function
+17. ❌ `@for` without `track` — always add `track item.id`
+18. ❌ Overriding Material styles with Tailwind — Material for components, Tailwind for layout only
+19. ❌ Storing JWT in localStorage — Keycloak manages tokens in-memory
+20. ❌ Hardcoding display strings — use i18n translation keys
+21. ❌ Missing role guard on routes — every route needs `canActivate: [roleGuard]`
+22. ❌ Missing `aria-label` on icon buttons — required for accessibility
+
 ## Troubleshooting
 
+### Backend
 | Problem | Solution |
 |---|---|
 | Lombok annotation found | Remove it. Use Java 21 record for DTOs, explicit getters/setters for entities, LoggerFactory for logging |
@@ -487,3 +655,20 @@ bash .claude/hooks/pre-push-checks.sh
 | Redis connection refused | Start infrastructure: `docker-compose up -d redis` |
 | RabbitMQ connection refused | Start infrastructure: `docker-compose up -d rabbitmq` |
 | Keycloak 401 Unauthorized | Check JWT token, verify Keycloak realm config, check `issuer-uri` in application.yml |
+
+### Frontend (Angular 21)
+| Problem | Solution |
+|---|---|
+| Material styles broken / reset | Ensure Tailwind Preflight is DISABLED in `tailwind.config.ts`: `corePlugins: { preflight: false }` |
+| Material button colors wrong | NEVER apply Tailwind color classes to `mat-*` components — use `color="primary"` attribute |
+| Component not updating | Ensure `ChangeDetectionStrategy.OnPush` + update via `signal.set()` or `signal.update()` |
+| `@for` rendering issues | Add `track` expression: `@for (item of items(); track item.id)` |
+| Keycloak token not sent | Verify `enableBearerInterceptor: true` in Keycloak init + check `bearerExcludedUrls` |
+| Route not loading | Check `app.routes.ts` has `loadChildren` + feature `routes.ts` exports correct `Routes` array |
+| Role guard blocking | Verify user has required role in Keycloak + check `data: { roles: [...] }` on route |
+| i18n text not displaying | Check translation JSON files in `src/assets/i18n/` and ensure language service is initialized |
+| Bundle too large | Import specific Material modules (e.g., `MatTableModule`) not entire `MaterialModule` |
+| SCSS not applying | Ensure component uses `styleUrl` (singular) not `styleUrls` (array) in Angular 21 |
+
+### Reference
+For comprehensive Angular guidelines, see: `docs/ANGULAR_GUIDELINES.md`
