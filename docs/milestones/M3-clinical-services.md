@@ -4,6 +4,25 @@
 **Dependencies:** M2 (Core Services)
 **Exit Gate:** Clinical workflow end-to-end test passes
 
+## 📊 Development Status: 🟡 IN PROGRESS (~33%)
+
+**Started:** 2026-04-06 | **PR:** #11 (OPEN DRAFT — not merged to main)
+**Issues Completed:** 14/43
+- transfusion-service: ✅ Complete (in PR #11, not on main)
+- hospital-service: ⚠️ Partial scaffold (2 of 4 entities)
+- request-matching-service: ❌ Minimal (Application class only)
+- Cross-service tests: ❌ Not started
+
+## 🔧 FIX REQUIRED
+
+| # | Issue | Severity | Description |
+|---|---|---|---|
+| 1 | **PR #11 not merged** | 🔴 BLOCKER | transfusion-service code exists only in draft PR #11. Must complete hospital-service + request-matching-service, then merge to main. |
+| 2 | **hospital-service incomplete** | 🟡 HIGH | Missing 2 entities (HospitalRequest, HospitalFeedback), all DTOs, mappers, repos, services, controllers, RabbitMQ (BloodRequestCreatedEvent publisher), and all tests. Only Hospital + HospitalContract entities + 6 enums exist. |
+| 3 | **request-matching-service barely started** | 🔴 HIGH | Missing build.gradle.kts deps, all 3 entities (EmergencyRequest, DisasterEvent, DonorMobilization), compatibility matching algorithm, emergency/disaster workflows, all controllers/tests, RabbitMQ listeners (BloodStockUpdatedEvent, BloodRequestCreatedEvent) + publishers (BloodRequestMatchedEvent, EmergencyRequestEvent). |
+| 4 | **Cross-service clinical tests not started** | 🟡 MEDIUM | M3-041, M3-042, M3-043 integration tests are required for exit gate. |
+| 5 | **Blocks M5 (Gateway + Frontend)** | 🔴 BLOCKER | M5 depends on M3 completion. Cannot start frontend features for clinical workflows until these services exist. |
+
 ---
 
 ## Objective
@@ -13,24 +32,24 @@ Implement the clinical workflow services: blood transfusion management, hospital
 ## Issues
 
 ### transfusion-service (Modules 6, 7)
-- [ ] **M3-001**: Scaffold transfusion-service project structure
-- [ ] **M3-002**: Create entities — CrossMatchRequest, CrossMatchResult, BloodIssue, EmergencyIssue
-- [ ] **M3-003**: Create entities — Transfusion, TransfusionReaction, HemovigilanceReport, LookBackInvestigation
-- [ ] **M3-004**: Create DTOs (records) for all transfusion entities
-- [ ] **M3-005**: Create MapStruct mappers
-- [ ] **M3-006**: Create repositories with cross-match query methods
-- [ ] **M3-007**: Create services — CrossMatchService, BloodIssueService, TransfusionService, HemovigilanceService
-- [ ] **M3-008**: Implement ABO/Rh compatibility checking algorithm
-- [ ] **M3-009**: Implement emergency O-negative issue protocol
-- [ ] **M3-010**: Create controllers with @PreAuthorize (DOCTOR, NURSE roles)
-- [ ] **M3-011**: Create RabbitMQ publishers — TransfusionCompletedEvent, TransfusionReactionEvent
-- [ ] **M3-012**: Implement look-back investigation workflow
-- [ ] **M3-013**: Write unit tests (>80% coverage)
-- [ ] **M3-014**: Write integration tests with Testcontainers
+- [x] **M3-001**: Scaffold transfusion-service project structure *(PR #11 — draft)*
+- [x] **M3-002**: Create entities — CrossMatchRequest, CrossMatchResult, BloodIssue, EmergencyIssue *(PR #11)*
+- [x] **M3-003**: Create entities — Transfusion, TransfusionReaction, HemovigilanceReport, LookBackInvestigation *(PR #11)*
+- [x] **M3-004**: Create DTOs (records) for all transfusion entities *(PR #11 — 18 records)*
+- [x] **M3-005**: Create MapStruct mappers *(PR #11 — 8 mappers)*
+- [x] **M3-006**: Create repositories with cross-match query methods *(PR #11 — 8 repos)*
+- [x] **M3-007**: Create services — CrossMatchService, BloodIssueService, TransfusionService, HemovigilanceService *(PR #11)*
+- [x] **M3-008**: Implement ABO/Rh compatibility checking algorithm *(PR #11 — BloodCompatibilityUtil)*
+- [x] **M3-009**: Implement emergency O-negative issue protocol *(PR #11)*
+- [x] **M3-010**: Create controllers with @PreAuthorize (DOCTOR, NURSE roles) *(PR #11 — 4 controllers)*
+- [x] **M3-011**: Create RabbitMQ publishers — TransfusionCompletedEvent, TransfusionReactionEvent *(PR #11)*
+- [x] **M3-012**: Implement look-back investigation workflow *(PR #11)*
+- [x] **M3-013**: Write unit tests (>80% coverage) *(PR #11 — 4 service test classes)*
+- [x] **M3-014**: Write integration tests with Testcontainers *(PR #11 — 4 controller test classes)*
 
 ### hospital-service (Module 10)
-- [ ] **M3-015**: Scaffold hospital-service project structure
-- [ ] **M3-016**: Create entities — Hospital, HospitalContract, HospitalRequest, HospitalFeedback
+- [x] **M3-015**: Scaffold hospital-service project structure *(PR #11)*
+- [ ] **M3-016**: Create entities — Hospital, HospitalContract, HospitalRequest, HospitalFeedback *(⚠️ only Hospital + HospitalContract done)*
 - [ ] **M3-017**: Create DTOs (records) for all hospital entities
 - [ ] **M3-018**: Create MapStruct mappers
 - [ ] **M3-019**: Create repositories
@@ -42,7 +61,7 @@ Implement the clinical workflow services: blood transfusion management, hospital
 - [ ] **M3-025**: Write integration tests
 
 ### request-matching-service (Modules 6-matching, 23)
-- [ ] **M3-026**: Scaffold request-matching-service project structure
+- [ ] **M3-026**: Scaffold request-matching-service project structure *(⚠️ Application class only)*
 - [ ] **M3-027**: Create entities — EmergencyRequest, DisasterEvent, DonorMobilization
 - [ ] **M3-028**: Create DTOs (records) for matching entities
 - [ ] **M3-029**: Create MapStruct mappers
