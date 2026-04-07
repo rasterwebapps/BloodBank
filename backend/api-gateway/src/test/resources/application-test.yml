@@ -1,0 +1,17 @@
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  cloud:
+    gateway:
+      routes: []
+
+management:
+  health:
+    redis:
+      enabled: false
+
+logging:
+  level:
+    com.bloodbank: DEBUG

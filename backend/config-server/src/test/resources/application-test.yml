@@ -1,0 +1,13 @@
+spring:
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config-repo
+
+encrypt:
+  key: test-encryption-key
+
+logging:
+  level:
+    org.springframework.cloud.config: DEBUG

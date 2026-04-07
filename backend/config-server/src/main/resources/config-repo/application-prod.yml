@@ -1,0 +1,32 @@
+# Production profile overrides
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres-prod:5432/bloodbank_db
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+  jpa:
+    show-sql: false
+  data:
+    redis:
+      host: redis-prod
+      port: 6379
+  rabbitmq:
+    host: rabbitmq-prod
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://auth.bloodbank.com/realms/bloodbank
+          jwk-set-uri: https://auth.bloodbank.com/realms/bloodbank/protocol/openid-connect/certs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+logging:
+  level:
+    com.bloodbank: WARN
+    root: INFO
