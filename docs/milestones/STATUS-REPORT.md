@@ -1,9 +1,12 @@
 # 🩸 BloodBank — Development Status Report
 
-**Report Date:** 2026-04-07
-**Data Source:** GitHub Pull Requests #1–#15 (descriptions, reviews, merge status, codebase verification)
-**Total PRs Reviewed:** 15 (all merged)
+**Report Date:** 2026-04-08
+**Data Source:** GitHub Pull Requests #1–#17 (descriptions, reviews, merge status, codebase verification, build validation)
+**Total PRs Reviewed:** 17 (all merged)
 **PR Review Comments:** 0 (no reviewer comments or review threads found on any PR)
+**Build Status:** ✅ BUILD SUCCESSFUL (all 20 modules compile, all tests pass)
+**GitHub Issues Open:** 0 (milestones tracked in docs/milestones/ only — no GitHub Issues created yet)
+**CI/CD Workflows:** 1 (Copilot cloud agent only — no custom CI pipeline)
 
 ---
 
@@ -14,9 +17,9 @@
 | **M0** | ✅ COMPLETE | 100% | 24/24 | #1, #2, #3 |
 | **M1** | ✅ COMPLETE | 100% | 33/33 | #4, #5, #6 |
 | **M2** | ✅ COMPLETE | 100% | 54/54 | #7, #8, #9, #10 |
-| **M3** | 🟡 IN PROGRESS | ~35% | 15/43 | #11 (merged) |
-| **M4** | 🟡 PARTIAL | ~79% | 52/66 | #12 (merged) |
-| **M5** | 🟡 IN PROGRESS | ~29% | 15/52 | #15 |
+| **M3** | 🟡 IN PROGRESS | ~35% | 15/43 | #11 |
+| **M4** | 🟡 PARTIAL | ~79% | 52/66 | #12 |
+| **M5** | 🟡 IN PROGRESS | ~29% | 15/52 | #15, #17 |
 | **M6** | 🔴 NOT STARTED | 0% | 0/30 | — |
 | **M7** | 🔴 NOT STARTED | 0% | 0/46 | — |
 | **M8** | 🔴 NOT STARTED | 0% | 0/28 | — |
@@ -30,234 +33,270 @@
 
 ---
 
-## Detailed Milestone Status
+## Build System Status
 
-### M0: Project Setup & Architecture — ✅ COMPLETE (100%)
+### ✅ Gradle Build — ALL 20 MODULES
 
-| Section | Issues | Status | PR |
+| Check | Result | Details |
+|---|---|---|
+| `./gradlew build -x test` | ✅ PASS | 86 tasks executed in ~1m 48s |
+| `./gradlew test` | ✅ PASS | 64 tasks executed in ~2m 59s, 0 failures |
+| Root build.gradle.kts | ✅ Valid | Spring Boot 3.4.5, Java 21, JaCoCo 80% threshold |
+| settings.gradle.kts | ✅ Valid | All 20 modules listed (14 services + 6 shared-libs) |
+| gradle.properties | ✅ Valid | Versions: Spring Cloud 2024.0.1, MapStruct 1.6.3, Testcontainers 1.20.4, Resilience4j 2.2.0, SpringDoc 2.8.4 |
+
+### Per-Module Compile Status
+
+| Module | Compile | Tests | Notes |
 |---|---|---|---|
-| Architecture & Design (M0-001 to M0-005) | 5 | ✅ Done (ADRs, ERD, event contracts) | #3 |
-| Requirements & Planning (M0-006 to M0-010) | 5 | ✅ Done (documented in CLAUDE.md/README) | #1 |
-| Security Design (M0-011 to M0-014) | 4 | ✅ Done (RBAC matrix, branch isolation) | #3 |
-| UI/UX Design (M0-015 to M0-018) | 4 | ✅ Done (design documented) | #1 |
-| Repository Setup (M0-019 to M0-024) | 6 | ✅ Done (CLAUDE.md, skills, hooks, commands, templates) | #1, #2 |
+| shared-libs:common-model | ✅ | NO-SOURCE | 13 source files, no tests |
+| shared-libs:common-dto | ✅ | NO-SOURCE | 4 source files, no tests |
+| shared-libs:common-events | ✅ | NO-SOURCE | 15 source files, no tests |
+| shared-libs:common-exceptions | ✅ | NO-SOURCE | 6 source files, no tests |
+| shared-libs:common-security | ✅ | NO-SOURCE | 5 source files, no tests |
+| shared-libs:db-migration | ✅ | ✅ PASS | 1 main + 1 test (FlywayMigrationTest) |
+| backend:api-gateway | ✅ | ✅ PASS | 7 main + 10 test files |
+| backend:config-server | ✅ | ✅ PASS | 2 main + 1 test file |
+| backend:branch-service | ✅ | ✅ PASS | 49 main + 5 test files |
+| backend:donor-service | ✅ | ✅ PASS | 83 main + 8 test files |
+| backend:lab-service | ✅ | ✅ PASS | 47 main + 35 test files |
+| backend:inventory-service | ✅ | ✅ PASS | 98 main + 12 test files |
+| backend:transfusion-service | ✅ | ✅ PASS | 64 main + 8 test files |
+| backend:hospital-service | ✅ | NO-SOURCE | 9 main + 0 test files ⚠️ |
+| backend:billing-service | ✅ | ✅ PASS | 41 main + 8 test files |
+| backend:request-matching-service | ✅ | NO-SOURCE | 1 main + 0 test files ⚠️ |
+| backend:notification-service | ✅ | ✅ PASS | 36 main + 8 test files |
+| backend:reporting-service | ✅ | ✅ PASS | 51 main + 8 test files |
+| backend:document-service | ✅ | NO-SOURCE | 20 main + 0 test files ⚠️ |
+| backend:compliance-service | ✅ | NO-SOURCE | 1 main + 0 test files ⚠️ |
 
-**Deliverables Verified:**
-- ✅ Architecture docs (6 ADRs, ERD, event contracts) in `docs/architecture/`
-- ✅ Security docs (RBAC matrix, branch isolation) in `docs/security/`
-- ✅ GitHub templates (bug report, feature request, PR template) in `.github/`
-- ✅ CLAUDE.md with full project rules
-- ✅ 13 skills, 6 commands, 3 hooks in `.claude/`
-- ✅ 14 milestone files in `docs/milestones/`
+**Build Warnings:** Deprecation warnings for `@MockBean` in transfusion-service tests (Spring Boot 3.4.x deprecated `org.springframework.boot.test.mock.mockito.MockBean` in favor of `org.springframework.test.context.bean.override.mockito.MockitoBean`)
 
 ---
 
-### M1: Foundation — ✅ COMPLETE (100%)
+## Backend Services Status
 
-| Section | Issues | Status | PR |
-|---|---|---|---|
-| Build System (M1-001 to M1-006) | 6 | ✅ Done | #4 |
-| Flyway Migrations (M1-007 to M1-026) | 20 | ✅ Done (V1–V20, ~87 tables) | #5 |
-| Shared Libraries (M1-027 to M1-032) | 6 | ✅ Done (all 6 libs) | #6 |
-| Docker Compose (M1-033) | 1 | ✅ Done | #4 |
+### Service Implementation Matrix
 
-**Deliverables Verified:**
-- ✅ Root build.gradle.kts (Spring Boot 3.4.5, Java 21, JaCoCo 80%)
-- ✅ settings.gradle.kts with all 20 modules
-- ✅ 20 Flyway migrations in `shared-libs/db-migration/`
-- ✅ common-model: BaseEntity, BranchScopedEntity, AuditableEntity + 10 enums
-- ✅ common-dto: ApiResponse, PagedResponse, ErrorResponse, ValidationError (records)
-- ✅ common-events: 14 event records + EventConstants
-- ✅ common-exceptions: 5 exceptions + GlobalExceptionHandler
-- ✅ common-security: SecurityConfig, BranchDataFilterAspect, JwtUtils, RoleConstants, CurrentUser
-- ✅ db-migration: FlywayConfig + FlywayMigrationTest
-- ✅ docker-compose.yml (PostgreSQL 17, Redis 7, RabbitMQ 3.13, Keycloak 26, MinIO, Mailhog)
+| Service | Port | Main Files | Test Files | Controllers | Services | Entities | Repos | Mappers | DTOs | Events | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| api-gateway | 8080 | 7 | 10 | — | — | — | — | — | — | — | ✅ COMPLETE |
+| config-server | 8888 | 2 | 1 | — | — | — | — | — | — | — | ✅ COMPLETE |
+| branch-service | 8081 | 49 | 5 | 2 | 2 | 12 | 12 | 2 | 17 | — | ✅ COMPLETE |
+| donor-service | 8082 | 83 | 8 | 4 | 4 | 12 | 12 | 8 | 26 | 2 | ✅ COMPLETE |
+| lab-service | 8083 | 47 | 35 | 5 | 5 | 5 | 5 | 5 | 11 | 2 | ✅ COMPLETE |
+| inventory-service | 8084 | 98 | 12 | 5 | 6 | 13 | 13 | 13 | 28 | 4 | ✅ COMPLETE |
+| transfusion-service | 8085 | 64 | 8 | 4 | 5 | 8 | 8 | 8 | 17 | 1 | ✅ COMPLETE |
+| hospital-service | 8086 | 9 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | ⚠️ PARTIAL |
+| billing-service | 8088 | 41 | 8 | 4 | 4 | 5 | 5 | 5 | 10 | 2 | ✅ COMPLETE |
+| request-matching-service | 8087 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 🔴 SCAFFOLD |
+| notification-service | 8089 | 36 | 8 | 4 | 4 | 4 | 4 | 4 | 8 | 1 | ✅ COMPLETE |
+| reporting-service | 8090 | 51 | 8 | 5 | 6 | 6 | 6 | 6 | 12 | 1 | ✅ COMPLETE |
+| document-service | 8091 | 20 | 0 | 2 | 4 | 2 | 2 | 2 | 4 | 0 | ⚠️ NO TESTS |
+| compliance-service | 8092 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 🔴 SCAFFOLD |
 
----
+**Total Backend:** 609 main Java files, 103 test Java files across 14 services
 
-### M2: Core Services — ✅ COMPLETE (100%)
+### Backend Summary
 
-| Service | Issues | Files (main/test) | Tests | Status | PR |
-|---|---|---|---|---|---|
-| branch-service (M2-001–012) | 12 | 49 / 5 | 180 | ✅ Done | #7 |
-| donor-service (M2-013–026) | 14 | 83 / 8 | 113 | ✅ Done | #8 |
-| lab-service (M2-027–038) | 12 | 47 / 10 | 90 | ✅ Done | #9 |
-| inventory-service (M2-039–054) | 16 | 98 / 11 | varies | ✅ Done | #10 |
-
-**Key Features Implemented:**
-- ✅ 4 running services with full CRUD APIs
-- ✅ RabbitMQ event publishing/consuming (DonationCompletedEvent → lab auto-creates test orders → inventory receives results)
-- ✅ Redis caching for branch/master data (24h TTL)
-- ✅ >80% JaCoCo coverage on all services
-- ✅ FEFO dispatch logic in inventory-service
-- ✅ Dual-review approval workflow in lab-service
-- ✅ Donor eligibility checks (56-day rule, hemoglobin/weight/BP/pulse/temp)
-- ✅ Auto-expire scheduler for blood units (hourly)
-- ✅ All entities extend BranchScopedEntity with @FilterDef/@Filter
+- **Fully implemented with tests:** 9 services (api-gateway, config-server, branch, donor, lab, inventory, transfusion, billing, notification, reporting) — **64%**
+- **Implemented but missing tests:** 1 service (document-service) — **7%**
+- **Partially implemented:** 1 service (hospital-service — entities only) — **7%**
+- **Scaffold only:** 2 services (request-matching-service, compliance-service — Application.java only) — **14%**
 
 ---
 
-### M3: Clinical Services — 🟡 IN PROGRESS (~35%)
+## Shared Libraries Status
 
-| Service | Issues | Status | PR |
-|---|---|---|---|
-| transfusion-service (M3-001–014) | 14 | ✅ Complete (merged to main) | #11 (merged) |
-| hospital-service (M3-015–025) | 11 | ⚠️ Partial scaffold | #11 (merged) |
-| request-matching-service (M3-026–040) | 15 | ❌ Minimal scaffold | — |
-| Cross-Service Tests (M3-041–043) | 3 | ❌ Not started | — |
-
-**PR #11 — MERGED to main (2026-04-07)**
-
-**transfusion-service (on main):**
-- 64 main files, 8 test files (4 service + 4 controller tests)
-- 8 entities, 4 services, 4 controllers, 11 enums, 18 DTOs, 8 mappers
-- ABO/Rh compatibility algorithm via BloodCompatibilityUtil
-- Emergency O-negative protocol
-- RabbitMQ: publishes TransfusionCompletedEvent, TransfusionReactionEvent
-- Unit + controller tests, >80% JaCoCo coverage
-
-**hospital-service (partial on main):**
-- 9 main files, 0 test files
-- 6 enums, 2 of 4 entities (Hospital, HospitalContract)
-- MISSING: HospitalRequest, HospitalFeedback entities, DTOs, mappers, repositories, services, controllers, RabbitMQ, tests
-
-**request-matching-service (scaffold only on main):**
-- 1 file: Application class only
-- MISSING: all entities/DTOs/services/controllers/tests, RabbitMQ listeners
-
-#### 🔧 FIX REQUIRED
-
-| # | Issue | Severity | Description |
-|---|---|---|---|
-| 1 | **hospital-service incomplete** | 🔴 HIGH | Missing 2 entities (HospitalRequest, HospitalFeedback), all DTOs, mappers, repos, services, controllers, RabbitMQ (BloodRequestCreatedEvent), and all tests |
-| 2 | **request-matching-service barely started** | 🔴 HIGH | Missing all 3 entities (EmergencyRequest, DisasterEvent, DonorMobilization), compatibility matching algorithm, emergency/disaster workflows, all controllers/tests, RabbitMQ listeners (BloodStockUpdatedEvent, BloodRequestCreatedEvent) |
-| 3 | **Cross-service clinical tests missing** | 🟡 MEDIUM | M3-041, M3-042, M3-043 integration tests not started |
-| 4 | **Blocks M5 frontend clinical features** | 🔴 BLOCKER | M5 API Gateway and Config Server are done (PR #15). But frontend clinical feature modules cannot be built until these services exist. |
-
----
-
-### M4: Support Services — 🟡 PARTIAL (~79%)
-
-| Service | Issues | Files (main/test) | Status | PR |
+| Library | Main Files | Test Files | Key Components | Status |
 |---|---|---|---|---|
-| billing-service (M4-001–014) | 14 | 41 / 8 | ✅ Done | #12 |
-| notification-service (M4-015–029) | 15 | 36 / 8 | ✅ Done | #12 |
-| reporting-service (M4-030–043) | 14 | 51 / 8 | ✅ Done | #12 |
-| document-service (M4-044–054) | 11 | 20 / 0 | ⚠️ Missing tests | #12 |
-| compliance-service (M4-055–066) | 12 | 1 / 0 | ❌ Scaffold only | — |
+| common-model | 13 | 0 | BaseEntity, BranchScopedEntity, AuditableEntity + 10 enums | ✅ COMPLETE |
+| common-dto | 4 | 0 | ApiResponse, PagedResponse, ErrorResponse, ValidationError (records) | ✅ COMPLETE |
+| common-events | 15 | 0 | 14 event records + EventConstants | ✅ COMPLETE |
+| common-exceptions | 6 | 0 | 5 exceptions + GlobalExceptionHandler | ✅ COMPLETE |
+| common-security | 5 | 0 | SecurityConfig, BranchDataFilterAspect, JwtUtils, RoleConstants, CurrentUser | ✅ COMPLETE |
+| db-migration | 1+20 SQL | 1 | FlywayConfig + 20 Flyway migrations (V1–V20, ~87 tables) | ✅ COMPLETE |
 
-**Implemented (4 services):**
-- ✅ billing-service: Auto-invoice via BloodRequestMatchedEvent, GST/VAT, InvoiceGeneratedEvent
-- ✅ notification-service: 14 @RabbitListener methods for all domain events, multi-channel (EMAIL/SMS/PUSH/IN_APP/WHATSAPP)
-- ✅ reporting-service: Immutable audit trail (14 events), chain of custody, digital signatures
-- ⚠️ document-service: MinIO/S3 storage, versioning — BUT **no test classes**
+**Total Shared Libs:** 44 Java files + 20 SQL migrations. All 6 libraries compile successfully.
 
-#### 🔧 FIX REQUIRED
-
-| # | Issue | Severity | Description |
-|---|---|---|---|
-| 1 | **compliance-service not implemented** | 🔴 HIGH | Only Application.java exists. Missing all 5 entities (RegulatoryFramework, SopDocument, License, Deviation, RecallRecord), DTOs, services, controllers, RecallInitiatedEvent publisher, and all tests |
-| 2 | **document-service missing tests** | 🟡 MEDIUM | 20 main source files but 0 test files. Needs unit tests for DocumentService + DocumentVersionService and controller tests |
-| 3 | **Blocks M5 frontend compliance features** | 🟡 HIGH | M5 API Gateway is done (PR #15), but frontend compliance feature module cannot be built until compliance-service exists. |
+**Note:** Shared libraries have no unit tests (except db-migration). These are mostly interface/record/abstract-class libraries where testing happens at the service level.
 
 ---
 
-### M5: API Gateway + Frontend — 🟡 IN PROGRESS (~29%)
+## Frontend Status
 
-| Section | Issues | Status | PR |
-|---|---|---|---|
-| API Gateway (M5-001–010) | 10 | ✅ Complete (7 main files, 10 test files, 30 tests) | #15 |
-| Config Server (M5-011–015) | 5 | ✅ Complete (2 main files, 1 test file, 10 tests) | #15 |
-| Config Repository | — | ✅ Complete (16 YAML files for 12 services + 3 environments) | #15 |
-| Angular Core & Shared (M5-016–024) | 9 | ❌ Not started (no frontend/ dir) |
-| Staff Portal Features (M5-025–040) | 16 | ❌ Not started |
-| Hospital Portal (M5-041–045) | 5 | ❌ Not started |
-| Donor Portal (M5-046–052) | 7 | ❌ Not started |
+### 🔴 Angular 21 Frontend — NOT STARTED
 
-**PR #15 — MERGED to main (2026-04-07)**
+| Item | Status | Notes |
+|---|---|---|
+| `frontend/` directory | ❌ Does not exist | No Angular code created yet |
+| Angular CLI scaffold | ❌ Not done | M5-016: Scaffold Angular 21 app |
+| Core module (auth, guards, interceptors) | ❌ Not started | M5-017 to M5-019 |
+| Shared components (table, badges, layout) | ❌ Not started | M5-020 to M5-024 |
+| Staff Portal (12 feature modules) | ❌ Not started | M5-025 to M5-040 |
+| Hospital Portal | ❌ Not started | M5-041 to M5-045 |
+| Donor Portal | ❌ Not started | M5-046 to M5-052 |
+| Angular guidelines doc | ✅ Complete | `docs/ANGULAR_GUIDELINES.md` (25 sections, PR #17) |
+| ADR-007 (Angular architecture) | ✅ Complete | `docs/architecture/adr/ADR-007-angular-frontend-architecture.md` |
 
-**api-gateway (on main):**
-- 7 main files, 10 test files (30 tests, >80% JaCoCo coverage)
-- Spring Cloud Gateway (reactive, NOT servlet)
-- Route definitions for all 12 backend services (ports 8081–8092) with path-based predicates
-- JWT validation via spring-boot-starter-oauth2-resource-server with reactive Keycloak role extraction
-- BranchIdExtractionFilter — extracts branch_id from JWT, adds X-Branch-Id header (1st layer of 4-layer branch isolation)
-- Rate limiting with Redis-backed RequestRateLimiter (100 req/sec per user)
-- CORS configuration (configurable, defaults to localhost:4200)
-- Circuit breaker (Resilience4j) per downstream service (50% failure threshold, 10s wait)
-- Request/response logging filter with X-Request-Id propagation
+**Remaining Issues:** 37 out of 52 (M5-016 to M5-052)
 
-**config-server (on main):**
-- 2 main files, 1 test file (10 tests)
-- Spring Cloud Config Server with @EnableConfigServer
-- Native profile (file-based config) — searches config-repo/ directory + classpath
-- Config files for all 12 services in config-repo/
-- Environment-specific configs: application-dev.yml, application-staging.yml, application-prod.yml
-- Encryption support for sensitive properties (ENCRYPT_KEY env var)
-
-#### 🔧 REMAINING WORK
-
-| # | Issue | Severity | Description |
-|---|---|---|---|
-| 1 | **Angular frontend not started** | 🔴 HIGH | 37 issues remaining (M5-016 to M5-052). frontend/ directory does not exist. Needs Angular 21 scaffolding with standalone components, signals, zoneless change detection. |
-| 2 | **Frontend blocked by M3 and M4** | 🟡 MEDIUM | Clinical features (transfusion, hospital, matching UIs) blocked by incomplete hospital-service and request-matching-service. Compliance features blocked by missing compliance-service. |
-| 3 | **API Gateway and Config Server ready** | 🟢 INFO | Backend gateway infrastructure complete — frontend can connect through gateway once scaffolded. |
+**Readiness for Frontend Development:**
+- ✅ API Gateway ready (JWT validation, branch isolation, rate limiting, CORS at localhost:4200)
+- ✅ Config Server ready (16 YAML configs for all services)
+- ✅ Angular guidelines documented comprehensively (25 sections)
+- ✅ ADR-007 architecture decision recorded
+- ✅ 9 backend APIs ready for integration (branch, donor, lab, inventory, transfusion, billing, notification, reporting, document)
+- ⚠️ 2 backend APIs not ready (hospital-service partial, request-matching-service scaffold)
+- ⚠️ 1 backend API missing (compliance-service scaffold only)
 
 ---
 
-### M6: Integration + Security Testing — 🔴 NOT STARTED (0%)
-**Blocked by:** M5 (Gateway + Frontend)
+## Infrastructure Readiness
 
-### M7: Infrastructure — 🔴 NOT STARTED (0%)
-**Note:** Can start in parallel with M3/M4 (depends on M2 which is complete)
+### Docker & Container Infrastructure
 
-#### 🔧 FIX REQUIRED
-
-| # | Issue | Severity | Description |
+| Component | Status | Location | Notes |
 |---|---|---|---|
-| 1 | **Can be unblocked now** | 🟢 OPPORTUNITY | M7 depends on M2 (complete). Docker, K8s, Jenkins, Keycloak, and monitoring work can begin immediately in parallel with M3/M4 |
+| docker-compose.yml | ✅ COMPLETE | Root | PostgreSQL 17, Redis 7, RabbitMQ 3.13, Keycloak 26, MinIO, Mailhog with healthchecks |
+| Service Dockerfiles | 🔴 NOT STARTED | — | No Dockerfile in any of the 14 services (M7-001 to M7-006) |
+| Multi-stage Docker builds | 🔴 NOT STARTED | — | Planned: Gradle build → Temurin JRE 21 Alpine |
+| Docker Compose for services | 🔴 NOT STARTED | — | Only infra containers defined, no app service containers |
 
-### M8: Performance Testing — 🔴 NOT STARTED (0%)
-**Blocked by:** M6, M7
+### Kubernetes
 
-### M9: UAT + Compliance — 🔴 NOT STARTED (0%)
-**Blocked by:** M8
+| Component | Status | Notes |
+|---|---|---|
+| k8s/ directory | 🔴 NOT CREATED | No Kubernetes manifests exist |
+| Namespaces | 🔴 NOT STARTED | M7-007 |
+| Deployments | 🔴 NOT STARTED | M7-008 to M7-012 |
+| Services & Ingress | 🔴 NOT STARTED | M7-013, M7-014 |
+| ConfigMaps & Secrets | 🔴 NOT STARTED | M7-015 |
+| HPA (Auto-scaling) | 🔴 NOT STARTED | M7-016 |
+| StatefulSets (DB, Redis, RabbitMQ) | 🔴 NOT STARTED | M7-017 |
+| Flyway K8s Job | 🔴 NOT STARTED | M7-018 |
 
-### M10: Pilot Deployment — 🔴 NOT STARTED (0%)
-**Blocked by:** M9
+### CI/CD
 
-### M11: Regional Rollout — 🔴 NOT STARTED (0%)
-**Blocked by:** M10
+| Component | Status | Notes |
+|---|---|---|
+| GitHub Actions | ⚠️ COPILOT ONLY | Only workflow is "Copilot cloud agent" — no build/test/deploy pipeline |
+| Jenkinsfile | 🔴 NOT CREATED | M7-019: 11-stage declarative pipeline planned |
+| Custom CI pipeline | 🔴 NOT STARTED | No GitHub Actions workflows for build/test/lint/deploy |
 
-### M12: Worldwide Launch — 🔴 NOT STARTED (0%)
-**Blocked by:** M11
+### Security Infrastructure
 
-### M13: Post-Launch — 🔴 NOT STARTED (0%)
-**Blocked by:** M12
+| Component | Status | Notes |
+|---|---|---|
+| keycloak/ directory | 🔴 NOT CREATED | No Keycloak realm export or config scripts |
+| Keycloak realm config | 🔴 NOT STARTED | ADR-006 defines single realm with 16 roles, LDAP, MFA |
+| Keycloak Docker (dev) | ✅ AVAILABLE | In docker-compose.yml (port 8180, start-dev mode) |
+| JWT validation (Gateway) | ✅ IMPLEMENTED | api-gateway validates JWT, extracts branch_id |
+| RBAC matrix doc | ✅ COMPLETE | `docs/security/rbac-matrix.md` |
+| Branch isolation doc | ✅ COMPLETE | `docs/security/branch-isolation.md` |
+
+### Monitoring & Observability
+
+| Component | Status | Notes |
+|---|---|---|
+| monitoring/ directory | 🔴 NOT CREATED | No monitoring configs exist |
+| OpenTelemetry | 🔴 NOT STARTED | M7 planned |
+| Micrometer metrics | 🔴 NOT STARTED | Spring Boot Actuator available in all services |
+| Prometheus/Grafana | 🔴 NOT STARTED | M7 planned |
+| Centralized logging | 🔴 NOT STARTED | M7 planned |
+
+### Config Management
+
+| Component | Status | Notes |
+|---|---|---|
+| Config Server | ✅ COMPLETE | Spring Cloud Config, native profile, port 8888 |
+| config-repo/ | ✅ COMPLETE | 16 YAML files (12 services + 4 environment profiles) |
+| Encryption support | ✅ READY | ENCRYPT_KEY env var support configured |
 
 ---
 
-## Pull Request Summary
+## Documentation Status
 
-| PR | Title | Status | Milestone | Merged | Files | Lines |
-|---|---|---|---|---|---|---|
-| #1 | Skills, hooks, commands, milestones | Closed | M0 | ✅ 2026-04-04 | 39 | +3,414 |
-| #2 | Consolidate 41→20 agents, fix docs | Closed | M0 | ✅ 2026-04-04 | 3 | +122 |
-| #3 | M0 ADRs, ERD, event contracts, RBAC, templates | Closed | M0 | ✅ 2026-04-04 | 13 | +2,219 |
-| #4 | M1-Part1: Gradle, Docker Compose, skeleton | Closed | M1 | ✅ 2026-04-04 | 63 | +1,750 |
-| #5 | M1-Part2: 20 Flyway migrations | Closed | M1 | ✅ 2026-04-04 | 21 | +2,465 |
-| #6 | M1-Part3: 6 shared libraries | Closed | M1 | ✅ 2026-04-04 | 48 | +1,064 |
-| #7 | M2: branch-service | Closed | M2 | ✅ 2026-04-06 | 58 | +5,880 |
-| #8 | M2: donor-service | Closed | M2 | ✅ 2026-04-06 | 92 | +7,613 |
-| #9 | M2: lab-service | Closed | M2 | ✅ 2026-04-06 | 58 | +4,277 |
-| #10 | M2: inventory-service | Closed | M2 | ✅ 2026-04-06 | 111 | +6,354 |
-| #11 | M3: transfusion (complete), hospital/matching (partial) | Closed | M3 | ✅ 2026-04-07 | 81 | +4,208 |
-| #12 | M4: billing, notification, reporting, document | Closed | M4 | ✅ 2026-04-07 | 179 | +11,359 |
-| #13 | Status report and milestone updates | Closed | — | ✅ 2026-04-07 | 16 | +1,200 |
-| #14 | Correct milestone status (PR #11 merged, fix M3/M4 counts) | Closed | — | ✅ 2026-04-07 | 5 | +54/−54 |
-| #15 | API Gateway and Config Server (M5-001 to M5-015) | Closed | M5 | ✅ 2026-04-07 | 56 | +1,652 |
+### Architecture & Design Docs
 
-**Total Lines Added: ~53,631** | **Total Files Changed: ~843**
+| Document | Status | Location |
+|---|---|---|
+| ADR-001: Single shared database | ✅ Complete | `docs/architecture/adr/` |
+| ADR-002: No Lombok | ✅ Complete | `docs/architecture/adr/` |
+| ADR-003: RabbitMQ async only | ✅ Complete | `docs/architecture/adr/` |
+| ADR-004: 4-layer branch isolation | ✅ Complete | `docs/architecture/adr/` |
+| ADR-005: URI-based API versioning | ✅ Complete | `docs/architecture/adr/` |
+| ADR-006: Keycloak single realm | ✅ Complete | `docs/architecture/adr/` |
+| ADR-007: Angular 21 frontend | ✅ Complete | `docs/architecture/adr/` |
+| ERD (~87 tables) | ✅ Complete | `docs/architecture/erd.md` |
+| Event contracts (15 events) | ✅ Complete | `docs/architecture/event-contracts.md` |
+| RBAC matrix (16 roles) | ✅ Complete | `docs/security/rbac-matrix.md` |
+| Branch isolation design | ✅ Complete | `docs/security/branch-isolation.md` |
+| Angular guidelines (25 sections) | ✅ Complete | `docs/ANGULAR_GUIDELINES.md` |
+| CLAUDE.md (project rules) | ✅ Complete | Root |
+| README.md | ✅ Complete | Root |
+| 14 milestone docs | ✅ Complete | `docs/milestones/` |
+
+### GitHub Repository Config
+
+| Item | Status | Notes |
+|---|---|---|
+| PR template | ✅ Present | `.github/PULL_REQUEST_TEMPLATE.md` |
+| Bug report template | ✅ Present | `.github/ISSUE_TEMPLATE/bug_report.md` |
+| Feature request template | ✅ Present | `.github/ISSUE_TEMPLATE/feature_request.md` |
+| Copilot instructions | ✅ Present | `.github/copilot-instructions.md` |
+| Claude skills (13) | ✅ Present | `.claude/skills/` |
+| Claude commands (6) | ✅ Present | `.claude/commands/` |
+| Claude hooks (3) | ✅ Present | `.claude/hooks/` |
+
+---
+
+## Pull Request Summary (All 17 PRs)
+
+| PR | Title | Milestone | Merged | Files | Lines Added |
+|---|---|---|---|---|---|
+| #1 | Skills, hooks, commands, milestones | M0 | ✅ 2026-04-04 | 39 | +3,414 |
+| #2 | Consolidate 41→20 agents, fix docs | M0 | ✅ 2026-04-04 | 3 | +122 |
+| #3 | M0 ADRs, ERD, event contracts, RBAC, templates | M0 | ✅ 2026-04-04 | 13 | +2,219 |
+| #4 | M1-Part1: Gradle, Docker Compose, skeleton | M1 | ✅ 2026-04-04 | 63 | +1,750 |
+| #5 | M1-Part2: 20 Flyway migrations | M1 | ✅ 2026-04-04 | 21 | +2,465 |
+| #6 | M1-Part3: 6 shared libraries | M1 | ✅ 2026-04-04 | 48 | +1,064 |
+| #7 | M2: branch-service | M2 | ✅ 2026-04-06 | 58 | +5,880 |
+| #8 | M2: donor-service | M2 | ✅ 2026-04-06 | 92 | +7,613 |
+| #9 | M2: lab-service | M2 | ✅ 2026-04-06 | 58 | +4,277 |
+| #10 | M2: inventory-service | M2 | ✅ 2026-04-06 | 111 | +6,354 |
+| #11 | M3: transfusion (complete), hospital/matching (partial) | M3 | ✅ 2026-04-07 | 81 | +4,208 |
+| #12 | M4: billing, notification, reporting, document | M4 | ✅ 2026-04-07 | 179 | +11,359 |
+| #13 | Status report and milestone updates | Docs | ✅ 2026-04-07 | 16 | +1,200 |
+| #14 | Correct milestone status (PR #11 merged) | Docs | ✅ 2026-04-07 | 5 | +54/−54 |
+| #15 | API Gateway and Config Server (M5-001–M5-015) | M5 | ✅ 2026-04-07 | 56 | +1,652 |
+| #16 | Update project status — M5 now 29% | Docs | ✅ 2026-04-07 | 2 | ~200 |
+| #17 | Comprehensive Angular 21 frontend guidelines | Docs/M5 | ✅ 2026-04-07 | 4 | ~2,800 |
+
+**Total Lines Added: ~53,631+** | **Total Files Changed: ~843+** | **All PRs merged with 0 review comments**
+
+---
+
+## Code Quality Observations
+
+### ✅ Positive Findings
+
+1. **No Lombok violations** — All entities use explicit getters/setters, all DTOs are Java 21 records
+2. **Constructor injection everywhere** — No `@Autowired` field injection found
+3. **`@PreAuthorize` on all controller methods** — Role-based access control enforced
+4. **Branch data isolation** — `@FilterDef`/`@Filter` on branch-scoped entities
+5. **Thin RabbitMQ events** — Events carry IDs only (not entity data)
+6. **Clean build** — All 20 modules compile with zero errors
+7. **All existing tests pass** — Zero test failures across entire project
+
+### ⚠️ Concerns
+
+1. **Zero PR review comments** — All 17 PRs merged without human code review
+2. **Deprecation warnings** — `@MockBean` deprecated in Spring Boot 3.4.x, should migrate to `@MockitoBean`
+3. **Shared libraries have no tests** — common-model, common-dto, common-events, common-exceptions, common-security have 0 test files
+4. **4 services with 0 tests** — hospital-service, request-matching-service, document-service, compliance-service
+5. **No static analysis** — Checkstyle and SpotBugs configured in CLAUDE.md but not in build.gradle.kts
+6. **No GitHub Actions CI** — Only the Copilot agent workflow exists; no automated build/test pipeline
 
 ---
 
@@ -266,73 +305,57 @@
 ### 🔴 Critical Path Blockers
 
 1. **M3 incomplete → blocks M5 frontend clinical features → blocks M6–M13 chain**
-   - PR #11 is merged; transfusion-service is complete on main
-   - hospital-service needs significant implementation (2/4 entities, no DTOs/services/controllers/tests)
-   - request-matching-service needs full implementation (Application class only)
-   - Estimated effort: ~1 week to complete
+   - hospital-service: 2 of 4 entities, no DTOs/services/controllers/tests
+   - request-matching-service: Application.java only
+   - Estimated effort: ~1 week
 
 2. **M4 compliance-service missing → blocks M5 compliance frontend features**
-   - Entire service needs implementation (5 entities, services, controllers, tests)
+   - Only Application.java exists
    - Estimated effort: ~2-3 days
 
-3. **document-service has no tests → quality gap**
-   - 20 source files with 0 test coverage
-   - Risk of undetected bugs propagating
-
-4. **Angular frontend not started → M5 37 issues remaining**
-   - frontend/ directory does not exist
-   - 3 portals (Staff, Hospital, Donor) with 17 feature modules to build
+3. **Angular frontend not started → M5 has 37 remaining issues**
+   - `frontend/` directory does not exist
+   - 3 portals, 17 feature modules to build
    - Estimated effort: ~2-3 weeks
 
-### 🟢 Recent Progress (PR #15 — 2026-04-07)
+4. **No CI/CD pipeline → quality risk**
+   - No automated builds/tests on PRs
+   - No deployment pipeline
 
-1. **API Gateway fully implemented**
-   - 7 main files, 10 test files, 30 tests passing, >80% coverage
-   - JWT validation, branch isolation, rate limiting, circuit breaker, CORS, logging
-   
-2. **Config Server fully implemented**
-   - Native profile with config-repo/ directory (16 YAML files)
-   - Environment-specific configs for dev/staging/prod
-   - Encryption support for sensitive properties
+### 🟢 Opportunities
 
-3. **M5 no longer "NOT STARTED"** — 15/52 issues complete (29%)
-
-### 🟡 Opportunities
-
-1. **M7 (Infrastructure) can start NOW**
-   - Only depends on M2 (complete)
-   - Docker, K8s, Jenkins, Keycloak, Monitoring work is parallelizable
-   - Would save 2+ weeks on critical path
-
-2. **Angular frontend core (M5-016 to M5-024) can start NOW**
-   - API Gateway is ready — frontend can connect through it
-   - Core module, shared components, layout, i18n don't depend on M3/M4 services
-   - Only specific feature modules (hospital, compliance) are blocked
-
-3. **No PR review feedback exists**
-   - All 15 PRs have 0 review comments and 0 review threads
-   - Risk: code quality issues may be accumulating without human review
-   - Recommendation: conduct code review on merged PRs, especially M2 services
-
-### 📊 Velocity Metrics
-
-- **M0**: 3 days (April 4)
-- **M1**: 1 day (April 4) — 3 PRs same day
-- **M2**: 2 days (April 4–6) — 4 services
-- **M3**: Started April 6 — PR #11 merged April 7 (transfusion complete, hospital/matching partial)
-- **M4**: 1 day (April 7) — 4 of 5 services (PR #12)
-- **M5**: Started April 7 — API Gateway + Config Server in 1 PR (#15), same day
-
-**Average throughput**: ~1 complete service per day (when actively developed)
+1. **M7 (Infrastructure) can start NOW** — Only depends on M2 (complete)
+2. **Angular core scaffold (M5-016 to M5-024) can start NOW** — API Gateway ready
+3. **GitHub Actions CI can be added immediately** — Simple workflow for `./gradlew build`
+4. **document-service tests can be added NOW** — Service is implemented
 
 ---
 
-## Recommendations
+## Recommendations (Priority Order)
 
-1. **IMMEDIATE**: Complete hospital-service (DTOs, services, controllers, tests) and request-matching-service (full implementation)
-2. **IMMEDIATE**: Implement compliance-service (M4-055 to M4-066)
-3. **IMMEDIATE**: Add tests for document-service (M4-053, M4-054)
-4. **NEXT**: Scaffold Angular 21 frontend (M5-016 to M5-024) — API Gateway is ready for frontend connections
-5. **PARALLEL**: Start M7 infrastructure work (Docker, K8s, Jenkins, Keycloak) — not blocked
-6. **PROCESS**: Establish PR review process — all 15 PRs merged without review comments
-7. **TRACKING**: Convert milestone issues to GitHub Issues for better project tracking
+1. **IMMEDIATE**: Complete hospital-service and request-matching-service (M3 blocker)
+2. **IMMEDIATE**: Implement compliance-service (M4 blocker)
+3. **IMMEDIATE**: Add tests for document-service
+4. **HIGH**: Scaffold Angular 21 frontend (M5-016 core/shared — not blocked)
+5. **HIGH**: Add GitHub Actions CI workflow (build + test on every PR)
+6. **PARALLEL**: Start M7 infrastructure (Dockerfiles, K8s, Jenkins, Keycloak config)
+7. **PROCESS**: Establish PR code review process — 17 PRs merged with zero reviews
+8. **TRACKING**: Create GitHub Issues from milestone docs for better project management
+9. **TECH DEBT**: Migrate `@MockBean` to `@MockitoBean` in test files (Spring Boot 3.4.x deprecation)
+10. **TECH DEBT**: Add unit tests for shared libraries
+
+---
+
+## Velocity & Timeline
+
+| Period | Milestones | Services Delivered | PRs |
+|---|---|---|---|
+| Day 1 (Apr 4) | M0 + M1 complete | Shared libs, migrations, skeleton | #1–#6 |
+| Day 2-3 (Apr 4-6) | M2 complete | 4 core services | #7–#10 |
+| Day 4 (Apr 7) | M3 partial, M4 partial, M5 partial | 5 services + gateway + config | #11–#17 |
+
+**Average throughput:** ~1 complete service per day (when actively developed)
+**Total development days:** 4 days active development
+**Projected remaining (M3+M4 completion):** ~1 week
+**Projected remaining (M5 frontend):** ~2-3 weeks
+**Projected remaining (M6-M7):** ~2-3 weeks (can parallelize with M5)
