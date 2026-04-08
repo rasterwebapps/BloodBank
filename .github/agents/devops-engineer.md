@@ -80,8 +80,8 @@ RUN npm run build
 # Stage 2: Serve
 FROM nginx:1.27-alpine
 RUN addgroup -S nginx-app && adduser -S nginx-app -G nginx-app
-COPY --from=builder /app/dist/bloodbank-ui/browser /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --chown=nginx-app:nginx-app --from=builder /app/dist/bloodbank-ui/browser /usr/share/nginx/html
+COPY --chown=nginx-app:nginx-app nginx.conf /etc/nginx/conf.d/default.conf
 USER nginx-app
 EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=10s CMD wget -q --spider http://localhost/health || exit 1

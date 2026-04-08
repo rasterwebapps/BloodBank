@@ -92,7 +92,7 @@ public class Donor extends BranchScopedEntity {
     @Column(name = "blood_group", nullable = false)
     private BloodGroupEnum bloodGroup;
 
-    public Donor() {} // required for JPA and MapStruct
+    public Donor() {} // required for JPA (proxy instantiation)
 
     public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) { this.firstName = firstName; }

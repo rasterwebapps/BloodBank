@@ -198,6 +198,7 @@ class DonorControllerTest {
 ```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DonorIntegrationTest {
 
     @Container
