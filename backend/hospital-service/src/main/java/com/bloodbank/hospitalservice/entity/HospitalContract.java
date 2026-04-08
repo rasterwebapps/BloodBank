@@ -57,7 +57,7 @@ public class HospitalContract extends BranchScopedEntity {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
-    protected HospitalContract() {}
+    public HospitalContract() {}
 
     public UUID getHospitalId() { return hospitalId; }
     public void setHospitalId(UUID hospitalId) { this.hospitalId = hospitalId; }
