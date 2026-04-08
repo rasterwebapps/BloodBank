@@ -66,7 +66,7 @@ public class Hospital extends BranchScopedEntity {
     @Column(name = "status", nullable = false, length = 20)
     private HospitalStatusEnum status;
 
-    protected Hospital() {}
+    public Hospital() {}
 
     public String getHospitalCode() { return hospitalCode; }
     public void setHospitalCode(String hospitalCode) { this.hospitalCode = hospitalCode; }
