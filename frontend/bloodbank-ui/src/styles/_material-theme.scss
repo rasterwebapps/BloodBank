@@ -1,0 +1,39 @@
+// ==========================================================================
+// Angular Material M3 Custom Theme — BloodBank
+// ==========================================================================
+// Blood red primary, Medical blue secondary, Success green tertiary
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$red-palette,
+        tertiary: mat.$green-palette,
+      ),
+      typography: (
+        brand-family: 'Inter, Roboto, sans-serif',
+        plain-family: 'Inter, Roboto, sans-serif',
+      ),
+      density: 0,
+    )
+  );
+}
+
+// --- Dark theme class toggle ---
+html.dark-theme {
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$red-palette,
+        tertiary: mat.$green-palette,
+        theme-type: dark,
+      ),
+      typography: (
+        brand-family: 'Inter, Roboto, sans-serif',
+        plain-family: 'Inter, Roboto, sans-serif',
+      ),
+      density: 0,
+    )
+  );
+}

@@ -1,0 +1,70 @@
+// ==========================================================================
+// Global Styles Entry Point — BloodBank
+// ==========================================================================
+
+// --- Tailwind CSS 4 ---
+@import "tailwindcss" layer(tailwind);
+
+// Disable Tailwind Preflight — conflicts with Angular Material
+@layer tailwind.base {
+  // Intentionally empty: Tailwind Preflight is overridden to prevent
+  // resetting styles that Angular Material depends on.
+}
+
+// --- Tailwind CSS 4 theme configuration ---
+@theme {
+  --color-bloodbank-primary: #DC2626;
+  --color-bloodbank-secondary: #2563EB;
+  --color-bloodbank-success: #16A34A;
+  --color-bloodbank-warning: #D97706;
+  --color-bloodbank-danger: #DC2626;
+  --color-bloodbank-info: #0891B2;
+}
+
+// --- Angular Material M3 Theme ---
+@use './styles/material-theme';
+
+// --- Design Tokens ---
+@use './styles/variables';
+
+// --- Typography ---
+@use './styles/typography';
+
+// --- Healthcare Colors ---
+@use './styles/healthcare-colors';
+
+// ==========================================================================
+// Global Resets & Defaults
+// ==========================================================================
+
+body {
+  color-scheme: light;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+}
+
+html {
+  height: 100%;
+}
+
+// --- Accessibility: Focus Ring ---
+*:focus-visible {
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+
+// --- Reduced Motion ---
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
