@@ -14,9 +14,14 @@ import { KeycloakService } from 'keycloak-angular';
 
 import { routes } from './app.routes';
 import { initializeKeycloak } from '@core/auth/auth.init';
+import { AuthService } from '@core/auth/auth.service';
 import { authInterceptor } from '@core/auth/auth.interceptor';
 import { branchInterceptor } from '@core/interceptors/branch.interceptor';
 import { errorInterceptor } from '@core/interceptors/error.interceptor';
+
+function initializeUserProfile(authService: AuthService): () => Promise<void> {
+  return () => authService.loadUserProfile();
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -33,6 +38,12 @@ export const appConfig: ApplicationConfig = {
       useFactory: initializeKeycloak,
       multi: true,
       deps: [KeycloakService],
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeUserProfile,
+      multi: true,
+      deps: [AuthService],
     },
   ],
 };

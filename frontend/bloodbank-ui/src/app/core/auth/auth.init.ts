@@ -1,7 +1,6 @@
 import { KeycloakService } from 'keycloak-angular';
 import { environment } from '@env/environment';
 import { AuthService } from './auth.service';
-import { inject } from '@angular/core';
 
 /**
  * APP_INITIALIZER factory for Keycloak.
@@ -25,11 +24,6 @@ export function initializeKeycloak(keycloak: KeycloakService): () => Promise<boo
       bearerPrefix: 'Bearer',
       bearerExcludedUrls: ['/assets', '/i18n'],
     });
-
-    if (authenticated) {
-      const authService = inject(AuthService);
-      await authService.loadUserProfile();
-    }
 
     return authenticated;
   };

@@ -22,7 +22,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         case 403:
           snackBar.open('You do not have permission for this action', 'Dismiss', {
             duration: 5000,
-            panelClass: ['snackbar-warn'],
+            panelClass: ['snackbar-warning'],
           });
           break;
         case 404:
