@@ -31,6 +31,9 @@
 23. [Common Mistakes to Avoid](#23-common-mistakes-to-avoid)
 24. [Build & Deployment](#24-build--deployment)
 25. [17 Feature Modules](#25-17-feature-modules)
+26. [Multi-Branch UX Rules](#26-multi-branch-ux-rules)
+27. [UX Interaction Patterns](#27-ux-interaction-patterns)
+28. [Quality Checklist](#28-quality-checklist)
 
 ---
 
@@ -210,6 +213,68 @@ frontend/bloodbank-ui/
 | Donor Portal | `/donor/` | DONOR (self-service) |
 
 The same Angular app serves all 3 portals. Routes and navigation are filtered by the authenticated user's role(s).
+
+### Smart vs Dumb Component Pattern
+
+#### Smart Components (Pages/Containers)
+
+- **Location**: `features/{feature}/pages/`
+- **Suffix**: `.page.ts` (e.g., `donor-list.page.ts`, `donor-form.page.ts`)
+- **Responsibilities**:
+  - Inject services via `inject()`
+  - Hold state via Signals (`signal()`, `computed()`)
+  - Handle user actions and HTTP calls
+  - Route navigation logic
+  - Pass data **DOWN** to dumb components via `input()` signal API
+  - Receive events **UP** from dumb components via `output()` signal API
+
+#### Dumb Components (Presentational)
+
+- **Location**: `features/{feature}/components/`
+- **Suffix**: `.component.ts`
+- **Responsibilities**:
+  - Receive data **ONLY** via `input()` signal API
+  - Emit events **ONLY** via `output()` signal API
+  - **ZERO** service injection (except utility services like `DatePipe`)
+  - Pure UI rendering with `OnPush` change detection
+  - All styling and template logic
+
+### Feature Module Structure (ALWAYS Follow)
+
+```
+features/{feature}/
+├── routes.ts                              # Lazy-loaded route definitions
+├── models/{entity}.model.ts               # TypeScript interfaces & enums
+├── services/{entity}.service.ts           # HttpClient API service
+├── pages/
+│   ├── {entity}-list.page.ts              # List page (smart)
+│   └── {entity}-form.page.ts              # Create/Edit page (smart)
+└── components/
+    ├── {entity}-table/
+    │   ├── {entity}-table.component.ts     # Table display (dumb)
+    │   └── {entity}-table.component.html
+    ├── {entity}-form/
+    │   ├── {entity}-form.component.ts      # Form UI (dumb)
+    │   └── {entity}-form.component.html
+    └── {entity}-detail/
+        ├── {entity}-detail.component.ts    # Detail view (dumb)
+        └── {entity}-detail.component.html
+```
+
+### Shared Component Guidelines
+
+- **Location**: `shared/components/`, `shared/directives/`, `shared/pipes/`
+- **Use for**: Cross-feature reusable UI elements
+- **Examples in project**:
+  - `BreadcrumbComponent` — dynamic route-based breadcrumbs
+  - `BranchSelectorComponent` — branch switching dropdown
+  - `HasRoleDirective` — role-based element visibility
+  - `BloodGroupPipe` — blood group display formatting
+  - `DateAgoPipe` — relative date formatting via date-fns
+- **When to create a shared component**:
+  - Used by 2+ feature modules
+  - Has no feature-specific business logic
+  - Is purely presentational
 
 ---
 
@@ -420,6 +485,15 @@ export default {
 };
 ```
 
+### Elevation & Surfaces
+
+- `mat-card`: Default Material elevation (`mat-elevation-z1`)
+- Dialog/Modal: `mat-elevation-z24`
+- Toolbar: `mat-elevation-z4`
+- Floating action buttons: `mat-elevation-z6`
+- **AVOID** custom `box-shadow` — use Material elevation classes
+- Use `mat-card` for all content containers — **NEVER** plain `<div>` for content sections
+
 ---
 
 ## 7. Theme & Color System
@@ -510,6 +584,38 @@ theme: {
 },
 ```
 
+### Status Badge Colors (Consistent Across ALL Modules)
+
+| Status | Tailwind Classes |
+|--------|-----------------|
+| PENDING | `bg-yellow-100 text-yellow-800` |
+| IN_PROGRESS | `bg-indigo-100 text-indigo-800` |
+| VALIDATED | `bg-green-100 text-green-800` |
+| AUTHORIZED | `bg-purple-100 text-purple-800` |
+| RELEASED | `bg-teal-100 text-teal-800` |
+| AMENDED | `bg-orange-100 text-orange-800` |
+| CANCELLED | `bg-red-100 text-red-800` |
+| DRAFT | `bg-gray-100 text-gray-800` |
+| AVAILABLE | `bg-green-100 text-green-800` |
+| RESERVED | `bg-amber-100 text-amber-800` |
+| ISSUED | `bg-blue-100 text-blue-800` |
+| QUARANTINE | `bg-red-100 text-red-800` |
+| EXPIRED | `bg-gray-100 text-gray-800` |
+| COMPLETED | `bg-green-100 text-green-800` |
+| REJECTED | `bg-red-100 text-red-800` |
+| PAID | `bg-green-100 text-green-800` |
+| PARTIALLY_PAID | `bg-yellow-100 text-yellow-800` |
+| OVERDUE | `bg-red-100 text-red-800` |
+
+### Lab-Specific Result Flags
+
+| Flag | CSS Class | Style |
+|------|-----------|-------|
+| Critical | `.critical-value` | `color: #d32f2f; font-weight: bold;` — LIFE-THREATENING values |
+| High | `.high-flag` | `color: #f57c00;` — Above normal range |
+| Low | `.low-flag` | `color: #1976d2;` — Below normal range |
+| Normal | default | Default text color — Within range |
+
 ---
 
 ## 8. Typography
@@ -594,6 +700,50 @@ readonly navItems: NavItem[] = [
   { label: 'Settings',      icon: 'settings',        route: '/staff/settings',      roles: ['BRANCH_ADMIN', 'SUPER_ADMIN'] },
 ];
 ```
+
+### Spacing & Layout System
+
+#### Page Layout
+- Main content wrapped in `<div class="p-6">` (24px padding)
+- Cards use `<mat-card class="mb-4">` with 16px bottom margin
+- Form sections separated by `<mat-divider class="my-4">`
+- Grid layouts: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4`
+
+#### Form Layout
+- Two-column on desktop (`md:grid-cols-2`), single column on mobile
+- Three-column for compact forms (`lg:grid-cols-3`)
+- Form fields use full width within grid cells
+- Action buttons right-aligned: `<div class="flex justify-end gap-2">`
+
+#### Table Layout
+- Full width `mat-table` wrapped in `mat-card`
+- Search bar + action button row above table
+- Paginator below table
+- Responsive: horizontal scroll on mobile (`overflow-x-auto`)
+
+### Navigation UX
+
+1. **Sidenav**:
+   - Desktop (>1024px): permanently open side mode
+   - Mobile (<1024px): overlay mode, toggle via hamburger button
+   - Active route: highlighted with primary color
+   - Icons + labels for all nav items
+   - Grouped by function: Operations, Lab, Finance, Admin
+
+2. **Breadcrumbs**:
+   - Always show below toolbar: `Dashboard > Donors > Donor Detail`
+   - Use shared `BreadcrumbComponent`
+   - Clickable crumbs for navigation back
+
+3. **Page Header**:
+   - Every page: `<h1>` title + optional subtitle + action button
+   - Example: `"Donors"` + `"Manage donor records"` + `[Register Donor]` button
+   - Right-align action buttons
+
+4. **Tab Navigation**:
+   - Use `mat-tab-group` for multi-section views
+   - Donor detail: Demographics | Donations | Health Records | Deferrals | History
+   - Lazy load tab content
 
 ---
 
@@ -838,6 +988,36 @@ export class DonorFormComponent {
 - Grid layout: `grid grid-cols-1 md:grid-cols-2 gap-6`
 - Actions bar: `col-span-full flex justify-end gap-4`
 
+### Form UX Rules
+
+1. **Validation**:
+   - Show validation errors **ONLY** after field is touched (`field.touched && field.invalid`)
+   - Use `<mat-error>` inside `<mat-form-field>` — **NEVER** custom error divs
+   - Display specific error messages: `"First name is required"`, NOT `"Field required"`
+   - Disable submit button when form is invalid: `[disabled]="form.invalid || saving()"`
+
+2. **Save Flow**:
+   - Show saving spinner on submit button via `saving()` signal
+   - Disable form during save to prevent double submission
+   - On success: navigate back + show success snackbar
+   - On error: show error snackbar + keep form open with data preserved
+
+3. **Edit Mode**:
+   - Pre-populate form with existing data via route param + service call
+   - Show loading spinner while fetching existing data
+   - Confirm unsaved changes on navigation (`canDeactivate` guard)
+
+4. **Autocomplete**:
+   - Donor search: search by name, phone, donor ID
+   - Doctor search: search by name, registration number
+   - Debounce at **300ms**, minimum **2 characters**
+
+5. **Date Inputs**:
+   - ALWAYS use `mat-datepicker`
+   - Date of birth: `max` date = today
+   - Collection date: default = now
+   - Display format: `dd/MM/yyyy`
+
 ---
 
 ## 13. Data Tables
@@ -915,6 +1095,20 @@ export class DonorFormComponent {
 - Show `<app-loading-skeleton>` while loading
 - Show `<app-empty-state>` when no results
 - Virtual scroll (`<cdk-virtual-scroll-viewport>`) for lists > 1000 items
+
+### Table UX Rules
+
+1. ALWAYS include: search bar, column sort, pagination, row actions
+2. Pagination: default page size = **20**, options = `[10, 20, 50, 100]`
+3. Search: debounce at **300ms**, search on backend (**NOT** client-side filter)
+4. Status columns: use colored chips/badges (`MatChip` or Tailwind badge)
+5. Action column: `mat-icon-button` with `mat-menu` for multiple actions
+6. Row click: navigate to detail page (`cursor-pointer` on rows)
+7. Empty state: centered message with icon when no data
+8. Loading: `mat-progress-bar` on top of table during fetch
+9. Selection: `MatCheckbox` column for batch operations when needed
+10. Date columns: use date-fns formatting pipe for consistent formatting
+11. Currency columns: use currency formatting pipe
 
 ---
 
@@ -1195,6 +1389,28 @@ Create dedicated pages for:
 - `/not-found` — 404 page
 - `/error` — 500 page (something went wrong)
 
+### Notification/Feedback UX
+
+| Type | Behavior |
+|------|----------|
+| SUCCESS | `MatSnackBar` — green accent, **3s** auto-dismiss, bottom-center |
+| ERROR | `MatSnackBar` — red/warn, **5s** auto-dismiss, with "Dismiss" action |
+| WARNING | `MatSnackBar` — orange, **5s** auto-dismiss |
+| INFO | `MatSnackBar` — default, **3s** auto-dismiss |
+
+**Confirmations:**
+- Delete: `MatDialog` with "Are you sure? This action cannot be undone."
+- Cancel form with unsaved changes: `MatDialog` confirmation
+- Critical operations: Type-to-confirm pattern
+
+**Use the `NotificationService`:**
+```typescript
+notificationService.success('Donor registered successfully');
+notificationService.error('Failed to save record');
+notificationService.warning('Duplicate donor detected');
+notificationService.info('Report is being generated...');
+```
+
 ---
 
 ## 19. Performance
@@ -1389,6 +1605,50 @@ These actions MUST show a `ConfirmDialog` before execution:
 - All PHI screens must have audit logging
 - Print views must include "CONFIDENTIAL" watermark
 
+### Donor Registration
+
+- Donor ID auto-generated by backend — display as read-only chip after creation
+- Duplicate detection: check before save, warn user with found matches
+- Age auto-calculated from DOB (display as `"32Y 5M"` format)
+- Photo upload: optional, circular avatar with camera icon placeholder
+
+### Blood Collection
+
+- Barcode display: large, scannable Code128 format
+- Sample status timeline: `Collected → Received → Processing → Completed`
+- Color-coded tube types: Purple (EDTA), Red (Serum), Green (Lithium Heparin), Blue (Citrate)
+- Rejection reasons: dropdown with common reasons + free text
+
+### Lab Result Entry
+
+- Auto-flagging: **H** (High), **L** (Low), **C** (Critical) based on reference ranges
+- Critical value alerts: RED background + popup notification
+- Result validation workflow: `Entry → Technical Validation → Authorization`
+- Amendment tracking: show previous values with strikethrough
+- Tab-through numeric entry for lab result grids
+
+### Report Generation
+
+- PDF preview in-app
+- Print button with `@media print` styles
+- Doctor/patient portal: read-only report access
+- Digital signature placeholder for authorized results
+- Letterhead template: branch-specific header/footer
+
+### Billing
+
+- Rate switching: Walk-in / Corporate / Hospital / Insurance
+- Discount: percentage or flat amount, requires reason
+- Payment methods: Cash, Card, UPI, Insurance, Credit
+- Partial payment support with balance tracking
+- Invoice status: color-coded chips (Draft, Generated, Paid, Overdue)
+
+### Quality Control
+
+- Levey-Jennings charts: line chart with ±1SD, ±2SD, ±3SD zones
+- Westgard rule violations: highlighted with specific rule codes
+- QC lot management: expiry date tracking with visual warnings
+
 ---
 
 ## 23. Common Mistakes to Avoid
@@ -1410,6 +1670,15 @@ These actions MUST show a `ConfirmDialog` before execution:
 | 13 | Loading entire Material module | Import specific `Mat*Module` per component |
 | 14 | No loading state | Show skeleton/spinner for EVERY async operation |
 | 15 | Blank screens on error | Show error card or snackbar, NEVER blank |
+| 16 | Using `any` type in TypeScript | Use proper interfaces and types |
+| 17 | Skipping loading/empty/error states | EVERY data view needs all three states |
+| 18 | Client-side pagination for large lists | Server-side pagination ALWAYS |
+| 19 | Hardcoding API URLs | Use `environment` config |
+| 20 | Using `setTimeout` for UI timing | Use Angular lifecycle or RxJS `timer` |
+| 21 | Showing raw error messages from API | Map to user-friendly messages |
+| 22 | Using `mat-raised-button color="warn"` for non-destructive actions | Use `color="primary"` or default |
+| 23 | Putting business logic in templates | Use `computed()` or component methods |
+| 24 | Skipping form validation | Every input MUST have validators |
 
 ---
 
@@ -1496,11 +1765,81 @@ export const environment = {
 
 ---
 
+## 26. Multi-Branch UX Rules
+
+> **CRITICAL for the BloodBank multi-tenant architecture**
+
+1. `BranchSelectorComponent` **ALWAYS** visible in toolbar
+2. Branch switch triggers full data refresh for current view
+3. `BranchInterceptor` automatically adds `X-Branch-Id` header to ALL HTTP requests
+4. Branch ID persisted in `localStorage` (survives refresh)
+5. Branch name displayed in toolbar: `"Branch: Central Blood Bank, City"`
+6. `SUPER_ADMIN` can see cross-branch data with a toggle
+7. All data tables implicitly show **ONLY** current branch data
+8. Branch context shown in print/PDF reports
+
+---
+
+## 27. UX Interaction Patterns
+
+### Loading States (MANDATORY for Every Data-Fetching Component)
+
+```html
+@if (loading()) {
+  <div class="flex justify-center items-center py-12">
+    <mat-spinner diameter="48" />
+  </div>
+} @else if (error()) {
+  <div class="text-center py-12">
+    <mat-icon class="text-red-500 text-5xl">error_outline</mat-icon>
+    <p class="text-gray-500 mt-2">{{ error() }}</p>
+    <button mat-raised-button color="primary" (click)="retry()">Retry</button>
+  </div>
+} @else if (items().length === 0) {
+  <div class="text-center py-12">
+    <mat-icon class="text-gray-400 text-5xl">inbox</mat-icon>
+    <p class="text-gray-500 mt-2">No records found</p>
+  </div>
+} @else {
+  <!-- Data content -->
+}
+```
+
+Every data view MUST handle these 4 states: **loading**, **error**, **empty**, and **data**. No exceptions.
+
+---
+
+## 28. Quality Checklist
+
+> **AI agent must verify ALL items before marking a component/feature as complete.**
+
+- [ ] Component uses `standalone: true` and `ChangeDetectionStrategy.OnPush`
+- [ ] Template uses `@if` / `@for` / `@switch` (NOT `*ngIf` / `*ngFor`)
+- [ ] All signals are `readonly`
+- [ ] `input()` / `output()` signal APIs used (NOT `@Input()` / `@Output()`)
+- [ ] Loading, empty, and error states are handled
+- [ ] Form fields have `mat-label` and validation messages
+- [ ] Tables have search, sort, pagination
+- [ ] Status values use consistent color-coded badges
+- [ ] All icon buttons have `aria-label`
+- [ ] Service uses `inject()` and `firstValueFrom` correctly
+- [ ] Routes are lazy-loaded with `roleGuard`
+- [ ] No `any` types in the code
+- [ ] Date formatting uses date-fns pipe
+- [ ] Responsive: works on mobile (test `md:` breakpoint)
+- [ ] Actions show confirmation dialogs where appropriate
+- [ ] Snackbar notifications for success/error feedback
+- [ ] Branch context handled correctly
+- [ ] i18n keys used for all display strings
+
+---
+
 ## Changelog
 
 | Date | Version | Changes |
 |---|---|---|
 | 2026-04-07 | 1.0 | Initial comprehensive Angular 21 guidelines |
+| 2026-04-09 | 1.1 | Enhanced with UI/UX agent guidelines — added Smart/Dumb component pattern, status badge colors, lab result flags, form UX rules, table UX rules, navigation UX, multi-branch UX rules, domain-specific UI rules, quality checklist |
 
 ---
 
