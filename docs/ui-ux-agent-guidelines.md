@@ -1,6 +1,6 @@
-# 🎨 RasterOneLab — UI/UX AI Agent Guidelines
+# 🎨  — UI/UX AI Agent Guidelines
 
-> **Purpose**: Complete rules, skills, instructions, and guidelines for any AI coding agent building frontend UI in the RasterOneLab LIS project. Ensures consistent, production-quality, accessible UI using **Angular 19 + Angular Material 19 (M3) + Tailwind CSS 4**.
+> **Purpose**: Complete rules, skills, instructions, and guidelines for any AI coding agent building frontend UI in the   project. Ensures consistent, production-quality, accessible UI using **Angular 19 + Angular Material 19 (M3) + Tailwind CSS 4**.
 
 ---
 
@@ -13,10 +13,10 @@
 5. [Multi-Branch UX Rules](#5-multi-branch-ux-rules)
 6. [Accessibility (a11y) Rules](#6-accessibility-a11y-rules)
 7. [Performance Rules](#7-performance-rules)
-8. [LIS Domain-Specific UI Rules](#8-lis-domain-specific-ui-rules)
+8. [ Domain-Specific UI Rules](#8--domain-specific-ui-rules)
 9. [File & Code Conventions](#9-file--code-conventions)
 10. [What the AI Agent Must NEVER Do](#10-what-the-ai-agent-must-never-do)
-11. [Quality Checklist](#11-quality-checklist)
+11. [Quality Checkt](#11-quality-checkt)
 
 ---
 
@@ -81,7 +81,7 @@
 #### Smart Components (Pages/Containers)
 
 - **Location**: `features/{feature}/pages/`
-- **Suffix**: `.page.ts` or `-list.page.ts`, `-form.page.ts`
+- **Suffix**: `.page.ts` or `-t.page.ts`, `-form.page.ts`
 - **Responsibilities**:
   - Inject services
   - Hold state via Signals
@@ -110,12 +110,12 @@ features/{feature}/
 ├── services/{entity}.service.ts           # HttpClient API service
 ├── store/{entity}.store.ts                # @ngrx/signals SignalStore (if complex state)
 ├── pages/
-│   ├── {entity}-list.page.ts              # List page (smart)
+│   ├── {entity}-t.page.ts              # t page (smart)
 │   └── {entity}-form.page.ts              # Create/Edit page (smart)
 └── components/
-    ├── {entity}-list/
-    │   ├── {entity}-list.component.ts     # Table display (dumb)
-    │   └── {entity}-list.component.html   # Template
+    ├── {entity}-t/
+    │   ├── {entity}-t.component.ts     # Table display (dumb)
+    │   └── {entity}-t.component.html   # Template
     ├── {entity}-form/
     │   ├── {entity}-form.component.ts     # Form UI (dumb)
     │   └── {entity}-form.component.html   # Template
@@ -359,7 +359,7 @@ notificationService.info('Report is being generated...');
 
 ## 5. Multi-Branch UX Rules
 
-> **CRITICAL for the LIS multi-tenant architecture**
+> **CRITICAL for the  multi-tenant architecture**
 
 1. `BranchSelectorComponent` **ALWAYS** visible in toolbar
 2. Branch switch triggers full data refresh for current view
@@ -393,7 +393,7 @@ notificationService.info('Report is being generated...');
 2. `OnPush` change detection on **ALL** components (configured via schematics)
 3. Use `track` in `@for` loops: `@for (item of items(); track item.id)`
 4. Avoid complex computations in templates — use `computed()` signals
-5. Virtual scrolling (`ScrollingModule`) for lists > 100 items
+5. Virtual scrolling (`ScrollingModule`) for ts > 100 items
 6. Debounce search inputs: **300ms**
 7. Pagination: **server-side ALWAYS** — NEVER load all records client-side
 8. Image lazy loading: `loading="lazy"` attribute
@@ -404,7 +404,7 @@ notificationService.info('Report is being generated...');
 
 ---
 
-## 8. LIS Domain-Specific UI Rules
+## 8.  Domain-Specific UI Rules
 
 ### Patient Registration
 
@@ -440,7 +440,7 @@ notificationService.info('Report is being generated...');
 
 ### Billing
 
-- Rate list switching: Walk-in / Corporate / Insurance / Doctor Referral
+- Rate t switching: Walk-in / Corporate / Insurance / Doctor Referral
 - Discount: percentage or flat amount, requires reason
 - Payment methods: Cash, Card, UPI, Insurance, Credit
 - Partial payment support with balance tracking
@@ -462,16 +462,16 @@ notificationService.info('Report is being generated...');
 
 | Type | Convention | Example |
 |------|-----------|---------|
-| Component files | `kebab-case.component.ts` | `patient-list.component.ts` |
+| Component files | `kebab-case.component.ts` | `patient-t.component.ts` |
 | Service files | `kebab-case.service.ts` | `patient.service.ts` |
 | Model files | `kebab-case.model.ts` | `patient.model.ts` |
 | Pipe files | `kebab-case.pipe.ts` | `date-format.pipe.ts` |
 | Directive files | `kebab-case.directive.ts` | `permission.directive.ts` |
 | Guard files | `kebab-case.guard.ts` | `auth.guard.ts` |
 | Store files | `kebab-case.store.ts` | `patient.store.ts` |
-| Component selectors | `app-{feature}-{name}` | `app-patient-list`, `app-invoice-detail` |
+| Component selectors | `app-{feature}-{name}` | `app-patient-t`, `app-invoice-detail` |
 | Directive selectors | `appCamelCase` | `appPermission`, `appDebounceClick` |
-| Classes | PascalCase with suffix | `PatientListComponent`, `PatientService` |
+| Classes | PascalCase with suffix | `PatienttComponent`, `PatientService` |
 | Interfaces | PascalCase, NO `I` prefix | `Patient` (not `IPatient`) |
 | Signals | `readonly camelCase` | `readonly patients = signal<Patient[]>([]);` |
 | Computed signals | `readonly` | `readonly filteredPatients = computed(() => ...);` |
@@ -587,7 +587,7 @@ this.entityService.getAll(page, size).pipe(
 | Expose JPA entity shapes directly | Match backend DTOs |
 | Use inline styles | Tailwind utilities or SCSS |
 | Skip loading/empty/error states | Every data view needs all three |
-| Do client-side pagination for lists | Server-side pagination |
+| Do client-side pagination for ts | Server-side pagination |
 | Skip `aria-labels` on icon buttons | Always add `aria-label` |
 | Use `mat-raised-button color="warn"` for non-destructive actions | `color="primary"` or default |
 | Put business logic in templates | Use `computed()` or methods |
@@ -598,7 +598,7 @@ this.entityService.getAll(page, size).pipe(
 
 ---
 
-## 11. Quality Checklist
+## 11. Quality Checkt
 
 > **AI agent must verify ALL items before marking a component/feature as complete.**
 
