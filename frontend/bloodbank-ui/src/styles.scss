@@ -2,6 +2,12 @@
 // Global Styles Entry Point — BloodBank
 // ==========================================================================
 
+// --- Sass modules (@use must come first) ---
+@use './styles/material-theme';
+@use './styles/variables';
+@use './styles/typography';
+@use './styles/healthcare-colors';
+
 // --- Tailwind CSS 4 ---
 @import "tailwindcss" layer(tailwind);
 
@@ -20,18 +26,6 @@
   --color-bloodbank-danger: #DC2626;
   --color-bloodbank-info: #0891B2;
 }
-
-// --- Angular Material M3 Theme ---
-@use './styles/material-theme';
-
-// --- Design Tokens ---
-@use './styles/variables';
-
-// --- Typography ---
-@use './styles/typography';
-
-// --- Healthcare Colors ---
-@use './styles/healthcare-colors';
 
 // ==========================================================================
 // Global Resets & Defaults
