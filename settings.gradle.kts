@@ -8,6 +8,9 @@ include("shared-libs:common-exceptions")
 include("shared-libs:common-security")
 include("shared-libs:db-migration")
 
+// Integration Tests
+include("backend:integration-tests")
+
 // Backend Services
 include("backend:api-gateway")
 include("backend:config-server")
