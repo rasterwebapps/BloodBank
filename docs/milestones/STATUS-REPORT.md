@@ -26,7 +26,7 @@
 | **M12** | 🔴 NOT STARTED | 0% | 0/20 | — |
 | **M13** | 🔴 NOT STARTED | 0% | 0/33 | — |
 
-**Overall Progress: ~95% of coding milestones (M0–M5: 235/272), ~44% of total project (235/530)**
+**Overall Progress: ~86% of coding milestones (M0–M5: 235/272), ~44% of total project (235/530)**
 
 ---
 
