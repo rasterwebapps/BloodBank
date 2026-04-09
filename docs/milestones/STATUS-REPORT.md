@@ -1,8 +1,8 @@
 # 🩸 BloodBank — Development Status Report
 
-**Report Date:** 2026-04-07
-**Data Source:** GitHub Pull Requests #1–#15 (descriptions, reviews, merge status, codebase verification)
-**Total PRs Reviewed:** 15 (all merged)
+**Report Date:** 2026-04-09
+**Data Source:** GitHub Pull Requests #1–#15+ (descriptions, reviews, merge status, codebase verification)
+**Total PRs Reviewed:** 15+ (all merged)
 **PR Review Comments:** 0 (no reviewer comments or review threads found on any PR)
 
 ---
@@ -14,7 +14,7 @@
 | **M0** | ✅ COMPLETE | 100% | 24/24 | #1, #2, #3 |
 | **M1** | ✅ COMPLETE | 100% | 33/33 | #4, #5, #6 |
 | **M2** | ✅ COMPLETE | 100% | 54/54 | #7, #8, #9, #10 |
-| **M3** | 🟡 IN PROGRESS | ~35% | 15/43 | #11 (merged) |
+| **M3** | ✅ COMPLETE | 100% | 43/43 | #11+ |
 | **M4** | 🟡 PARTIAL | ~79% | 52/66 | #12 (merged) |
 | **M5** | 🟡 IN PROGRESS | ~29% | 15/52 | #15 |
 | **M6** | 🔴 NOT STARTED | 0% | 0/30 | — |
@@ -26,7 +26,7 @@
 | **M12** | 🔴 NOT STARTED | 0% | 0/20 | — |
 | **M13** | 🔴 NOT STARTED | 0% | 0/33 | — |
 
-**Overall Progress: ~47% of coding milestones (M0–M5), ~36% of total project (193/530)**
+**Overall Progress: ~81% of coding milestones (M0–M5: 221/272), ~42% of total project (221/530)**
 
 ---
 
@@ -97,16 +97,16 @@
 
 ---
 
-### M3: Clinical Services — 🟡 IN PROGRESS (~35%)
+### M3: Clinical Services — ✅ COMPLETE (100%)
 
-| Service | Issues | Status | PR |
-|---|---|---|---|
-| transfusion-service (M3-001–014) | 14 | ✅ Complete (merged to main) | #11 (merged) |
-| hospital-service (M3-015–025) | 11 | ⚠️ Partial scaffold | #11 (merged) |
-| request-matching-service (M3-026–040) | 15 | ❌ Minimal scaffold | — |
-| Cross-Service Tests (M3-041–043) | 3 | ❌ Not started | — |
+| Service | Issues | Files (main/test) | Tests | Status | PR |
+|---|---|---|---|---|---|
+| transfusion-service (M3-001–014) | 14 | 64 / 8 | 8 classes | ✅ Done | #11 |
+| hospital-service (M3-015–025) | 11 | 38 / 8 | 150 @Test | ✅ Done | #11+ |
+| request-matching-service (M3-026–040) | 15 | 34 / 6 | 103 @Test | ✅ Done | — |
+| Cross-Service Tests (M3-041–043) | 3 | — / 4 | 27 @Test | ✅ Done | — |
 
-**PR #11 — MERGED to main (2026-04-07)**
+**All 3 clinical services fully implemented and verified:**
 
 **transfusion-service (on main):**
 - 64 main files, 8 test files (4 service + 4 controller tests)
@@ -116,23 +116,30 @@
 - RabbitMQ: publishes TransfusionCompletedEvent, TransfusionReactionEvent
 - Unit + controller tests, >80% JaCoCo coverage
 
-**hospital-service (partial on main):**
-- 9 main files, 0 test files
-- 6 enums, 2 of 4 entities (Hospital, HospitalContract)
-- MISSING: HospitalRequest, HospitalFeedback entities, DTOs, mappers, repositories, services, controllers, RabbitMQ, tests
+**hospital-service (complete):**
+- 38 main files, 8 test files (4 service + 4 controller tests, 150 @Test methods)
+- 4 entities (Hospital, HospitalContract, HospitalRequest, HospitalFeedback) — all BranchScopedEntity + @FilterDef/@Filter
+- 8 DTO records, 4 MapStruct mappers, 4 repositories, 4 services, 4 controllers
+- 26 endpoints, @PreAuthorize on every method (HOSPITAL_USER, BRANCH_MANAGER roles)
+- RabbitMQ: HospitalEventPublisher (BloodRequestCreatedEvent)
+- Hospital credit management (creditLimit in HospitalContract)
+- Constructor injection, explicit Logger, no Lombok, flyway.enabled=false
 
-**request-matching-service (scaffold only on main):**
-- 1 file: Application class only
-- MISSING: all entities/DTOs/services/controllers/tests, RabbitMQ listeners
+**request-matching-service (complete):**
+- 34 main files, 6 test files (3 service + 3 controller tests, 103 @Test methods)
+- 3 entities (EmergencyRequest, DisasterEvent, DonorMobilization) — all BranchScopedEntity + @FilterDef/@Filter
+- 6 DTO records, 3 MapStruct mappers, 3 repositories, 3 services, 3 controllers
+- 22 endpoints, @PreAuthorize on every method
+- Blood compatibility matching (ABO/Rh + FEFO selection)
+- Emergency request workflow (create, escalate, cancel, broadcast)
+- Mass casualty protocol (disaster create, escalate, close)
+- Donor mobilization workflow (mobilize, record response, mark completed)
+- RabbitMQ: publishes BloodRequestMatchedEvent + EmergencyRequestEvent; listens to BloodStockUpdatedEvent, BloodRequestCreatedEvent, StockCriticalEvent
 
-#### 🔧 FIX REQUIRED
-
-| # | Issue | Severity | Description |
-|---|---|---|---|
-| 1 | **hospital-service incomplete** | 🔴 HIGH | Missing 2 entities (HospitalRequest, HospitalFeedback), all DTOs, mappers, repos, services, controllers, RabbitMQ (BloodRequestCreatedEvent), and all tests |
-| 2 | **request-matching-service barely started** | 🔴 HIGH | Missing all 3 entities (EmergencyRequest, DisasterEvent, DonorMobilization), compatibility matching algorithm, emergency/disaster workflows, all controllers/tests, RabbitMQ listeners (BloodStockUpdatedEvent, BloodRequestCreatedEvent) |
-| 3 | **Cross-service clinical tests missing** | 🟡 MEDIUM | M3-041, M3-042, M3-043 integration tests not started |
-| 4 | **Blocks M5 frontend clinical features** | 🔴 BLOCKER | M5 API Gateway and Config Server are done (PR #15). But frontend clinical feature modules cannot be built until these services exist. |
+**Cross-service integration tests (complete):**
+- HospitalRequestWorkflowIntegrationTest (9 tests): Hospital Request → Match → Cross-Match → Issue → Transfuse
+- EmergencyTransfusionWorkflowIntegrationTest (8 tests): Emergency → O-Neg Issue → Transfusion → Reaction → Hemovigilance
+- DisasterMobilizationWorkflowIntegrationTest (10 tests): Disaster → Mass Mobilization → Emergency Stock Rebalancing
 
 ---
 
@@ -265,11 +272,12 @@
 
 ### 🔴 Critical Path Blockers
 
-1. **M3 incomplete → blocks M5 frontend clinical features → blocks M6–M13 chain**
-   - PR #11 is merged; transfusion-service is complete on main
-   - hospital-service needs significant implementation (2/4 entities, no DTOs/services/controllers/tests)
-   - request-matching-service needs full implementation (Application class only)
-   - Estimated effort: ~1 week to complete
+1. **~~M3 incomplete~~ → RESOLVED** ✅
+   - All 3 clinical services fully implemented
+   - hospital-service: 38 main files, 8 test files, 150 @Test methods
+   - request-matching-service: 34 main files, 6 test files, 103 @Test methods
+   - Cross-service integration tests: 3 workflow classes, 27 @Test methods
+   - M5 frontend clinical features are now UNBLOCKED
 
 2. **M4 compliance-service missing → blocks M5 compliance frontend features**
    - Entire service needs implementation (5 entities, services, controllers, tests)
@@ -284,18 +292,24 @@
    - 3 portals (Staff, Hospital, Donor) with 17 feature modules to build
    - Estimated effort: ~2-3 weeks
 
-### 🟢 Recent Progress (PR #15 — 2026-04-07)
+### 🟢 Recent Progress (2026-04-09)
 
-1. **API Gateway fully implemented**
+1. **M3 Clinical Services — COMPLETE** ✅
+   - hospital-service: 38 main files, 8 test files, 4 entities, 8 DTOs, 4 services, 4 controllers, RabbitMQ, 150 tests
+   - request-matching-service: 34 main files, 6 test files, 3 entities, 6 DTOs, 3 services, 3 controllers, RabbitMQ, 103 tests
+   - Cross-service integration tests: 3 workflow classes, 27 tests
+   - M5 frontend clinical features UNBLOCKED
+
+2. **API Gateway fully implemented** (PR #15 — 2026-04-07)
    - 7 main files, 10 test files, 30 tests passing, >80% coverage
    - JWT validation, branch isolation, rate limiting, circuit breaker, CORS, logging
-   
-2. **Config Server fully implemented**
+
+3. **Config Server fully implemented** (PR #15 — 2026-04-07)
    - Native profile with config-repo/ directory (16 YAML files)
    - Environment-specific configs for dev/staging/prod
    - Encryption support for sensitive properties
 
-3. **M5 no longer "NOT STARTED"** — 15/52 issues complete (29%)
+4. **M5 no longer "NOT STARTED"** — 15/52 issues complete (29%)
 
 ### 🟡 Opportunities
 
@@ -304,10 +318,10 @@
    - Docker, K8s, Jenkins, Keycloak, Monitoring work is parallelizable
    - Would save 2+ weeks on critical path
 
-2. **Angular frontend core (M5-016 to M5-024) can start NOW**
+2. **Angular frontend core + clinical features can start NOW**
    - API Gateway is ready — frontend can connect through it
-   - Core module, shared components, layout, i18n don't depend on M3/M4 services
-   - Only specific feature modules (hospital, compliance) are blocked
+   - M3 clinical services complete — hospital, transfusion, matching APIs available
+   - Only compliance feature module blocked (M4 compliance-service missing)
 
 3. **No PR review feedback exists**
    - All 15 PRs have 0 review comments and 0 review threads
@@ -319,7 +333,7 @@
 - **M0**: 3 days (April 4)
 - **M1**: 1 day (April 4) — 3 PRs same day
 - **M2**: 2 days (April 4–6) — 4 services
-- **M3**: Started April 6 — PR #11 merged April 7 (transfusion complete, hospital/matching partial)
+- **M3**: 3 days (April 6–9) — 3 clinical services + 3 integration test suites complete
 - **M4**: 1 day (April 7) — 4 of 5 services (PR #12)
 - **M5**: Started April 7 — API Gateway + Config Server in 1 PR (#15), same day
 
@@ -329,10 +343,10 @@
 
 ## Recommendations
 
-1. **IMMEDIATE**: Complete hospital-service (DTOs, services, controllers, tests) and request-matching-service (full implementation)
+1. ~~**IMMEDIATE**: Complete hospital-service and request-matching-service~~ ✅ DONE
 2. **IMMEDIATE**: Implement compliance-service (M4-055 to M4-066)
 3. **IMMEDIATE**: Add tests for document-service (M4-053, M4-054)
-4. **NEXT**: Scaffold Angular 21 frontend (M5-016 to M5-024) — API Gateway is ready for frontend connections
+4. **NEXT**: Scaffold Angular 21 frontend (M5-016 to M5-024) — API Gateway is ready for frontend connections, M3 clinical APIs now available
 5. **PARALLEL**: Start M7 infrastructure work (Docker, K8s, Jenkins, Keycloak) — not blocked
 6. **PROCESS**: Establish PR review process — all 15 PRs merged without review comments
 7. **TRACKING**: Convert milestone issues to GitHub Issues for better project tracking
