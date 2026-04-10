@@ -186,7 +186,7 @@
             type="submit"
             [disabled]="saving() || (!isEditMode() && !form.controls.consent.value)">
             @if (saving()) {
-              <mat-spinner diameter="20" aria-label="Saving donor information" />
+              <mat-spinner diameter="20" role="status" aria-label="Saving donor information" />
             } @else {
               <ng-container>
                 <mat-icon>{{ isEditMode() ? 'save' : 'person_add' }}</mat-icon>
