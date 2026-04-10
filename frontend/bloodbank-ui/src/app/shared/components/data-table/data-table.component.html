@@ -1,0 +1,25 @@
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+<div class="overflow-x-auto">
+  <table
+    mat-table
+    [dataSource]="dataSource()"
+    matSort
+    (matSortChange)="onSortChange($event)"
+    class="w-full">
+    <ng-content />
+
+    <tr mat-header-row *matHeaderRowDef="columns()"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns()"></tr>
+  </table>
+</div>
+
+<mat-paginator
+  [length]="totalElements()"
+  [pageSize]="pageSize()"
+  [pageSizeOptions]="pageSizeOptions()"
+  (page)="onPageChange($event)"
+  showFirstLastButtons
+  aria-label="Select page" />

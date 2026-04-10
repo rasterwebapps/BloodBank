@@ -1,0 +1,9 @@
+<div class="empty-state">
+  <mat-icon class="empty-state-icon">{{ icon() }}</mat-icon>
+  <p class="empty-state-message">{{ message() }}</p>
+  @if (actionLabel()) {
+    <button mat-flat-button color="primary" (click)="onAction()">
+      {{ actionLabel() }}
+    </button>
+  }
+</div>

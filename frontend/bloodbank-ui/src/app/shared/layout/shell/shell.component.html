@@ -1,0 +1,27 @@
+<div class="shell-container">
+  <!-- Sidenav -->
+  <app-sidenav
+    [collapsed]="sidenavCollapsed()"
+    [isMobile]="isMobile()"
+    (collapsedChange)="sidenavCollapsed.set($event)" />
+
+  <!-- Main content area -->
+  <div class="shell-content" [class.shell-content-collapsed]="sidenavCollapsed()">
+    <!-- Top bar -->
+    <app-topbar
+      [currentBranch]="currentBranch()"
+      [user]="currentUser()"
+      (toggleSidenav)="toggleSidenav()" />
+
+    <!-- Breadcrumb -->
+    <app-breadcrumb />
+
+    <!-- Page content -->
+    <main class="shell-main">
+      <router-outlet />
+    </main>
+
+    <!-- Footer -->
+    <app-footer />
+  </div>
+</div>

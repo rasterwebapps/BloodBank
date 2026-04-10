@@ -6,15 +6,20 @@ export const routes: Routes = [
   // Default redirect
   { path: '', redirectTo: 'staff/dashboard', pathMatch: 'full' },
 
-  // Staff Portal — all staff roles
+  // Staff Portal — all staff roles (wrapped in shell layout)
   {
     path: 'staff',
+    loadComponent: () =>
+      import('@shared/layout/shell/shell.component').then(
+        (m) => m.ShellComponent,
+      ),
     canActivate: [roleGuard],
     data: { roles: STAFF_ROLES },
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
+        data: { breadcrumb: 'Dashboard' },
         loadChildren: () =>
           import('@features/dashboard/dashboard.routes').then(
             (m) => m.DASHBOARD_ROUTES,
@@ -23,15 +28,20 @@ export const routes: Routes = [
     ],
   },
 
-  // Hospital Portal
+  // Hospital Portal (wrapped in shell layout)
   {
     path: 'hospital',
+    loadComponent: () =>
+      import('@shared/layout/shell/shell.component').then(
+        (m) => m.ShellComponent,
+      ),
     canActivate: [roleGuard],
     data: { roles: [Role.HOSPITAL_USER] },
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
+        data: { breadcrumb: 'Dashboard' },
         loadChildren: () =>
           import('@features/dashboard/dashboard.routes').then(
             (m) => m.DASHBOARD_ROUTES,
@@ -40,15 +50,20 @@ export const routes: Routes = [
     ],
   },
 
-  // Donor Portal
+  // Donor Portal (wrapped in shell layout)
   {
     path: 'donor',
+    loadComponent: () =>
+      import('@shared/layout/shell/shell.component').then(
+        (m) => m.ShellComponent,
+      ),
     canActivate: [roleGuard],
     data: { roles: [Role.DONOR] },
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
+        data: { breadcrumb: 'Dashboard' },
         loadChildren: () =>
           import('@features/dashboard/dashboard.routes').then(
             (m) => m.DASHBOARD_ROUTES,
@@ -57,7 +72,7 @@ export const routes: Routes = [
     ],
   },
 
-  // Error pages (no guard required)
+  // Error pages (no guard required — no shell)
   {
     path: 'unauthorized',
     loadComponent: () =>

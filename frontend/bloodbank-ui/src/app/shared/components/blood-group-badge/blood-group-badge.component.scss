@@ -1,0 +1,65 @@
+:host {
+  display: inline-block;
+}
+
+.blood-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+// --- Size variants ---
+.blood-badge-sm {
+  width: 28px;
+  height: 28px;
+  font-size: 0.625rem;
+}
+
+.blood-badge-md {
+  width: 36px;
+  height: 36px;
+  font-size: 0.75rem;
+}
+
+.blood-badge-lg {
+  width: 48px;
+  height: 48px;
+  font-size: 1rem;
+}
+
+// --- Blood group colors (from healthcare-colors.scss) ---
+.blood-badge-a-positive {
+  background-color: var(--bg-a-positive, #dc2626);
+}
+
+.blood-badge-a-negative {
+  background-color: var(--bg-a-negative, #b91c1c);
+}
+
+.blood-badge-b-positive {
+  background-color: var(--bg-b-positive, #2563eb);
+}
+
+.blood-badge-b-negative {
+  background-color: var(--bg-b-negative, #1d4ed8);
+}
+
+.blood-badge-ab-positive {
+  background-color: var(--bg-ab-positive, #7c3aed);
+}
+
+.blood-badge-ab-negative {
+  background-color: var(--bg-ab-negative, #6d28d9);
+}
+
+.blood-badge-o-positive {
+  background-color: var(--bg-o-positive, #059669);
+}
+
+.blood-badge-o-negative {
+  background-color: var(--bg-o-negative, #047857);
+}
