@@ -1,0 +1,220 @@
+<div class="donor-detail-container p-6">
+  @if (loading()) {
+    <app-loading-skeleton [rows]="8" [columns]="2" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadDonor(donor()?.id ?? '')" />
+  } @else if (donor(); as d) {
+    <!-- Back button and actions -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <button mat-icon-button matTooltip="Back to list" aria-label="Back to donor list" (click)="goBack()">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1 class="text-2xl font-bold">{{ fullName() }}</h1>
+        <app-status-badge [status]="d.status" />
+      </div>
+      <button mat-raised-button color="primary" (click)="editDonor()" aria-label="Edit donor">
+        <mat-icon>edit</mat-icon>
+        Edit
+      </button>
+    </div>
+
+    <!-- Profile Card -->
+    <mat-card class="mb-6">
+      <mat-card-content>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
+          <!-- Column 1: Basic Info -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-500 mb-3">Basic Information</h3>
+            <div class="space-y-2">
+              <div class="detail-row">
+                <span class="detail-label">Donor #</span>
+                <span class="detail-value font-mono">{{ d.donorNumber }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Date of Birth</span>
+                <span class="detail-value">{{ d.dateOfBirth | date:'mediumDate' }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Gender</span>
+                <span class="detail-value">{{ genderLabel() }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Blood Group</span>
+                <span class="detail-value">
+                  @if (d.bloodGroupId) {
+                    <app-blood-group-badge [bloodGroup]="d.bloodGroupId" size="sm" />
+                  }
+                </span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">National ID</span>
+                <span class="detail-value">{{ d.nationalId || '—' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Contact Info -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-500 mb-3">Contact</h3>
+            <div class="space-y-2">
+              <div class="detail-row">
+                <span class="detail-label">Email</span>
+                <span class="detail-value">{{ d.email || '—' }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Phone</span>
+                <span class="detail-value">{{ d.phone || '—' }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Address</span>
+                <span class="detail-value">{{ d.addressLine1 || '—' }}</span>
+              </div>
+              @if (d.addressLine2) {
+                <div class="detail-row">
+                  <span class="detail-label"></span>
+                  <span class="detail-value">{{ d.addressLine2 }}</span>
+                </div>
+              }
+              <div class="detail-row">
+                <span class="detail-label">Postal Code</span>
+                <span class="detail-value">{{ d.postalCode || '—' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 3: Donation Info -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-500 mb-3">Donation History</h3>
+            <div class="space-y-2">
+              <div class="detail-row">
+                <span class="detail-label">Total Donations</span>
+                <span class="detail-value font-bold text-lg">{{ d.totalDonations }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Last Donation</span>
+                <span class="detail-value">
+                  @if (d.lastDonationDate) {
+                    {{ d.lastDonationDate | date:'mediumDate' }}
+                  } @else {
+                    <span class="text-gray-400">Never</span>
+                  }
+                </span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Registered</span>
+                <span class="detail-value">{{ d.registrationDate | date:'mediumDate' }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Donor Type</span>
+                <span class="detail-value">{{ d.donorType }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Nationality</span>
+                <span class="detail-value">{{ d.nationality || '—' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tabs: Health Records, Consents -->
+    <mat-tab-group
+      (selectedIndexChange)="onTabChange($event)"
+      animationDuration="200ms">
+
+      <!-- Health Records Tab -->
+      <mat-tab label="Health Records">
+        <div class="p-4">
+          @if (healthRecords().length === 0) {
+            <p class="text-gray-500 text-center py-8">No health records found.</p>
+          } @else {
+            <table mat-table [dataSource]="healthRecords()" class="w-full">
+              <ng-container matColumnDef="screeningDate">
+                <th mat-header-cell *matHeaderCellDef>Screening Date</th>
+                <td mat-cell *matCellDef="let record">{{ record.screeningDate | date:'medium' }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="hemoglobinGdl">
+                <th mat-header-cell *matHeaderCellDef>Hemoglobin (g/dL)</th>
+                <td mat-cell *matCellDef="let record">{{ record.hemoglobinGdl }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="bloodPressure">
+                <th mat-header-cell *matHeaderCellDef>Blood Pressure</th>
+                <td mat-cell *matCellDef="let record">{{ record.bloodPressureSystolic }}/{{ record.bloodPressureDiastolic }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="pulseRate">
+                <th mat-header-cell *matHeaderCellDef>Pulse Rate</th>
+                <td mat-cell *matCellDef="let record">{{ record.pulseRate }} bpm</td>
+              </ng-container>
+
+              <ng-container matColumnDef="weightKg">
+                <th mat-header-cell *matHeaderCellDef>Weight (kg)</th>
+                <td mat-cell *matCellDef="let record">{{ record.weightKg }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="isEligible">
+                <th mat-header-cell *matHeaderCellDef>Eligible</th>
+                <td mat-cell *matCellDef="let record">
+                  <mat-icon [class]="record.isEligible ? 'text-green-600' : 'text-red-600'">
+                    {{ record.isEligible ? 'check_circle' : 'cancel' }}
+                  </mat-icon>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="healthRecordColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: healthRecordColumns"></tr>
+            </table>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- Consents Tab -->
+      <mat-tab label="Consents">
+        <div class="p-4">
+          @if (consents().length === 0) {
+            <p class="text-gray-500 text-center py-8">No consent records found.</p>
+          } @else {
+            <table mat-table [dataSource]="consents()" class="w-full">
+              <ng-container matColumnDef="consentType">
+                <th mat-header-cell *matHeaderCellDef>Type</th>
+                <td mat-cell *matCellDef="let consent">{{ consent.consentType }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="consentGiven">
+                <th mat-header-cell *matHeaderCellDef>Given</th>
+                <td mat-cell *matCellDef="let consent">
+                  <mat-icon [class]="consent.consentGiven ? 'text-green-600' : 'text-red-600'">
+                    {{ consent.consentGiven ? 'check_circle' : 'cancel' }}
+                  </mat-icon>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="consentDate">
+                <th mat-header-cell *matHeaderCellDef>Date</th>
+                <td mat-cell *matCellDef="let consent">{{ consent.consentDate | date:'mediumDate' }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="expiryDate">
+                <th mat-header-cell *matHeaderCellDef>Expiry</th>
+                <td mat-cell *matCellDef="let consent">
+                  @if (consent.expiryDate) {
+                    {{ consent.expiryDate | date:'mediumDate' }}
+                  } @else {
+                    <span class="text-gray-400">No expiry</span>
+                  }
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="consentColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: consentColumns"></tr>
+            </table>
+          }
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</div>

@@ -1,0 +1,207 @@
+<div class="donor-form-container p-6">
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6">
+    <button mat-icon-button matTooltip="Cancel" aria-label="Go back" (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-2xl font-bold">{{ pageTitle() }}</h1>
+  </div>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="8" [columns]="2" />
+  } @else if (error() && !saving()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadDonor(donorId() ?? '')" />
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <mat-card>
+        <mat-card-content class="p-6">
+
+          <!-- Personal Information -->
+          <h2 class="text-lg font-semibold mb-4">Personal Information</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <app-form-field
+              label="First Name"
+              [control]="firstNameCtrl"
+              [errorMessages]="errorMessages['firstName']"
+              [required]="true" />
+            <app-form-field
+              label="Last Name"
+              [control]="lastNameCtrl"
+              [errorMessages]="errorMessages['lastName']"
+              [required]="true" />
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Date of Birth -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Date of Birth</mat-label>
+              <input
+                matInput
+                [matDatepicker]="dobPicker"
+                formControlName="dateOfBirth"
+                placeholder="Select date"
+                required />
+              <mat-datepicker-toggle matIconSuffix [for]="dobPicker" />
+              <mat-datepicker #dobPicker />
+              @if (form.controls.dateOfBirth.hasError('required') && form.controls.dateOfBirth.touched) {
+                <mat-error>Date of birth is required</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Gender -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Gender</mat-label>
+              <mat-select formControlName="gender" required>
+                @for (option of genderOptions; track option.value) {
+                  <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                }
+              </mat-select>
+              @if (form.controls.gender.hasError('required') && form.controls.gender.touched) {
+                <mat-error>Gender is required</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- National ID -->
+            <app-form-field
+              label="National ID"
+              [control]="nationalIdCtrl"
+              [errorMessages]="errorMessages['nationalId']"
+              [required]="true" />
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <app-form-field
+              label="Nationality"
+              [control]="nationalityCtrl"
+              [errorMessages]="errorMessages['nationality']"
+              [required]="true" />
+            <app-form-field
+              label="Occupation"
+              [control]="occupationCtrl" />
+          </div>
+
+          <mat-divider class="my-6" />
+
+          <!-- Blood Information -->
+          <h2 class="text-lg font-semibold mb-4">Blood Information</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Blood Group -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Blood Group</mat-label>
+              <mat-select formControlName="bloodGroupId" required>
+                @for (option of bloodGroupOptions; track option.value) {
+                  <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                }
+              </mat-select>
+              @if (form.controls.bloodGroupId.hasError('required') && form.controls.bloodGroupId.touched) {
+                <mat-error>Blood group is required</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Rh Factor -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Rh Factor</mat-label>
+              <mat-select formControlName="rhFactor">
+                <mat-option value="POSITIVE">Positive (+)</mat-option>
+                <mat-option value="NEGATIVE">Negative (−)</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <!-- Donor Type -->
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Donor Type</mat-label>
+              <mat-select formControlName="donorType" required>
+                @for (option of donorTypeOptions; track option.value) {
+                  <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <mat-divider class="my-6" />
+
+          <!-- Contact Information -->
+          <h2 class="text-lg font-semibold mb-4">Contact Information</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <app-form-field
+              label="Email"
+              type="email"
+              [control]="emailCtrl"
+              [errorMessages]="errorMessages['email']"
+              [required]="true" />
+            <app-form-field
+              label="Phone"
+              type="tel"
+              [control]="phoneCtrl"
+              [errorMessages]="errorMessages['phone']"
+              [required]="true"
+              placeholder="+1 234 567 8900" />
+          </div>
+
+          <mat-divider class="my-6" />
+
+          <!-- Address -->
+          <h2 class="text-lg font-semibold mb-4">Address</h2>
+          <div class="grid grid-cols-1 gap-4">
+            <app-form-field
+              label="Address Line 1"
+              [control]="addressLine1Ctrl"
+              [errorMessages]="errorMessages['addressLine1']"
+              [required]="true" />
+            <app-form-field
+              label="Address Line 2"
+              [control]="addressLine2Ctrl" />
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <app-form-field
+              label="Postal Code"
+              [control]="postalCodeCtrl" />
+          </div>
+
+          @if (!isEditMode()) {
+            <mat-divider class="my-6" />
+
+            <!-- Consent -->
+            <div class="flex items-start gap-2">
+              <mat-checkbox formControlName="consent" color="primary">
+                I consent to the collection and processing of my personal health data
+                for blood donation purposes in accordance with applicable regulations.
+              </mat-checkbox>
+            </div>
+          }
+        </mat-card-content>
+
+        <!-- Actions -->
+        <mat-card-actions class="flex justify-end gap-3 p-4">
+          <button
+            mat-button
+            type="button"
+            (click)="cancel()"
+            [disabled]="saving()">
+            Cancel
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="saving() || (!isEditMode() && !form.controls.consent.value)">
+            @if (saving()) {
+              <mat-spinner diameter="20" role="status" aria-label="Saving donor information" />
+            } @else {
+              <ng-container>
+                <mat-icon>{{ isEditMode() ? 'save' : 'person_add' }}</mat-icon>
+                {{ submitLabel() }}
+              </ng-container>
+            }
+          </button>
+        </mat-card-actions>
+      </mat-card>
+
+      @if (error() && saving()) {
+        <div class="mt-4">
+          <app-error-card [message]="error() ?? ''" />
+        </div>
+      }
+    </form>
+  }
+</div>

@@ -25,6 +25,14 @@ export const routes: Routes = [
             (m) => m.DASHBOARD_ROUTES,
           ),
       },
+      {
+        path: 'donors',
+        data: { breadcrumb: 'Donors' },
+        loadChildren: () =>
+          import('@features/donor/donor.routes').then(
+            (m) => m.DONOR_ROUTES,
+          ),
+      },
     ],
   },
 
