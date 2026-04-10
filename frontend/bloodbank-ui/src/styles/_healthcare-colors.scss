@@ -1,0 +1,51 @@
+// ==========================================================================
+// Healthcare Colors — BloodBank
+// ==========================================================================
+// CSS Custom Properties for blood groups, clinical statuses, and severity levels
+
+:root {
+  // --- Blood Group Colors ---
+  --bg-a-positive: #DC2626;   // Red-600
+  --bg-a-negative: #B91C1C;   // Red-700
+  --bg-b-positive: #2563EB;   // Blue-600
+  --bg-b-negative: #1D4ED8;   // Blue-700
+  --bg-ab-positive: #7C3AED;  // Violet-600
+  --bg-ab-negative: #6D28D9;  // Violet-700
+  --bg-o-positive: #059669;   // Emerald-600
+  --bg-o-negative: #047857;   // Emerald-700
+
+  // --- Clinical Status Colors ---
+  --status-available: #16A34A;   // Green-600 — unit available
+  --status-reserved: #D97706;    // Amber-600 — unit reserved
+  --status-issued: #2563EB;      // Blue-600 — unit issued
+  --status-quarantine: #DC2626;  // Red-600 — unit quarantined
+  --status-expired: #6B7280;     // Gray-500 — unit expired
+  --status-disposed: #374151;    // Gray-700 — unit disposed
+  --status-tested: #0891B2;      // Cyan-600 — testing complete
+  --status-pending: #F59E0B;     // Amber-500 — pending action
+
+  // --- Severity / Priority Colors ---
+  --severity-critical: #DC2626;  // Red-600
+  --severity-urgent: #EA580C;    // Orange-600
+  --severity-routine: #2563EB;   // Blue-600
+  --severity-low: #16A34A;       // Green-600
+
+  // --- Donation / Collection Status ---
+  --donation-success: #16A34A;   // Successful
+  --donation-deferred: #D97706;  // Deferred
+  --donation-adverse: #DC2626;   // Adverse reaction
+}
+
+// --- Lab-Specific Result Flags ---
+.critical-value {
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+.high-flag {
+  color: #f57c00;
+}
+
+.low-flag {
+  color: #1976d2;
+}

@@ -1,0 +1,18 @@
+// ==========================================================================
+// Typography — BloodBank
+// ==========================================================================
+// Primary: Inter (modern, healthcare-friendly)
+// Fallback: Roboto (Material default), then system fonts
+
+body {
+  font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Heading defaults
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  font-weight: 600;
+  line-height: 1.3;
+}
