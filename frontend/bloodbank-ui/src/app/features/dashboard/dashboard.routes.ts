@@ -5,9 +5,7 @@ export const DASHBOARD_ROUTES: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./dashboard-placeholder.component').then(
-        (m) => m.DashboardPlaceholderComponent,
-      ),
+      import('./dashboard.component').then((m) => m.DashboardComponent),
     canActivate: [roleGuard],
     data: { roles: ['*'] },
   },

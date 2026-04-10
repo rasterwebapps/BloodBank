@@ -1,0 +1,30 @@
+<mat-card class="kpi-card">
+  <mat-card-content>
+    <div class="flex items-center gap-4 p-4">
+      <div class="flex items-center justify-center w-12 h-12 rounded-full" [class]="colorClass()" aria-hidden="true">
+        <mat-icon aria-hidden="true">{{ icon() }}</mat-icon>
+      </div>
+
+      <div class="flex flex-col flex-1 min-w-0">
+        <span class="text-sm font-medium text-gray-500">{{ label() }}</span>
+        <div class="flex items-baseline gap-2">
+          <span class="text-2xl font-bold text-gray-900">{{ value() }}</span>
+
+          @if (trend()) {
+            <span
+              class="text-xs font-semibold"
+              [class.trend-positive]="isPositiveTrend()"
+              [class.trend-negative]="isNegativeTrend()">
+              @if (isPositiveTrend()) {
+                <mat-icon class="trend-icon" aria-hidden="true">trending_up</mat-icon>
+              } @else if (isNegativeTrend()) {
+                <mat-icon class="trend-icon" aria-hidden="true">trending_down</mat-icon>
+              }
+              {{ trend() }}
+            </span>
+          }
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
