@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
 
 /**
  * Animated pulse placeholder rows for loading states.
@@ -25,11 +25,11 @@ export class LoadingSkeletonComponent {
   /** Height of each row in pixels */
   readonly rowHeight = input(20);
 
-  get rowArray(): number[] {
-    return Array.from({ length: this.rows() }, (_, i) => i);
-  }
+  readonly rowArray = computed(() =>
+    Array.from({ length: this.rows() }, (_, i) => i),
+  );
 
-  get columnArray(): number[] {
-    return Array.from({ length: this.columns() }, (_, i) => i);
-  }
+  readonly columnArray = computed(() =>
+    Array.from({ length: this.columns() }, (_, i) => i),
+  );
 }

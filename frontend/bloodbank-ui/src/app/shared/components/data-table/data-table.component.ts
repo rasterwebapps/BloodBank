@@ -5,9 +5,8 @@ import {
   output,
   viewChild,
   AfterViewInit,
-  ContentChild,
 } from '@angular/core';
-import { MatTableModule, MatColumnDef } from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
 import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -73,9 +72,6 @@ export class DataTableComponent<T> implements AfterViewInit {
 
   readonly sort = viewChild(MatSort);
   readonly paginator = viewChild(MatPaginator);
-
-  /** Content-projected column definitions */
-  @ContentChild(MatColumnDef) columnDef!: MatColumnDef;
 
   ngAfterViewInit(): void {
     // Sort and paginator are available after view init

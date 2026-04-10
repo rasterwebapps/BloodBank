@@ -6,7 +6,8 @@
 
   <!-- Branch selector -->
   @if (branches().length > 1) {
-    <button mat-button [matMenuTriggerFor]="branchMenu" class="branch-selector">
+    <button mat-button [matMenuTriggerFor]="branchMenu" class="branch-selector"
+      [attr.aria-label]="'Select branch: ' + (currentBranch()?.name ?? 'No branch selected')">
       <mat-icon>business</mat-icon>
       <span>{{ currentBranch()?.name ?? 'Select Branch' }}</span>
       <mat-icon>arrow_drop_down</mat-icon>
