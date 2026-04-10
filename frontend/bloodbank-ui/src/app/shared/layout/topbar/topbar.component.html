@@ -1,0 +1,56 @@
+<mat-toolbar class="topbar">
+  <!-- Hamburger menu -->
+  <button mat-icon-button (click)="onToggleSidenav()" aria-label="Toggle navigation">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <!-- Branch selector -->
+  @if (branches().length > 1) {
+    <button mat-button [matMenuTriggerFor]="branchMenu" class="branch-selector">
+      <mat-icon>business</mat-icon>
+      <span>{{ currentBranch()?.name ?? 'Select Branch' }}</span>
+      <mat-icon>arrow_drop_down</mat-icon>
+    </button>
+    <mat-menu #branchMenu="matMenu">
+      @for (branch of branches(); track branch.id) {
+        <button mat-menu-item (click)="onSelectBranch(branch.id)">
+          {{ branch.name }}
+        </button>
+      }
+    </mat-menu>
+  } @else if (currentBranch()) {
+    <span class="branch-name">{{ currentBranch()?.name }}</span>
+  }
+
+  <span class="topbar-spacer"></span>
+
+  <!-- Theme toggle -->
+  <button mat-icon-button (click)="onToggleTheme()" [attr.aria-label]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'">
+    <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+
+  <!-- Notifications -->
+  <button mat-icon-button aria-label="Notifications" matBadge="3" matBadgeColor="warn" matBadgeSize="small">
+    <mat-icon>notifications</mat-icon>
+  </button>
+
+  <!-- User menu -->
+  <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="User menu">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #userMenu="matMenu">
+    <div class="user-info">
+      <strong>{{ displayName() }}</strong>
+      <small>{{ user()?.email }}</small>
+    </div>
+    <mat-divider />
+    <button mat-menu-item (click)="onManageAccount()">
+      <mat-icon>person</mat-icon>
+      <span>My Account</span>
+    </button>
+    <button mat-menu-item (click)="onLogout()">
+      <mat-icon>logout</mat-icon>
+      <span>Sign Out</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>

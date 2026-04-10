@@ -1,0 +1,38 @@
+@if (isMobile() && !collapsed()) {
+  <div class="sidenav-backdrop" (click)="onBackdropClick()"></div>
+}
+
+<nav
+  class="sidenav"
+  [class.sidenav-collapsed]="collapsed()"
+  [class.sidenav-mobile]="isMobile()"
+  [class.sidenav-mobile-open]="isMobile() && !collapsed()"
+  role="navigation"
+  aria-label="Main navigation">
+
+  <!-- Brand -->
+  <div class="sidenav-brand">
+    <mat-icon class="brand-icon">bloodtype</mat-icon>
+    @if (!collapsed()) {
+      <span class="brand-text">BloodBank</span>
+    }
+  </div>
+
+  <!-- Nav items -->
+  <mat-nav-list>
+    @for (item of navItems(); track item.route) {
+      <a
+        mat-list-item
+        [routerLink]="item.route"
+        routerLinkActive="active-link"
+        [matTooltip]="collapsed() ? item.label : ''"
+        matTooltipPosition="right"
+        (click)="onBackdropClick()">
+        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+        @if (!collapsed()) {
+          <span matListItemTitle>{{ item.label }}</span>
+        }
+      </a>
+    }
+  </mat-nav-list>
+</nav>

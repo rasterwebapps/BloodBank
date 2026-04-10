@@ -1,0 +1,29 @@
+:host {
+  display: block;
+}
+
+.error-card {
+  max-width: 480px;
+  margin: 24px auto;
+}
+
+.error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+}
+
+.error-message {
+  font-size: 0.875rem;
+  color: rgba(0, 0, 0, 0.54);
+  margin: 0 0 16px;
+}

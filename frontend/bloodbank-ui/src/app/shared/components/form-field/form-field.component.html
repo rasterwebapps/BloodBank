@@ -1,0 +1,15 @@
+<mat-form-field appearance="outline" class="w-full">
+  <mat-label>{{ label() }}</mat-label>
+  <input
+    matInput
+    [formControl]="control()"
+    [type]="type()"
+    [placeholder]="placeholder()"
+    [required]="required()" />
+  @if (hint()) {
+    <mat-hint>{{ hint() }}</mat-hint>
+  }
+  @if (errorMessage) {
+    <mat-error>{{ errorMessage }}</mat-error>
+  }
+</mat-form-field>

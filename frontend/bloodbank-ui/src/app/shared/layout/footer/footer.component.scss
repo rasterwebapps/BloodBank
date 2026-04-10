@@ -1,0 +1,18 @@
+:host {
+  display: block;
+}
+
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.54);
+  border-top: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+  background-color: var(--mat-sys-surface, #fff);
+}
+
+.footer-version {
+  font-weight: 500;
+}

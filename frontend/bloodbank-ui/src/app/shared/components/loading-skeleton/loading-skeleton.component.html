@@ -1,0 +1,9 @@
+<div class="skeleton-container" role="status" aria-label="Loading content">
+  @for (row of rowArray; track row) {
+    <div class="skeleton-row">
+      @for (col of columnArray; track col) {
+        <div class="skeleton-cell" [style.height.px]="rowHeight()"></div>
+      }
+    </div>
+  }
+</div>
