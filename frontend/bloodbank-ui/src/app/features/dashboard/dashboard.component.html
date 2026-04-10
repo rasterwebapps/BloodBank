@@ -1,0 +1,119 @@
+<div class="dashboard-container p-6">
+  <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="4" [columns]="4" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadDashboard()" />
+  } @else {
+    <!-- KPI Cards -->
+    @if (kpis(); as kpiData) {
+      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <app-kpi-card
+          label="Donors Today"
+          [value]="kpiData.totalDonorsToday"
+          icon="people"
+          colorClass="bg-blue-50 text-blue-700" />
+
+        <app-kpi-card
+          label="Donors This Month"
+          [value]="kpiData.totalDonorsMonth"
+          icon="calendar_month"
+          colorClass="bg-indigo-50 text-indigo-700" />
+
+        <app-kpi-card
+          label="Collections Today"
+          [value]="kpiData.collectionsToday"
+          icon="bloodtype"
+          colorClass="bg-red-50 text-red-700" />
+
+        <app-kpi-card
+          label="Pending Lab Tests"
+          [value]="kpiData.pendingTestOrders"
+          icon="science"
+          colorClass="bg-amber-50 text-amber-700" />
+
+        <app-kpi-card
+          label="Expiring Units"
+          [value]="kpiData.expiringUnits"
+          icon="warning"
+          colorClass="bg-orange-50 text-orange-700" />
+
+        <app-kpi-card
+          label="Open Hospital Requests"
+          [value]="kpiData.openHospitalRequests"
+          icon="local_hospital"
+          colorClass="bg-green-50 text-green-700" />
+      </section>
+    }
+
+    <!-- Charts Section -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Blood Stock Levels -->
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>
+            <div class="flex items-center gap-2">
+              <mat-icon aria-hidden="true">inventory_2</mat-icon>
+              Blood Stock Levels
+            </div>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-wrapper">
+            <canvas
+              baseChart
+              type="bar"
+              [data]="stockChartData()"
+              [options]="stockChartOptions">
+            </canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Collection Status -->
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>
+            <div class="flex items-center gap-2">
+              <mat-icon aria-hidden="true">donut_large</mat-icon>
+              Collection Status
+            </div>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-wrapper">
+            <canvas
+              baseChart
+              type="doughnut"
+              [data]="collectionChartData()"
+              [options]="collectionChartOptions">
+            </canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Donation Trends -->
+      <mat-card class="lg:col-span-2">
+        <mat-card-header>
+          <mat-card-title>
+            <div class="flex items-center gap-2">
+              <mat-icon aria-hidden="true">show_chart</mat-icon>
+              Donation Trends (Last 30 Days)
+            </div>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-wrapper chart-wrapper--wide">
+            <canvas
+              baseChart
+              type="line"
+              [data]="trendChartData()"
+              [options]="trendChartOptions">
+            </canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </section>
+  }
+</div>

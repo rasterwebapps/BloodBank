@@ -1,0 +1,23 @@
+.kpi-card {
+  height: 100%;
+}
+
+.trend-positive {
+  color: #16a34a; // green-600
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.trend-negative {
+  color: #dc2626; // red-600
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.trend-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
