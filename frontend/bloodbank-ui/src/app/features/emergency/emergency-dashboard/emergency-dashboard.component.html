@@ -1,0 +1,161 @@
+<div class="emergency-dashboard-container p-6">
+
+  <!-- Page header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-red-700">Emergency Dashboard</h1>
+      <p class="text-sm text-gray-500 mt-1">Live status — refreshes every 30 seconds</p>
+    </div>
+    <div class="flex gap-3">
+      <button
+        mat-stroked-button
+        color="primary"
+        matTooltip="View disaster events"
+        aria-label="View disaster response"
+        (click)="viewDisasters()">
+        <mat-icon>public</mat-icon>
+        Disaster Response
+      </button>
+      <button
+        mat-raised-button
+        color="warn"
+        aria-label="Create new emergency blood request"
+        (click)="createEmergency()">
+        <mat-icon>add_alert</mat-icon>
+        Create Emergency
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+
+    <mat-card class="summary-card summary-card--active">
+      <mat-card-content class="p-4 flex items-center gap-4">
+        <mat-icon class="summary-icon text-red-600" aria-hidden="true">emergency</mat-icon>
+        <div>
+          <p class="text-sm text-gray-500">Active Emergencies</p>
+          <p class="text-3xl font-bold text-red-600">{{ activeCount() }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card summary-card--matched">
+      <mat-card-content class="p-4 flex items-center gap-4">
+        <mat-icon class="summary-icon text-green-600" aria-hidden="true">bloodtype</mat-icon>
+        <div>
+          <p class="text-sm text-gray-500">Matched Units</p>
+          <p class="text-3xl font-bold text-green-600">{{ matchedCount() }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card summary-card--dispatched">
+      <mat-card-content class="p-4 flex items-center gap-4">
+        <mat-icon class="summary-icon text-blue-600" aria-hidden="true">local_shipping</mat-icon>
+        <div>
+          <p class="text-sm text-gray-500">Dispatched</p>
+          <p class="text-3xl font-bold text-blue-600">{{ dispatchedCount() }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- Active emergencies table -->
+  <section aria-labelledby="active-heading">
+    <h2 id="active-heading" class="text-xl font-semibold mb-4">Active &amp; Matched Requests</h2>
+
+    @if (loading()) {
+      <app-loading-skeleton [rows]="6" [columns]="7" />
+    } @else if (error()) {
+      <app-error-card [message]="error()!" (retry)="loadEmergencies()" />
+    } @else if (isEmpty()) {
+      <app-empty-state
+        icon="check_circle"
+        message="No active emergencies at this time"
+        actionLabel="Create Emergency Request"
+        (action)="createEmergency()" />
+    } @else {
+      <mat-card>
+        <mat-card-content>
+          <table
+            mat-table
+            [dataSource]="activeRequests()"
+            class="w-full"
+            aria-label="Active emergency requests">
+
+            <!-- Request Number -->
+            <ng-container matColumnDef="requestNumber">
+              <th mat-header-cell *matHeaderCellDef>Request #</th>
+              <td mat-cell *matCellDef="let req">
+                <span class="font-medium text-sm">{{ req.requestNumber }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Patient Name -->
+            <ng-container matColumnDef="patientName">
+              <th mat-header-cell *matHeaderCellDef>Patient</th>
+              <td mat-cell *matCellDef="let req">{{ req.patientName }}</td>
+            </ng-container>
+
+            <!-- Blood Group -->
+            <ng-container matColumnDef="bloodGroup">
+              <th mat-header-cell *matHeaderCellDef>Blood Group</th>
+              <td mat-cell *matCellDef="let req">
+                <span class="font-semibold">{{ req.bloodGroup }}{{ req.rhFactor }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Priority Level -->
+            <ng-container matColumnDef="priorityLevel">
+              <th mat-header-cell *matHeaderCellDef>Priority</th>
+              <td mat-cell *matCellDef="let req">
+                <span class="priority-badge {{ getPriorityClass(req.priorityLevel) }}">
+                  {{ getPriorityLabel(req.priorityLevel) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Status -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let req">
+                <app-status-badge [status]="req.status" />
+              </td>
+            </ng-container>
+
+            <!-- Requested At -->
+            <ng-container matColumnDef="requestedAt">
+              <th mat-header-cell *matHeaderCellDef>Requested</th>
+              <td mat-cell *matCellDef="let req">
+                {{ req.requestedAt | date:'short' }}
+              </td>
+            </ng-container>
+
+            <!-- Actions -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let req">
+                <button
+                  mat-icon-button
+                  matTooltip="View Details"
+                  aria-label="View emergency request details">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: displayedColumns;"
+              class="emergency-row"
+              [class.row-critical]="row.priorityLevel === 'P1_CRITICAL'">
+            </tr>
+          </table>
+        </mat-card-content>
+      </mat-card>
+    }
+  </section>
+</div>

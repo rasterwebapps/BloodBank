@@ -73,6 +73,14 @@ export const routes: Routes = [
             (m) => m.TRANSFUSION_ROUTES,
           ),
       },
+      {
+        path: 'emergency',
+        data: { breadcrumb: 'Emergency' },
+        loadChildren: () =>
+          import('@features/emergency/emergency.routes').then(
+            (m) => m.EMERGENCY_ROUTES,
+          ),
+      },
     ],
   },
 

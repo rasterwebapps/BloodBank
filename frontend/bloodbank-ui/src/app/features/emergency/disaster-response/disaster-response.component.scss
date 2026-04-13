@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+// Disaster card selection state
+.disaster-card {
+  transition: box-shadow 150ms ease, border-color 150ms ease;
+  border: 2px solid transparent;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #1976d2;
+    outline-offset: 2px;
+  }
+
+  &--selected {
+    border-color: #1976d2;
+  }
+}
+
+// Severity colour classes
+.severity-low      { color: #16a34a; }
+.severity-medium   { color: #ca8a04; }
+.severity-high     { color: #ea580c; }
+.severity-critical { color: #dc2626; font-weight: 700; }
