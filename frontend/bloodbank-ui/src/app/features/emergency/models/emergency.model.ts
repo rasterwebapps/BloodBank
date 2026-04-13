@@ -1,7 +1,7 @@
 /**
  * Domain models for the Emergency feature.
  * Covers emergency blood requests, unit matching,
- * disaster events, and donor mobilisation.
+ * disaster events, and donor mobilization.
  */
 
 // ── Enums ──────────────────────────────────────────────────────────────────

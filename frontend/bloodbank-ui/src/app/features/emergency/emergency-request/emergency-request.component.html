@@ -201,9 +201,7 @@
     } @else if (isRecentEmpty()) {
       <app-empty-state
         icon="emergency_home"
-        message="No emergency requests found"
-        actionLabel="Create First Request"
-        (action)="onSubmit()" />
+        message="No emergency requests found" />
     } @else {
       <mat-card>
         <mat-card-content>
