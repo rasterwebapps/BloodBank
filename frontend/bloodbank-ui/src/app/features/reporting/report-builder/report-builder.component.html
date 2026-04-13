@@ -1,0 +1,106 @@
+<div class="report-builder-container p-6">
+  <h1 class="text-2xl font-bold mb-6">Report Builder</h1>
+
+  <mat-card class="mb-6">
+    <mat-card-header>
+      <mat-card-title>Generate Report</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="form" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        <mat-form-field appearance="outline">
+          <mat-label>Report Name</mat-label>
+          <input matInput formControlName="name" />
+          @if (form.controls.name.hasError('required')) {
+            <mat-error>Required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Report Type</mat-label>
+          <mat-select formControlName="type">
+            @for (t of reportTypes; track t) {
+              <mat-option [value]="t">{{ t }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Format</mat-label>
+          <mat-select formControlName="format">
+            @for (f of reportFormats; track f) {
+              <mat-option [value]="f">{{ f }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>From Date</mat-label>
+          <input matInput type="date" formControlName="fromDate" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>To Date</mat-label>
+          <input matInput type="date" formControlName="toDate" />
+        </mat-form-field>
+      </form>
+    </mat-card-content>
+    <mat-card-actions>
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="form.invalid || generating()"
+        (click)="generateReport()">
+        <mat-icon>assessment</mat-icon>
+        @if (generating()) { Generating... } @else { Generate Report }
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Recent Reports -->
+  <h2 class="text-xl font-semibold mb-4">Recent Reports</h2>
+
+  @if (reports().length === 0) {
+    <app-empty-state icon="assessment" message="No reports generated yet" />
+  } @else {
+    <app-data-table
+      [dataSource]="reports()"
+      [columns]="displayedColumns"
+      [totalElements]="totalElements()"
+      [pageSize]="10"
+      [loading]="false">
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let r"><span class="font-medium">{{ r.name }}</span></td>
+      </ng-container>
+
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let r">{{ r.type }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="format">
+        <th mat-header-cell *matHeaderCellDef>Format</th>
+        <td mat-cell *matCellDef="let r">
+          <mat-chip>{{ r.format }}</mat-chip>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="generatedAt">
+        <th mat-header-cell *matHeaderCellDef>Generated</th>
+        <td mat-cell *matCellDef="let r">{{ r.generatedAt | date:'medium' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let r">
+          @if (r.fileUrl) {
+            <button mat-icon-button matTooltip="Download" color="primary" (click)="downloadReport(r)">
+              <mat-icon>download</mat-icon>
+            </button>
+          }
+        </td>
+      </ng-container>
+    </app-data-table>
+  }
+</div>

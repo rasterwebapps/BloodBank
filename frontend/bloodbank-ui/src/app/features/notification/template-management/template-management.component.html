@@ -1,0 +1,127 @@
+<div class="template-management-container p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Notification Templates</h1>
+    <button mat-raised-button color="primary" (click)="toggleForm()">
+      <mat-icon>{{ showForm() ? 'close' : 'add' }}</mat-icon>
+      {{ showForm() ? 'Cancel' : 'New Template' }}
+    </button>
+  </div>
+
+  @if (showForm()) {
+    <mat-card class="mb-6">
+      <mat-card-header><mat-card-title>New Template</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Code</mat-label>
+            <input matInput formControlName="code" />
+            @if (form.controls.code.hasError('required')) {
+              <mat-error>Required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" />
+            @if (form.controls.name.hasError('required')) {
+              <mat-error>Required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Type</mat-label>
+            <mat-select formControlName="type">
+              @for (t of templateTypes; track t) {
+                <mat-option [value]="t">{{ t }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Channel</mat-label>
+            <mat-select formControlName="channel">
+              @for (c of channels; track c) {
+                <mat-option [value]="c">{{ c }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="md:col-span-2">
+            <mat-label>Subject (for Email)</mat-label>
+            <input matInput formControlName="subject" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="md:col-span-2">
+            <mat-label>Body</mat-label>
+            <textarea matInput formControlName="body" rows="5" placeholder="Use {{ '{{variable}}' }} for placeholders"></textarea>
+            @if (form.controls.body.hasError('required')) {
+              <mat-error>Required</mat-error>
+            }
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" [disabled]="form.invalid || submitting()" (click)="saveTemplate()">
+          @if (submitting()) { Saving... } @else { Save Template }
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  }
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="6" [columns]="6" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadTemplates()" />
+  } @else if (isEmpty()) {
+    <app-empty-state icon="wysiwyg" message="No templates created yet" />
+  } @else {
+    <app-data-table
+      [dataSource]="templates()"
+      [columns]="displayedColumns"
+      [totalElements]="totalElements()"
+      [pageSize]="pageSize()"
+      [loading]="loading()"
+      (pageChange)="onPageChange($event)">
+
+      <ng-container matColumnDef="code">
+        <th mat-header-cell *matHeaderCellDef>Code</th>
+        <td mat-cell *matCellDef="let t"><span class="font-mono text-sm">{{ t.code }}</span></td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let t">{{ t.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let t">{{ t.type }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="channel">
+        <th mat-header-cell *matHeaderCellDef>Channel</th>
+        <td mat-cell *matCellDef="let t">
+          <mat-chip>{{ t.channel }}</mat-chip>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="isActive">
+        <th mat-header-cell *matHeaderCellDef>Active</th>
+        <td mat-cell *matCellDef="let t">
+          <mat-chip [color]="t.isActive ? 'primary' : 'warn'" highlighted>
+            {{ t.isActive ? 'Active' : 'Inactive' }}
+          </mat-chip>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let t">
+          <button mat-icon-button color="warn" matTooltip="Delete" (click)="deleteTemplate(t)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+    </app-data-table>
+  }
+</div>

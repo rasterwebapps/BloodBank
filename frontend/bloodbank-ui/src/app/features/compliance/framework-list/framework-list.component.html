@@ -1,0 +1,52 @@
+<div class="framework-list-container p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Regulatory Frameworks</h1>
+  </div>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="6" [columns]="6" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadFrameworks()" />
+  } @else if (isEmpty()) {
+    <app-empty-state icon="policy" message="No regulatory frameworks found" />
+  } @else {
+    <app-data-table
+      [dataSource]="frameworks()"
+      [columns]="displayedColumns"
+      [totalElements]="totalElements()"
+      [pageSize]="pageSize()"
+      [loading]="loading()"
+      (pageChange)="onPageChange($event)">
+
+      <ng-container matColumnDef="code">
+        <th mat-header-cell *matHeaderCellDef>Code</th>
+        <td mat-cell *matCellDef="let f"><span class="font-mono text-sm">{{ f.code }}</span></td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let f"><span class="font-medium">{{ f.name }}</span></td>
+      </ng-container>
+
+      <ng-container matColumnDef="issuingAuthority">
+        <th mat-header-cell *matHeaderCellDef>Issuing Authority</th>
+        <td mat-cell *matCellDef="let f">{{ f.issuingAuthority }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="version">
+        <th mat-header-cell *matHeaderCellDef>Version</th>
+        <td mat-cell *matCellDef="let f">{{ f.version }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="effectiveDate">
+        <th mat-header-cell *matHeaderCellDef>Effective Date</th>
+        <td mat-cell *matCellDef="let f">{{ f.effectiveDate | date:'mediumDate' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let f"><app-status-badge [status]="f.status" /></td>
+      </ng-container>
+    </app-data-table>
+  }
+</div>
