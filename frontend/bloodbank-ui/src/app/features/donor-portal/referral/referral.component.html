@@ -1,0 +1,89 @@
+<div class="p-6">
+  <h1 class="text-2xl font-bold mb-6">Refer a Friend</h1>
+
+  @if (loading()) {
+    <app-loading-skeleton />
+  } @else if (error()) {
+    <app-error-card [message]="error()!" (retry)="load()" />
+  } @else {
+    <!-- Referral Link Card -->
+    <mat-card class="mb-6">
+      <mat-card-header>
+        <mat-icon mat-card-avatar color="primary">share</mat-icon>
+        <mat-card-title>Your Referral Link</mat-card-title>
+        <mat-card-subtitle>Share this link to invite friends to donate blood</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="pt-4">
+        <div class="flex items-center gap-2">
+          <mat-form-field appearance="outline" class="flex-1">
+            <mat-label>Referral Link</mat-label>
+            <input matInput [value]="referralInfo()?.url ?? ''" readonly />
+            <mat-icon matPrefix>link</mat-icon>
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="copyLink()">
+            <mat-icon>content_copy</mat-icon> Copy
+          </button>
+        </div>
+        <p class="text-sm text-gray-500 mt-1">Your referral code: <strong>{{ referralInfo()?.code }}</strong></p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <mat-card>
+        <mat-card-content class="flex items-center gap-4 p-4">
+          <mat-icon color="primary" style="font-size:36px;width:36px;height:36px">people</mat-icon>
+          <div>
+            <div class="text-3xl font-bold">{{ referralInfo()?.totalReferrals ?? 0 }}</div>
+            <div class="text-sm text-gray-500">Total Referrals</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card>
+        <mat-card-content class="flex items-center gap-4 p-4">
+          <mat-icon class="text-green-600" style="font-size:36px;width:36px;height:36px">how_to_reg</mat-icon>
+          <div>
+            <div class="text-3xl font-bold text-green-700">{{ referralInfo()?.successfulReferrals ?? 0 }}</div>
+            <div class="text-sm text-gray-500">Successful Donors</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Referrals Table -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Friends Referred</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (referrals().length === 0) {
+          <div class="flex flex-col items-center py-8 gap-3">
+            <mat-icon style="font-size:48px;width:48px;height:48px" class="text-gray-300">people_outline</mat-icon>
+            <p class="text-gray-500">No referrals yet. Share your link to get started!</p>
+          </div>
+        } @else {
+          <table mat-table [dataSource]="referrals()" class="w-full">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let r">{{ r.name }}</td>
+            </ng-container>
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef>Email</th>
+              <td mat-cell *matCellDef="let r">{{ r.email }}</td>
+            </ng-container>
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let r"><app-status-badge [status]="r.status" /></td>
+            </ng-container>
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef>Date</th>
+              <td mat-cell *matCellDef="let r">{{ r.date | date:'mediumDate' }}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

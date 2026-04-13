@@ -1,0 +1,144 @@
+<div class="p-6">
+  @if (loading()) {
+    <app-loading-skeleton />
+  } @else if (error()) {
+    <app-error-card [message]="error()!" (retry)="loadAll()" />
+  } @else {
+    <!-- Welcome -->
+    <div class="flex items-center gap-4 mb-6">
+      <mat-icon class="text-red-600 text-4xl" style="font-size:40px;width:40px;height:40px">favorite</mat-icon>
+      <div>
+        <h1 class="text-2xl font-bold">Welcome back, {{ profile()?.firstName }}!</h1>
+        <div class="flex items-center gap-2 mt-1">
+          <app-blood-group-badge [bloodGroup]="profile()?.bloodGroup ?? ''" />
+          <mat-chip [style.background-color]="tierColor()" class="text-white font-semibold">
+            {{ profile()?.loyaltyTier }} Donor
+          </mat-chip>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <mat-card>
+        <mat-card-content class="flex items-center gap-4 p-4">
+          <mat-icon color="primary" class="text-3xl" style="font-size:36px;width:36px;height:36px">volunteer_activism</mat-icon>
+          <div>
+            <div class="text-3xl font-bold">{{ profile()?.totalDonations ?? 0 }}</div>
+            <div class="text-sm text-gray-500">Total Donations</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-content class="flex items-center gap-4 p-4">
+          <mat-icon color="accent" class="text-3xl" style="font-size:36px;width:36px;height:36px">event_available</mat-icon>
+          <div>
+            <div class="text-lg font-semibold">
+              {{ profile()?.nextEligibleDate ? (profile()!.nextEligibleDate | date:'mediumDate') : 'Eligible Now' }}
+            </div>
+            <div class="text-sm text-gray-500">Next Eligible Date</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-content class="flex items-center gap-4 p-4">
+          <mat-icon class="text-3xl" style="font-size:36px;width:36px;height:36px;color:#ffd700">military_tech</mat-icon>
+          <div>
+            <div class="text-lg font-semibold" [style.color]="tierColor()">{{ profile()?.loyaltyTier }}</div>
+            <div class="text-sm text-gray-500">Loyalty Tier</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="flex flex-wrap gap-3 mb-6">
+      <button mat-raised-button color="primary" (click)="navigateTo('appointments/book')">
+        <mat-icon>calendar_month</mat-icon> Book Appointment
+      </button>
+      <button mat-stroked-button (click)="navigateTo('eligibility')">
+        <mat-icon>fact_check</mat-icon> Check Eligibility
+      </button>
+      <button mat-stroked-button (click)="navigateTo('card')">
+        <mat-icon>credit_card</mat-icon> My Card
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Recent Donations -->
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Recent Donations</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (recentDonations().length === 0) {
+            <p class="text-gray-500 py-4">No donations yet.</p>
+          } @else {
+            @for (d of recentDonations(); track d.id) {
+              <div class="flex justify-between items-center py-2">
+                <div>
+                  <div class="font-medium">{{ d.location }}</div>
+                  <div class="text-sm text-gray-500">{{ d.date | date:'mediumDate' }}</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm">{{ d.volume }} mL</span>
+                  <app-status-badge [status]="d.status" />
+                </div>
+              </div>
+              <mat-divider />
+            }
+          }
+          <button mat-button color="primary" class="mt-2" (click)="navigateTo('history')">View All</button>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Upcoming Appointments -->
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Upcoming Appointments</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (upcomingAppointments().length === 0) {
+            <p class="text-gray-500 py-4">No upcoming appointments.</p>
+          } @else {
+            @for (a of upcomingAppointments(); track a.id) {
+              <div class="flex justify-between items-center py-2">
+                <div>
+                  <div class="font-medium">{{ a.branchName }}</div>
+                  <div class="text-sm text-gray-500">{{ a.date | date:'mediumDate' }} · {{ a.timeSlot }}</div>
+                </div>
+                <app-status-badge [status]="a.status" />
+              </div>
+              <mat-divider />
+            }
+          }
+          <button mat-button color="primary" class="mt-2" (click)="navigateTo('appointments/book')">Book New</button>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Nearby Camps -->
+      @if (nearbyCamps().length > 0) {
+        <mat-card class="md:col-span-2">
+          <mat-card-header>
+            <mat-card-title>Nearby Blood Camps</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              @for (camp of nearbyCamps(); track camp.id) {
+                <div class="border rounded-lg p-3">
+                  <div class="font-semibold">{{ camp.name }}</div>
+                  <div class="text-sm text-gray-500">{{ camp.address }}</div>
+                  <div class="text-sm mt-1">{{ camp.date | date:'mediumDate' }} · {{ camp.startTime }}</div>
+                  <div class="text-sm mt-1 text-green-700 font-medium">{{ camp.availableSlots }} slots available</div>
+                </div>
+              }
+            </div>
+            <button mat-button color="primary" class="mt-2" (click)="navigateTo('camps')">View All Camps</button>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

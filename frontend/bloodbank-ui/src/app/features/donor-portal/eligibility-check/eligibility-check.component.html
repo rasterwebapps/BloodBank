@@ -1,0 +1,87 @@
+<div class="p-6 max-w-xl mx-auto">
+  <mat-card>
+    <mat-card-header>
+      <mat-icon mat-card-avatar color="primary">fact_check</mat-icon>
+      <mat-card-title>Eligibility Self-Check</mat-card-title>
+      <mat-card-subtitle>Answer a few questions to check if you can donate today</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content class="pt-4">
+      @if (result()) {
+        <div class="flex flex-col items-center py-6 gap-4">
+          @if (result()!.eligible) {
+            <mat-icon class="text-green-600" style="font-size:64px;width:64px;height:64px">check_circle</mat-icon>
+            <h2 class="text-xl font-bold text-green-700">You are eligible to donate!</h2>
+            <p class="text-gray-600 text-center">You meet the basic eligibility requirements. Visit your nearest branch to donate.</p>
+          } @else {
+            <mat-icon color="warn" style="font-size:64px;width:64px;height:64px">cancel</mat-icon>
+            <h2 class="text-xl font-bold text-red-700">Not eligible at this time</h2>
+            @if (result()!.reasons.length > 0) {
+              <ul class="text-red-700 list-disc list-inside">
+                @for (reason of result()!.reasons; track reason) {
+                  <li>{{ reason }}</li>
+                }
+              </ul>
+            }
+            @if (result()!.nextEligibleDate) {
+              <p class="text-gray-600">You may be eligible after: <strong>{{ result()!.nextEligibleDate }}</strong></p>
+            }
+          }
+          <button mat-stroked-button (click)="reset()">Check Again</button>
+        </div>
+      } @else {
+        @if (error()) {
+          <div class="bg-red-50 border border-red-200 rounded p-3 mb-4 flex items-center gap-2">
+            <mat-icon color="warn">error</mat-icon>
+            <span class="text-red-700">{{ error() }}</span>
+          </div>
+        }
+        <form [formGroup]="form" (ngSubmit)="check()" class="flex flex-col gap-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Weight (kg)</mat-label>
+            <input matInput type="number" formControlName="weight" min="50" />
+            @if (form.controls.weight.invalid && form.controls.weight.touched) {
+              <mat-error>Minimum weight is 50 kg</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Hemoglobin (g/dL)</mat-label>
+            <input matInput type="number" step="0.1" formControlName="hemoglobin" />
+            @if (form.controls.hemoglobin.invalid && form.controls.hemoglobin.touched) {
+              <mat-error>Please enter a valid hemoglobin value</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Last Donation Date (optional)</mat-label>
+            <input matInput [matDatepicker]="lastDonPicker" formControlName="lastDonationDate" [max]="maxDate" />
+            <mat-datepicker-toggle matSuffix [for]="lastDonPicker" />
+            <mat-datepicker #lastDonPicker />
+          </mat-form-field>
+
+          <mat-divider />
+
+          <div>
+            <p class="font-medium mb-2">Have you traveled to a malaria-endemic area in the last 12 months?</p>
+            <mat-radio-group formControlName="recentTravel" class="flex gap-6">
+              <mat-radio-button [value]="false">No</mat-radio-button>
+              <mat-radio-button [value]="true">Yes</mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+          <div>
+            <p class="font-medium mb-2">Are you currently taking any medications?</p>
+            <mat-radio-group formControlName="medications" class="flex gap-6">
+              <mat-radio-button [value]="false">No</mat-radio-button>
+              <mat-radio-button [value]="true">Yes</mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+          <button mat-raised-button color="primary" type="submit" [disabled]="loading()">
+            @if (loading()) { Checking... } @else { Check Eligibility }
+          </button>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>
