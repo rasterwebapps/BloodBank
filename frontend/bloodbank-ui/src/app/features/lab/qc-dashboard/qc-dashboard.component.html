@@ -1,0 +1,154 @@
+<div class="qc-dashboard-container p-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Quality Control Dashboard</h1>
+  </div>
+
+  @if (loading() && qcRecords().length === 0) {
+    <app-loading-skeleton [rows]="6" [columns]="4" />
+  } @else if (error() && qcRecords().length === 0) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadData()" />
+  } @else {
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <mat-card>
+        <mat-card-content class="summary-card qc-pass-card">
+          <mat-icon class="summary-icon">check_circle</mat-icon>
+          <div>
+            <span class="summary-value">{{ passCount() }}</span>
+            <span class="summary-label">Passed</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-content class="summary-card qc-warning-card">
+          <mat-icon class="summary-icon">warning</mat-icon>
+          <div>
+            <span class="summary-value">{{ warningCount() }}</span>
+            <span class="summary-label">Warnings</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-content class="summary-card qc-fail-card">
+          <mat-icon class="summary-icon">cancel</mat-icon>
+          <div>
+            <span class="summary-value">{{ failCount() }}</span>
+            <span class="summary-label">Failed</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Levey-Jennings Chart -->
+    <mat-card class="mb-6">
+      <mat-card-header>
+        <mat-card-title>Levey-Jennings Control Chart</mat-card-title>
+        <mat-card-subtitle>SD deviation of observed values from expected mean</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        @if (qcRecords().length > 0) {
+          <div class="chart-container">
+            <canvas #ljCanvas width="800" height="300"></canvas>
+          </div>
+        } @else {
+          <app-empty-state icon="analytics" message="No QC data to chart" />
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Filters -->
+    <div class="flex items-center gap-4 mb-4">
+      <mat-form-field appearance="outline" class="instrument-filter">
+        <mat-label>Filter by Instrument</mat-label>
+        <mat-select
+          [value]="selectedInstrumentId()"
+          (selectionChange)="onInstrumentFilterChange($event.value)">
+          <mat-option value="">All Instruments</mat-option>
+          @for (inst of instruments(); track inst.id) {
+            <mat-option [value]="inst.id">{{ inst.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- QC Records Table -->
+    @if (isEmpty()) {
+      <app-empty-state icon="science" message="No QC records found" />
+    } @else {
+      <app-data-table
+        [dataSource]="qcRecords()"
+        [columns]="displayedColumns"
+        [totalElements]="totalElements()"
+        [pageSize]="pageSize()"
+        [loading]="loading()"
+        (pageChange)="onPageChange($event)">
+
+        <!-- Instrument Column -->
+        <ng-container matColumnDef="instrumentName">
+          <th mat-header-cell *matHeaderCellDef>Instrument</th>
+          <td mat-cell *matCellDef="let record">
+            <span class="font-medium text-sm">{{ record.instrumentName }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Test Type Column -->
+        <ng-container matColumnDef="testType">
+          <th mat-header-cell *matHeaderCellDef>Test</th>
+          <td mat-cell *matCellDef="let record">{{ record.testType }}</td>
+        </ng-container>
+
+        <!-- Control Level Column -->
+        <ng-container matColumnDef="controlLevel">
+          <th mat-header-cell *matHeaderCellDef>Level</th>
+          <td mat-cell *matCellDef="let record">{{ record.controlLevel }}</td>
+        </ng-container>
+
+        <!-- Observed Value Column -->
+        <ng-container matColumnDef="observedValue">
+          <th mat-header-cell *matHeaderCellDef>Observed</th>
+          <td mat-cell *matCellDef="let record">
+            {{ record.observedValue }}
+            <span
+              class="deviation-badge text-xs ml-1"
+              [matTooltip]="'Deviation: ' + getDeviation(record) + ' SD'">
+              ({{ getDeviation(record) }} SD)
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Expected Value Column -->
+        <ng-container matColumnDef="expectedValue">
+          <th mat-header-cell *matHeaderCellDef>Expected</th>
+          <td mat-cell *matCellDef="let record">{{ record.expectedValue }}</td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let record">
+            <span class="qc-badge" [class]="getQcBadgeClass(record.status)">
+              {{ getQcStatusLabel(record.status) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Performed At Column -->
+        <ng-container matColumnDef="performedAt">
+          <th mat-header-cell *matHeaderCellDef>Performed</th>
+          <td mat-cell *matCellDef="let record">
+            {{ record.performedAt | date:'short' }}
+          </td>
+        </ng-container>
+
+        <!-- Performed By Column -->
+        <ng-container matColumnDef="performedBy">
+          <th mat-header-cell *matHeaderCellDef>Performed By</th>
+          <td mat-cell *matCellDef="let record">{{ record.performedBy }}</td>
+        </ng-container>
+      </app-data-table>
+    }
+  }
+</div>

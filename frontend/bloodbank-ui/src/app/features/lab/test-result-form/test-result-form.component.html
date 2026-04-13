@@ -1,0 +1,237 @@
+<div class="test-result-form-container p-6">
+  @if (loading()) {
+    <app-loading-skeleton [rows]="8" [columns]="2" />
+  } @else if (error() && !testOrder()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadTestOrder(orderId()!)" />
+  } @else if (testOrder(); as order) {
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">{{ pageTitle() }}</h1>
+        <p class="text-sm text-gray-600 mt-1">{{ orderSummary() }}</p>
+      </div>
+      <div class="flex gap-2">
+        @if (hasPendingReviews()) {
+          <button
+            mat-stroked-button
+            (click)="toggleMode()"
+            aria-label="Toggle between entry and review mode">
+            <mat-icon>{{ isReviewMode() ? 'edit' : 'rate_review' }}</mat-icon>
+            {{ isReviewMode() ? 'Enter Results' : 'Review Results' }}
+          </button>
+        }
+        <button mat-stroked-button (click)="cancel()" aria-label="Back to test orders">
+          <mat-icon>arrow_back</mat-icon>
+          Back
+        </button>
+      </div>
+    </div>
+
+    <!-- Existing Results Table -->
+    @if (existingResults().length > 0) {
+      <mat-card class="mb-6">
+        <mat-card-header>
+          <mat-card-title>Entered Results</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="results-table">
+            <table class="w-full">
+              <thead>
+                <tr class="text-left text-sm text-gray-600">
+                  <th class="p-2">Test</th>
+                  <th class="p-2">Result</th>
+                  <th class="p-2">Value</th>
+                  <th class="p-2">Tested By</th>
+                  <th class="p-2">Review Status</th>
+                  <th class="p-2">Reviewed By</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (result of existingResults(); track result.id) {
+                  <tr class="border-t">
+                    <td class="p-2 font-medium">{{ getTestTypeLabel(result.testType) }}</td>
+                    <td class="p-2">
+                      <span
+                        class="result-value"
+                        [class.reactive]="isReactive(result.result)">
+                        {{ getResultLabel(result.result) }}
+                      </span>
+                    </td>
+                    <td class="p-2 text-sm">
+                      @if (result.value) {
+                        {{ result.value }} {{ result.unit }}
+                      } @else {
+                        <span class="text-gray-400">—</span>
+                      }
+                    </td>
+                    <td class="p-2 text-sm">{{ result.testedBy }}</td>
+                    <td class="p-2">
+                      <span class="review-badge" [class]="getReviewBadgeClass(result.reviewStatus)">
+                        {{ getReviewStatusLabel(result.reviewStatus) }}
+                      </span>
+                    </td>
+                    <td class="p-2 text-sm">
+                      @if (result.reviewedBy) {
+                        {{ result.reviewedBy }}
+                      } @else {
+                        <span class="text-gray-400">—</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    @if (isReviewMode()) {
+      <!-- Review Mode: Confirm or reject pending results -->
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Dual-Review Confirmation</mat-card-title>
+          <mat-card-subtitle>A second technician must confirm or reject each result</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @for (result of existingResults(); track result.id) {
+            @if (result.reviewStatus === 'PENDING_REVIEW') {
+              <div class="review-item p-4 mb-4 border rounded">
+                <div class="flex items-center justify-between mb-3">
+                  <div>
+                    <span class="font-semibold">{{ getTestTypeLabel(result.testType) }}</span>
+                    <span class="ml-2 result-value" [class.reactive]="isReactive(result.result)">
+                      {{ getResultLabel(result.result) }}
+                    </span>
+                  </div>
+                  <span class="text-sm text-gray-500">
+                    Entered by {{ result.testedBy }} on {{ result.testedAt | date:'short' }}
+                  </span>
+                </div>
+
+                <form [formGroup]="reviewForm" class="flex items-end gap-4">
+                  <mat-form-field appearance="outline" class="flex-1">
+                    <mat-label>Review Decision</mat-label>
+                    <mat-select formControlName="reviewStatus">
+                      <mat-option value="REVIEWED">Confirm</mat-option>
+                      <mat-option value="REJECTED">Reject</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="flex-2">
+                    <mat-label>Review Notes</mat-label>
+                    <input matInput formControlName="reviewNotes" placeholder="Optional notes..." />
+                  </mat-form-field>
+
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    [disabled]="saving() || reviewForm.invalid"
+                    (click)="onReviewResult(result.id)"
+                    aria-label="Submit review for this test result">
+                    @if (saving()) {
+                      <mat-progress-spinner diameter="20" mode="indeterminate" />
+                    } @else {
+                      Submit Review
+                    }
+                  </button>
+                </form>
+              </div>
+            }
+          }
+        </mat-card-content>
+      </mat-card>
+    } @else {
+      <!-- Entry Mode: Enter new test results -->
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Enter New Result</mat-card-title>
+          <mat-card-subtitle>Results will require confirmation by a second technician</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @if (error()) {
+            <app-error-card [message]="error() ?? ''" />
+          }
+
+          <form [formGroup]="resultForm" (ngSubmit)="onSubmitResult()" class="result-entry-form">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Test Type -->
+              <mat-form-field appearance="outline">
+                <mat-label>Test Type</mat-label>
+                <mat-select formControlName="testType">
+                  @for (option of testTypeOptions; track option.value) {
+                    <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                  }
+                </mat-select>
+                @if (testTypeCtrl.hasError('required') && testTypeCtrl.touched) {
+                  <mat-error>Test type is required</mat-error>
+                }
+              </mat-form-field>
+
+              <!-- Result -->
+              <mat-form-field appearance="outline">
+                <mat-label>Result</mat-label>
+                <mat-select formControlName="result">
+                  @for (option of resultValueOptions; track option.value) {
+                    <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                  }
+                </mat-select>
+                @if (resultCtrl.hasError('required') && resultCtrl.touched) {
+                  <mat-error>Result is required</mat-error>
+                }
+              </mat-form-field>
+
+              <!-- Value -->
+              <mat-form-field appearance="outline">
+                <mat-label>Value</mat-label>
+                <input matInput formControlName="value" placeholder="e.g., 12.5" />
+              </mat-form-field>
+
+              <!-- Unit -->
+              <mat-form-field appearance="outline">
+                <mat-label>Unit</mat-label>
+                <input matInput formControlName="unit" placeholder="e.g., g/dL" />
+              </mat-form-field>
+
+              <!-- Reference Range -->
+              <mat-form-field appearance="outline">
+                <mat-label>Reference Range</mat-label>
+                <input matInput formControlName="referenceRange" placeholder="e.g., 12.0–16.0" />
+              </mat-form-field>
+
+              <!-- Method -->
+              <mat-form-field appearance="outline">
+                <mat-label>Method</mat-label>
+                <input matInput formControlName="method" placeholder="e.g., ELISA, CLIA" />
+              </mat-form-field>
+            </div>
+
+            <mat-divider class="my-4" />
+
+            <div class="flex justify-end gap-3">
+              <button
+                mat-stroked-button
+                type="button"
+                (click)="cancel()"
+                aria-label="Cancel and go back">
+                Cancel
+              </button>
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="saving() || resultForm.invalid"
+                aria-label="Submit test result">
+                @if (saving()) {
+                  <mat-progress-spinner diameter="20" mode="indeterminate" />
+                } @else {
+                  Submit Result
+                }
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    }
+  }
+</div>
