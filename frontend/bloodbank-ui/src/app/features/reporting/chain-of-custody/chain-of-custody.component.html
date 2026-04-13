@@ -1,0 +1,75 @@
+<div class="chain-of-custody-container p-6">
+  <h1 class="text-2xl font-bold mb-6">Chain of Custody Tracker</h1>
+
+  <!-- Search -->
+  <mat-card class="mb-6">
+    <mat-card-content>
+      <form [formGroup]="searchForm" class="flex gap-4 items-end mt-4">
+        <mat-form-field appearance="outline" class="flex-1">
+          <mat-label>Blood Unit Number</mat-label>
+          <input matInput formControlName="unitNumber" placeholder="e.g. BU-2024-001234" />
+          @if (searchForm.controls.unitNumber.hasError('required')) {
+            <mat-error>Unit number is required</mat-error>
+          }
+        </mat-form-field>
+        <button
+          mat-raised-button
+          color="primary"
+          class="mb-5"
+          [disabled]="searchForm.invalid || loading()"
+          (click)="search()">
+          <mat-icon>search</mat-icon>
+          Track Unit
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="4" [columns]="4" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" />
+  } @else if (custody()) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Blood Unit: {{ custody()!.unitNumber }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ custody()!.bloodGroup }} · {{ custody()!.componentType }} · 
+          Donor: {{ custody()!.donorName }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="mt-4">
+          <h3 class="text-lg font-semibold mb-4">Event Timeline</h3>
+          @for (event of custody()!.events; track event.id) {
+            <div class="flex gap-4 mb-4">
+              <div class="flex flex-col items-center">
+                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                  <mat-icon class="text-white text-sm">fiber_manual_record</mat-icon>
+                </div>
+                @if (!$last) {
+                  <div class="w-0.5 h-8 bg-gray-300 mt-1"></div>
+                }
+              </div>
+              <div class="flex-1 pb-4">
+                <div class="flex items-center justify-between">
+                  <span class="font-medium">{{ event.event }}</span>
+                  <span class="text-sm text-gray-500">{{ event.timestamp | date:'medium' }}</span>
+                </div>
+                <p class="text-sm text-gray-600">{{ event.location }}</p>
+                <p class="text-sm text-gray-500">By: {{ event.performedBy }}</p>
+                @if (event.notes) {
+                  <p class="text-sm italic text-gray-400 mt-1">{{ event.notes }}</p>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <app-empty-state
+      icon="manage_search"
+      message="Enter a blood unit number to track its chain of custody" />
+  }
+</div>

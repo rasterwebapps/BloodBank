@@ -105,6 +105,46 @@ export const routes: Routes = [
             (m) => m.SETTINGS_ROUTES,
           ),
       },
+      {
+        path: 'billing',
+        data: { breadcrumb: 'Billing' },
+        loadChildren: () =>
+          import('@features/billing/billing.routes').then(
+            (m) => m.BILLING_ROUTES,
+          ),
+      },
+      {
+        path: 'compliance',
+        data: { breadcrumb: 'Compliance' },
+        loadChildren: () =>
+          import('@features/compliance/compliance.routes').then(
+            (m) => m.COMPLIANCE_ROUTES,
+          ),
+      },
+      {
+        path: 'notifications',
+        data: { breadcrumb: 'Notifications' },
+        loadChildren: () =>
+          import('@features/notification/notification.routes').then(
+            (m) => m.NOTIFICATION_ROUTES,
+          ),
+      },
+      {
+        path: 'reports',
+        data: { breadcrumb: 'Reports' },
+        loadChildren: () =>
+          import('@features/reporting/reporting.routes').then(
+            (m) => m.REPORTING_ROUTES,
+          ),
+      },
+      {
+        path: 'documents',
+        data: { breadcrumb: 'Documents' },
+        loadChildren: () =>
+          import('@features/document/document.routes').then(
+            (m) => m.DOCUMENT_ROUTES,
+          ),
+      },
     ],
   },
 

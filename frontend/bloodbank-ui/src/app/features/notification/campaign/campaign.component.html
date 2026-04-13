@@ -1,0 +1,118 @@
+<div class="campaign-container p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Notification Campaigns</h1>
+    <button mat-raised-button color="primary" (click)="toggleForm()">
+      <mat-icon>{{ showForm() ? 'close' : 'add' }}</mat-icon>
+      {{ showForm() ? 'Cancel' : 'New Campaign' }}
+    </button>
+  </div>
+
+  @if (showForm()) {
+    <mat-card class="mb-6">
+      <mat-card-header><mat-card-title>New Campaign</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Campaign Name</mat-label>
+            <input matInput formControlName="name" />
+            @if (form.controls.name.hasError('required')) {
+              <mat-error>Required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Template</mat-label>
+            <mat-select formControlName="templateId">
+              @for (t of templates(); track t.id) {
+                <mat-option [value]="t.id">{{ t.name }}</mat-option>
+              }
+            </mat-select>
+            @if (form.controls.templateId.hasError('required')) {
+              <mat-error>Required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Scheduled At (optional)</mat-label>
+            <input matInput type="datetime-local" formControlName="scheduledAt" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Target Criteria (optional)</mat-label>
+            <input matInput formControlName="targetCriteria" placeholder="e.g. blood_group=A+" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="md:col-span-2">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" rows="2"></textarea>
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" [disabled]="form.invalid || submitting()" (click)="saveCampaign()">
+          @if (submitting()) { Saving... } @else { Create Campaign }
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  }
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="5" [columns]="7" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadCampaigns()" />
+  } @else if (isEmpty()) {
+    <app-empty-state icon="campaign" message="No campaigns created yet" />
+  } @else {
+    <app-data-table
+      [dataSource]="campaigns()"
+      [columns]="displayedColumns"
+      [totalElements]="totalElements()"
+      [pageSize]="pageSize()"
+      [loading]="loading()"
+      (pageChange)="onPageChange($event)">
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let c"><span class="font-medium">{{ c.name }}</span></td>
+      </ng-container>
+
+      <ng-container matColumnDef="templateName">
+        <th mat-header-cell *matHeaderCellDef>Template</th>
+        <td mat-cell *matCellDef="let c">{{ c.templateName }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let c"><app-status-badge [status]="c.status" /></td>
+      </ng-container>
+
+      <ng-container matColumnDef="totalRecipients">
+        <th mat-header-cell *matHeaderCellDef>Recipients</th>
+        <td mat-cell *matCellDef="let c">{{ c.totalRecipients }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="sentCount">
+        <th mat-header-cell *matHeaderCellDef>Sent</th>
+        <td mat-cell *matCellDef="let c">{{ c.sentCount }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="scheduledAt">
+        <th mat-header-cell *matHeaderCellDef>Scheduled</th>
+        <td mat-cell *matCellDef="let c">
+          @if (c.scheduledAt) { {{ c.scheduledAt | date:'medium' }} } @else { Immediate }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let c">
+          @if (c.status === 'DRAFT') {
+            <button mat-icon-button matTooltip="Launch" color="primary" (click)="launchCampaign(c)">
+              <mat-icon>send</mat-icon>
+            </button>
+          }
+        </td>
+      </ng-container>
+    </app-data-table>
+  }
+</div>

@@ -1,0 +1,90 @@
+<div class="payment-form-container p-6 max-w-xl mx-auto">
+  <div class="flex items-center gap-4 mb-6">
+    <button mat-icon-button (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-2xl font-bold">Record Payment</h1>
+  </div>
+
+  @if (invoice()) {
+    <mat-card class="mb-4">
+      <mat-card-content>
+        <div class="grid grid-cols-2 gap-4 mt-2">
+          <div>
+            <p class="text-sm text-gray-500">Invoice</p>
+            <p class="font-medium">{{ invoice()!.invoiceNumber }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Balance Due</p>
+            <p class="font-bold text-red-600">{{ invoice()!.balanceAmount }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <mat-card>
+    <mat-card-content>
+      <form [formGroup]="form" class="flex flex-col gap-4 mt-4">
+        <mat-form-field appearance="outline">
+          <mat-label>Payment Date</mat-label>
+          <input matInput type="date" formControlName="paymentDate" />
+          @if (form.controls.paymentDate.hasError('required')) {
+            <mat-error>Date is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Amount</mat-label>
+          <input matInput type="number" formControlName="amount" min="0.01" step="0.01" />
+          @if (form.controls.amount.hasError('required')) {
+            <mat-error>Amount is required</mat-error>
+          }
+          @if (form.controls.amount.hasError('min')) {
+            <mat-error>Amount must be greater than zero</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Payment Method</mat-label>
+          <mat-select formControlName="method">
+            @for (method of paymentMethods; track method.value) {
+              <mat-option [value]="method.value">{{ method.label }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.method.hasError('required')) {
+            <mat-error>Payment method is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Reference Number</mat-label>
+          <input matInput formControlName="referenceNumber" placeholder="Cheque/transfer ref" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Notes</mat-label>
+          <textarea matInput formControlName="notes" rows="3"></textarea>
+        </mat-form-field>
+
+        <div class="flex gap-2 justify-end">
+          <button mat-button type="button" (click)="cancel()">Cancel</button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="form.invalid || submitting()"
+            (click)="submit()">
+            @if (submitting()) {
+              <mat-icon>hourglass_empty</mat-icon>
+              Saving...
+            } @else {
+              <mat-icon>payments</mat-icon>
+              Record Payment
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

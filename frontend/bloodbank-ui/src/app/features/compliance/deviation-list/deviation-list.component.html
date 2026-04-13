@@ -1,0 +1,54 @@
+<div class="deviation-list-container p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Deviations &amp; CAPAs</h1>
+  </div>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="6" [columns]="6" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadDeviations()" />
+  } @else if (isEmpty()) {
+    <app-empty-state icon="report_problem" message="No deviations recorded" />
+  } @else {
+    <app-data-table
+      [dataSource]="deviations()"
+      [columns]="displayedColumns"
+      [totalElements]="totalElements()"
+      [pageSize]="pageSize()"
+      [loading]="loading()"
+      (pageChange)="onPageChange($event)">
+
+      <ng-container matColumnDef="deviationNumber">
+        <th mat-header-cell *matHeaderCellDef>Number</th>
+        <td mat-cell *matCellDef="let d"><span class="font-mono text-sm">{{ d.deviationNumber }}</span></td>
+      </ng-container>
+
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef>Title</th>
+        <td mat-cell *matCellDef="let d"><span class="font-medium">{{ d.title }}</span></td>
+      </ng-container>
+
+      <ng-container matColumnDef="severity">
+        <th mat-header-cell *matHeaderCellDef>Severity</th>
+        <td mat-cell *matCellDef="let d">
+          <mat-chip [color]="getSeverityColor(d.severity)" highlighted>{{ d.severity }}</mat-chip>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="department">
+        <th mat-header-cell *matHeaderCellDef>Department</th>
+        <td mat-cell *matCellDef="let d">{{ d.department }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="detectedDate">
+        <th mat-header-cell *matHeaderCellDef>Detected</th>
+        <td mat-cell *matCellDef="let d">{{ d.detectedDate | date:'mediumDate' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let d"><app-status-badge [status]="d.status" /></td>
+      </ng-container>
+    </app-data-table>
+  }
+</div>

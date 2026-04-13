@@ -1,0 +1,150 @@
+<div class="rate-management-container p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Rate Management</h1>
+    <button mat-raised-button color="primary" (click)="toggleForm()">
+      <mat-icon>{{ showForm() ? 'close' : 'add' }}</mat-icon>
+      {{ showForm() ? 'Cancel' : 'Add Rate' }}
+    </button>
+  </div>
+
+  @if (showForm()) {
+    <mat-card class="mb-6">
+      <mat-card-header>
+        <mat-card-title>New Rate</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="form" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Service Code</mat-label>
+            <input matInput formControlName="serviceCode" />
+            @if (form.controls.serviceCode.hasError('required')) {
+              <mat-error>Required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Service Name</mat-label>
+            <input matInput formControlName="serviceName" />
+            @if (form.controls.serviceName.hasError('required')) {
+              <mat-error>Required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Rate Type</mat-label>
+            <mat-select formControlName="rateType">
+              @for (rt of rateTypes; track rt) {
+                <mat-option [value]="rt">{{ rt }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Unit Price</mat-label>
+            <input matInput type="number" formControlName="unitPrice" min="0" step="0.01" />
+            @if (form.controls.unitPrice.hasError('required')) {
+              <mat-error>Required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Currency</mat-label>
+            <input matInput formControlName="currency" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Effective From</mat-label>
+            <input matInput type="date" formControlName="effectiveFrom" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Effective To (optional)</mat-label>
+            <input matInput type="date" formControlName="effectiveTo" />
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+      <mat-card-actions>
+        <button
+          mat-raised-button
+          color="primary"
+          [disabled]="form.invalid || submitting()"
+          (click)="saveRate()">
+          @if (submitting()) { Saving... } @else { Save Rate }
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  }
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="8" [columns]="8" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadRates()" />
+  } @else if (isEmpty()) {
+    <app-empty-state icon="price_change" message="No rates configured" />
+  } @else {
+    <app-data-table
+      [dataSource]="rates()"
+      [columns]="displayedColumns"
+      [totalElements]="totalElements()"
+      [pageSize]="pageSize()"
+      [loading]="loading()"
+      (pageChange)="onPageChange($event)">
+
+      <ng-container matColumnDef="serviceCode">
+        <th mat-header-cell *matHeaderCellDef>Code</th>
+        <td mat-cell *matCellDef="let r"><span class="font-mono text-sm">{{ r.serviceCode }}</span></td>
+      </ng-container>
+
+      <ng-container matColumnDef="serviceName">
+        <th mat-header-cell *matHeaderCellDef>Service</th>
+        <td mat-cell *matCellDef="let r">{{ r.serviceName }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="rateType">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let r">{{ r.rateType }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="unitPrice">
+        <th mat-header-cell *matHeaderCellDef>Price</th>
+        <td mat-cell *matCellDef="let r">{{ r.unitPrice | currency:r.currency }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="effectiveFrom">
+        <th mat-header-cell *matHeaderCellDef>From</th>
+        <td mat-cell *matCellDef="let r">{{ r.effectiveFrom | date:'mediumDate' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="effectiveTo">
+        <th mat-header-cell *matHeaderCellDef>To</th>
+        <td mat-cell *matCellDef="let r">
+          @if (r.effectiveTo) { {{ r.effectiveTo | date:'mediumDate' }} } @else { — }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="isActive">
+        <th mat-header-cell *matHeaderCellDef>Active</th>
+        <td mat-cell *matCellDef="let r">
+          <mat-chip [color]="r.isActive ? 'primary' : 'warn'" highlighted>
+            {{ r.isActive ? 'Active' : 'Inactive' }}
+          </mat-chip>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let r">
+          @if (r.isActive) {
+            <button
+              mat-icon-button
+              matTooltip="Deactivate"
+              color="warn"
+              (click)="deactivateRate(r)">
+              <mat-icon>block</mat-icon>
+            </button>
+          }
+        </td>
+      </ng-container>
+    </app-data-table>
+  }
+</div>

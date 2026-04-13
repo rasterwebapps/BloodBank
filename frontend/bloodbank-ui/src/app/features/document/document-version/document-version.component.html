@@ -1,0 +1,70 @@
+<div class="document-version-container p-6">
+  <div class="flex items-center gap-4 mb-6">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-2xl font-bold">Version History</h1>
+  </div>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="4" [columns]="7" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadVersions(documentId())" />
+  } @else if (isEmpty()) {
+    <app-empty-state icon="history" message="No versions found" />
+  } @else {
+    <mat-card>
+      <mat-card-content>
+        <mat-table [dataSource]="versions()">
+          <ng-container matColumnDef="versionNumber">
+            <th mat-header-cell *matHeaderCellDef>Version</th>
+            <td mat-cell *matCellDef="let v">
+              <span class="font-medium">v{{ v.versionNumber }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="uploadedBy">
+            <th mat-header-cell *matHeaderCellDef>Uploaded By</th>
+            <td mat-cell *matCellDef="let v">{{ v.uploadedBy }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="fileSize">
+            <th mat-header-cell *matHeaderCellDef>Size</th>
+            <td mat-cell *matCellDef="let v">{{ formatFileSize(v.fileSize) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="mimeType">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let v"><span class="font-mono text-xs">{{ v.mimeType }}</span></td>
+          </ng-container>
+
+          <ng-container matColumnDef="changeNotes">
+            <th mat-header-cell *matHeaderCellDef>Change Notes</th>
+            <td mat-cell *matCellDef="let v">{{ v.changeNotes ?? '—' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef>Uploaded</th>
+            <td mat-cell *matCellDef="let v">{{ v.createdAt | date:'medium' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let v">
+              <button
+                mat-icon-button
+                matTooltip="Download"
+                color="primary"
+                (click)="downloadVersion(v)">
+                <mat-icon>download</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </mat-table>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

@@ -1,0 +1,93 @@
+<div class="preference-container p-6 max-w-2xl mx-auto">
+  <h1 class="text-2xl font-bold mb-6">Notification Preferences</h1>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="4" [columns]="2" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadPreferences()" />
+  } @else {
+    <form [formGroup]="form">
+      <mat-card class="mb-4">
+        <mat-card-header>
+          <mat-card-title>Channels</mat-card-title>
+          <mat-card-subtitle>Choose how you receive notifications</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="flex flex-col gap-4 mt-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium">Email</p>
+                <p class="text-sm text-gray-500">Receive notifications via email</p>
+              </div>
+              <mat-slide-toggle formControlName="emailEnabled" color="primary" />
+            </div>
+            <mat-divider />
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium">SMS</p>
+                <p class="text-sm text-gray-500">Receive notifications via SMS</p>
+              </div>
+              <mat-slide-toggle formControlName="smsEnabled" color="primary" />
+            </div>
+            <mat-divider />
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium">Push Notifications</p>
+                <p class="text-sm text-gray-500">Receive browser push notifications</p>
+              </div>
+              <mat-slide-toggle formControlName="pushEnabled" color="primary" />
+            </div>
+            <mat-divider />
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium">In-App</p>
+                <p class="text-sm text-gray-500">Receive in-application notifications</p>
+              </div>
+              <mat-slide-toggle formControlName="inAppEnabled" color="primary" />
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="mb-4">
+        <mat-card-header>
+          <mat-card-title>Notification Types</mat-card-title>
+          <mat-card-subtitle>Choose which events trigger notifications</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="flex flex-col gap-4 mt-4">
+            <div class="flex items-center justify-between">
+              <p class="font-medium">Donation Reminders</p>
+              <mat-slide-toggle formControlName="donationReminders" color="primary" />
+            </div>
+            <mat-divider />
+            <div class="flex items-center justify-between">
+              <p class="font-medium">Appointment Reminders</p>
+              <mat-slide-toggle formControlName="appointmentReminders" color="primary" />
+            </div>
+            <mat-divider />
+            <div class="flex items-center justify-between">
+              <p class="font-medium">System Alerts</p>
+              <mat-slide-toggle formControlName="systemAlerts" color="primary" />
+            </div>
+            <mat-divider />
+            <div class="flex items-center justify-between">
+              <p class="font-medium">Campaign Messages</p>
+              <mat-slide-toggle formControlName="campaignMessages" color="primary" />
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="flex justify-end">
+        <button
+          mat-raised-button
+          color="primary"
+          [disabled]="submitting()"
+          (click)="savePreferences()">
+          @if (submitting()) { Saving... } @else { Save Preferences }
+        </button>
+      </div>
+    </form>
+  }
+</div>
