@@ -1,0 +1,149 @@
+<div class="p-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Inventory Dashboard</h1>
+    <div class="flex gap-2">
+      <button mat-stroked-button [routerLink]="['../units']">
+        <mat-icon>inventory_2</mat-icon>
+        Blood Units
+      </button>
+      <button mat-raised-button color="primary" (click)="loadStockLevels()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="4" [columns]="5" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadStockLevels()" />
+  } @else if (isEmpty()) {
+    <app-empty-state
+      icon="inventory_2"
+      message="No stock data available"
+      actionLabel="Refresh"
+      (action)="loadStockLevels()" />
+  } @else {
+    <!-- Summary chips -->
+    <div class="flex flex-wrap gap-3 mb-6">
+      <mat-chip-set aria-label="Stock level summary">
+        <mat-chip class="chip-critical">
+          Critical: {{ getCriticalCount() }} types
+        </mat-chip>
+        <mat-chip class="chip-low">
+          Low: {{ getLowCount() }} types
+        </mat-chip>
+        <mat-chip class="chip-adequate">
+          Adequate: {{ getAdequateCount() }} types
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+
+    <!-- Chart + Quick Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <!-- Bar Chart -->
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Stock by Blood Group</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container">
+            <canvas baseChart
+              [data]="chartData()"
+              [options]="chartOptions"
+              type="bar">
+            </canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Quick Actions -->
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Quick Actions</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="flex flex-col gap-3 mt-4">
+            <button mat-stroked-button [routerLink]="['../units']">
+              <mat-icon>list</mat-icon>
+              View All Blood Units
+            </button>
+            <button mat-stroked-button [routerLink]="['../transfer']">
+              <mat-icon>swap_horiz</mat-icon>
+              Initiate Transfer
+            </button>
+            <button mat-stroked-button [routerLink]="['../disposal']">
+              <mat-icon>delete_outline</mat-icon>
+              Dispose Units
+            </button>
+            <button mat-stroked-button [routerLink]="['../processing']">
+              <mat-icon>biotech</mat-icon>
+              Process Components
+            </button>
+            <button mat-stroked-button [routerLink]="['../storage']">
+              <mat-icon>warehouse</mat-icon>
+              Manage Storage
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Stock Matrix: Blood Group × Component Type -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Stock Level Matrix</mat-card-title>
+        <mat-card-subtitle>Blood Group × Component Type (units in inventory)</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="overflow-x-auto mt-4">
+          <table class="stock-matrix-table w-full">
+            <thead>
+              <tr>
+                <th class="text-left p-2 font-semibold text-sm">Blood Group</th>
+                @for (ct of componentTypeOptions; track ct.value) {
+                  <th class="text-center p-2 font-semibold text-sm">{{ ct.label }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (bg of bloodGroupOptions; track bg.value) {
+                <tr>
+                  <td class="p-2 font-bold text-sm">{{ bg.label }}</td>
+                  @for (ct of componentTypeOptions; track ct.value) {
+                    <td class="p-1 text-center">
+                      @if (getCellForBloodGroupAndComponent(bg.value, ct.value); as cell) {
+                        <div [class]="'stock-cell ' + getStockClass(cell.count)">
+                          {{ cell.count }}
+                        </div>
+                      } @else {
+                        <div class="stock-cell stock-critical">0</div>
+                      }
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Legend -->
+        <div class="flex flex-wrap gap-4 mt-4 text-sm">
+          <span class="flex items-center gap-1">
+            <span class="legend-dot legend-adequate"></span>
+            Adequate (≥10)
+          </span>
+          <span class="flex items-center gap-1">
+            <span class="legend-dot legend-low"></span>
+            Low (3–9)
+          </span>
+          <span class="flex items-center gap-1">
+            <span class="legend-dot legend-critical"></span>
+            Critical (&lt;3)
+          </span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

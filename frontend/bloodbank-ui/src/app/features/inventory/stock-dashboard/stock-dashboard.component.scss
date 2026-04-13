@@ -1,0 +1,60 @@
+.chart-container {
+  position: relative;
+  height: 280px;
+  width: 100%;
+}
+
+.stock-matrix-table {
+  border-collapse: collapse;
+
+  th,
+  td {
+    border: 1px solid #e0e0e0;
+  }
+}
+
+.stock-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 36px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 4px 8px;
+}
+
+.stock-adequate {
+  background-color: #c8e6c9;
+  color: #1b5e20;
+}
+
+.stock-low {
+  background-color: #fff8e1;
+  color: #6d4c01;
+}
+
+.stock-critical {
+  background-color: #ffcdd2;
+  color: #b71c1c;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legend-adequate {
+  background-color: #4caf50;
+}
+
+.legend-low {
+  background-color: #ff9800;
+}
+
+.legend-critical {
+  background-color: #f44336;
+}
