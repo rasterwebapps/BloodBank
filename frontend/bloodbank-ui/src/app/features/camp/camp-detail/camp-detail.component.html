@@ -1,0 +1,183 @@
+<div class="camp-detail-container p-6">
+  @if (loading()) {
+    <app-loading-skeleton [rows]="8" [columns]="2" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadCamp(camp()?.id ?? '')" />
+  } @else if (camp(); as c) {
+    <!-- Header -->
+    <div class="flex items-center gap-3 mb-6">
+      <button mat-icon-button matTooltip="Back to camps" aria-label="Go back" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="flex-1">
+        <h1 class="text-2xl font-bold">{{ c.name }}</h1>
+        <p class="text-sm text-gray-600">
+          {{ c.location }} · {{ c.campDate | date:'mediumDate' }}
+        </p>
+      </div>
+      <app-status-badge [status]="c.status" />
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <mat-card>
+        <mat-card-content class="p-4 text-center">
+          <p class="text-sm text-gray-600">Target Donors</p>
+          <p class="text-3xl font-bold">{{ c.targetDonors }}</p>
+        </mat-card-content>
+      </mat-card>
+      <mat-card>
+        <mat-card-content class="p-4 text-center">
+          <p class="text-sm text-gray-600">Registered</p>
+          <p class="text-3xl font-bold">{{ c.registeredDonors }}</p>
+        </mat-card-content>
+      </mat-card>
+      <mat-card>
+        <mat-card-content class="p-4 text-center">
+          <p class="text-sm text-gray-600">Actual Donors</p>
+          <p class="text-3xl font-bold">{{ c.actualDonors }}</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Camp Info Card -->
+    <mat-card class="mb-6">
+      <mat-card-content class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-gray-600">Address</p>
+            <p class="font-medium">{{ c.address }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Time</p>
+            <p class="font-medium">{{ c.startTime }} – {{ c.endTime }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Organizer</p>
+            <p class="font-medium">{{ c.organizerName }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Contact</p>
+            <p class="font-medium">{{ c.contactPhone }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Action Buttons -->
+    <div class="flex gap-3 mb-6">
+      @if (canActivate()) {
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="activateCamp()"
+          aria-label="Activate camp">
+          <mat-icon>play_arrow</mat-icon>
+          Activate Camp
+        </button>
+      }
+      @if (canComplete()) {
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="completeCamp()"
+          aria-label="Complete camp">
+          <mat-icon>check_circle</mat-icon>
+          Complete Camp
+        </button>
+        <button
+          mat-raised-button
+          (click)="registerDonor()"
+          aria-label="Register donor at camp">
+          <mat-icon>person_add</mat-icon>
+          Register Donor
+        </button>
+      }
+      <button
+        mat-stroked-button
+        (click)="editCamp()"
+        aria-label="Edit camp">
+        <mat-icon>edit</mat-icon>
+        Edit Camp
+      </button>
+    </div>
+
+    <!-- Tabs: Donors + Resources -->
+    <mat-tab-group>
+      <mat-tab label="Registered Donors ({{ donors().length }})">
+        <div class="pt-4">
+          @if (donors().length === 0) {
+            <app-empty-state
+              icon="people"
+              message="No donors registered yet"
+              actionLabel="Register Donor"
+              (action)="registerDonor()" />
+          } @else {
+            <table mat-table [dataSource]="donors()" class="w-full">
+              <ng-container matColumnDef="donorName">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td mat-cell *matCellDef="let d">{{ d.donorName }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="bloodGroup">
+                <th mat-header-cell *matHeaderCellDef>Blood Group</th>
+                <td mat-cell *matCellDef="let d">
+                  @if (d.bloodGroup) {
+                    <app-blood-group-badge [bloodGroup]="d.bloodGroup" size="sm" />
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="phone">
+                <th mat-header-cell *matHeaderCellDef>Phone</th>
+                <td mat-cell *matCellDef="let d">{{ d.phone }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="attended">
+                <th mat-header-cell *matHeaderCellDef>Attended</th>
+                <td mat-cell *matCellDef="let d">
+                  <mat-icon [class]="d.attended ? 'text-green-600' : 'text-gray-400'">
+                    {{ d.attended ? 'check_circle' : 'cancel' }}
+                  </mat-icon>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="donorColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: donorColumns;"></tr>
+            </table>
+          }
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Resources ({{ resources().length }})">
+        <div class="pt-4">
+          @if (resources().length === 0) {
+            <app-empty-state
+              icon="inventory_2"
+              message="No resources assigned" />
+          } @else {
+            <table mat-table [dataSource]="resources()" class="w-full">
+              <ng-container matColumnDef="resourceType">
+                <th mat-header-cell *matHeaderCellDef>Type</th>
+                <td mat-cell *matCellDef="let r">{{ r.resourceType }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="quantity">
+                <th mat-header-cell *matHeaderCellDef>Quantity</th>
+                <td mat-cell *matCellDef="let r">{{ r.quantity }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="notes">
+                <th mat-header-cell *matHeaderCellDef>Notes</th>
+                <td mat-cell *matCellDef="let r">{{ r.notes ?? '—' }}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="resourceColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: resourceColumns;"></tr>
+            </table>
+          }
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</div>

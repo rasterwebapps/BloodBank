@@ -1,0 +1,148 @@
+<div class="camp-form-container p-6">
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6">
+    <button mat-icon-button matTooltip="Cancel" aria-label="Go back" (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-2xl font-bold">{{ pageTitle() }}</h1>
+  </div>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="8" [columns]="2" />
+  } @else if (error() && !saving()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadCamp(campId() ?? '')" />
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <mat-card>
+        <mat-card-content class="p-6">
+
+          <!-- Camp Information -->
+          <h2 class="text-lg font-semibold mb-4">Camp Information</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <app-form-field
+              label="Camp Name"
+              [control]="nameCtrl"
+              [errorMessages]="errorMessages['name']"
+              [required]="true"
+              placeholder="e.g., Community Blood Drive" />
+            <app-form-field
+              label="Location"
+              [control]="locationCtrl"
+              [errorMessages]="errorMessages['location']"
+              [required]="true"
+              placeholder="e.g., Community Center Hall" />
+          </div>
+
+          <div class="mt-4">
+            <app-form-field
+              label="Address"
+              [control]="addressCtrl"
+              [errorMessages]="errorMessages['address']"
+              [required]="true"
+              placeholder="Full address of the camp venue" />
+          </div>
+
+          <mat-divider class="my-6" />
+
+          <!-- Date & Time -->
+          <h2 class="text-lg font-semibold mb-4">Date &amp; Time</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Camp Date</mat-label>
+              <input matInput type="date" formControlName="campDate" required />
+              @if (form.controls.campDate.hasError('required') && form.controls.campDate.touched) {
+                <mat-error>Camp date is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Start Time</mat-label>
+              <input matInput type="time" formControlName="startTime" required />
+              @if (form.controls.startTime.hasError('required') && form.controls.startTime.touched) {
+                <mat-error>Start time is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>End Time</mat-label>
+              <input matInput type="time" formControlName="endTime" required />
+              @if (form.controls.endTime.hasError('required') && form.controls.endTime.touched) {
+                <mat-error>End time is required</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="mt-4">
+            <mat-form-field appearance="outline" class="w-full md:w-1/3">
+              <mat-label>Target Donors</mat-label>
+              <input matInput type="number" formControlName="targetDonors" required />
+              @if (form.controls.targetDonors.hasError('required') && form.controls.targetDonors.touched) {
+                <mat-error>Target donors is required</mat-error>
+              } @else if (form.controls.targetDonors.hasError('min')) {
+                <mat-error>Must be at least 1</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <mat-divider class="my-6" />
+
+          <!-- Organizer Information -->
+          <h2 class="text-lg font-semibold mb-4">Organizer Information</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <app-form-field
+              label="Organizer Name"
+              [control]="organizerNameCtrl"
+              [errorMessages]="errorMessages['organizerName']"
+              [required]="true" />
+            <app-form-field
+              label="Contact Phone"
+              type="tel"
+              [control]="contactPhoneCtrl"
+              [errorMessages]="errorMessages['contactPhone']"
+              [required]="true"
+              placeholder="+1 234 567 8900" />
+          </div>
+
+          <!-- Notes -->
+          <div class="mt-4">
+            <app-form-field
+              label="Notes"
+              [control]="notesCtrl"
+              placeholder="Optional notes about the camp" />
+          </div>
+        </mat-card-content>
+
+        <!-- Actions -->
+        <mat-card-actions class="flex justify-end gap-3 p-4">
+          <button
+            mat-button
+            type="button"
+            (click)="cancel()"
+            [disabled]="saving()">
+            Cancel
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="saving()">
+            @if (saving()) {
+              <mat-spinner diameter="20" role="status" aria-label="Saving camp" />
+            } @else {
+              <ng-container>
+                <mat-icon>{{ isEditMode() ? 'save' : 'add_location' }}</mat-icon>
+                {{ submitLabel() }}
+              </ng-container>
+            }
+          </button>
+        </mat-card-actions>
+      </mat-card>
+
+      @if (error() && saving()) {
+        <div class="mt-4">
+          <app-error-card [message]="error() ?? ''" />
+        </div>
+      }
+    </form>
+  }
+</div>

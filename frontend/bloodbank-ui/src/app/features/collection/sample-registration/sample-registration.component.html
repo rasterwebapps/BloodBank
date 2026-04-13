@@ -1,0 +1,82 @@
+<div class="sample-registration-container p-6">
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6">
+    <button mat-icon-button matTooltip="Cancel" aria-label="Go back" (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-2xl font-bold">Register Sample</h1>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-card>
+      <mat-card-content class="p-6">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Sample Code -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Sample Code</mat-label>
+            <input matInput formControlName="sampleCode" required placeholder="e.g., SMP-2024-001" />
+            @if (form.controls.sampleCode.hasError('required') && form.controls.sampleCode.touched) {
+              <mat-error>Sample code is required</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Tube Type -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Tube Type</mat-label>
+            <mat-select formControlName="tubeType" required>
+              @for (option of tubeTypeOptions; track option.value) {
+                <mat-option [value]="option.value">{{ option.label }}</mat-option>
+              }
+            </mat-select>
+            @if (form.controls.tubeType.hasError('required') && form.controls.tubeType.touched) {
+              <mat-error>Tube type is required</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Volume -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Volume (mL)</mat-label>
+            <input matInput type="number" formControlName="volumeMl" required />
+            @if (form.controls.volumeMl.hasError('required') && form.controls.volumeMl.touched) {
+              <mat-error>Volume is required</mat-error>
+            } @else if (form.controls.volumeMl.hasError('min') || form.controls.volumeMl.hasError('max')) {
+              <mat-error>Must be 1–50 mL</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+
+      <!-- Actions -->
+      <mat-card-actions class="flex justify-end gap-3 p-4">
+        <button
+          mat-button
+          type="button"
+          (click)="cancel()"
+          [disabled]="saving()">
+          Cancel
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="saving()">
+          @if (saving()) {
+            <mat-spinner diameter="20" role="status" aria-label="Registering sample" />
+          } @else {
+            <ng-container>
+              <mat-icon>science</mat-icon>
+              Register Sample
+            </ng-container>
+          }
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    @if (error()) {
+      <div class="mt-4">
+        <app-error-card [message]="error() ?? ''" />
+      </div>
+    }
+  </form>
+</div>
