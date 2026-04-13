@@ -1,0 +1,64 @@
+<div class="user-activity-container p-6">
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6">
+    <button mat-icon-button aria-label="Back to users" matTooltip="Back" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-2xl font-bold">User Activity Log</h1>
+  </div>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="8" [columns]="5" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadActivity(currentUserId())" />
+  } @else if (isEmpty()) {
+    <app-empty-state
+      icon="history"
+      message="No activity records found for this user" />
+  } @else {
+    <app-data-table
+      [dataSource]="activities()"
+      [columns]="displayedColumns"
+      [totalElements]="totalElements()"
+      [pageSize]="pageSize()"
+      [loading]="loading()"
+      (pageChange)="onPageChange($event)">
+
+      <!-- Occurred At Column -->
+      <ng-container matColumnDef="occurredAt">
+        <th mat-header-cell *matHeaderCellDef>Date / Time</th>
+        <td mat-cell *matCellDef="let activity">
+          <span class="text-sm">{{ activity.occurredAt | date:'medium' }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Action Column -->
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef>Action</th>
+        <td mat-cell *matCellDef="let activity">
+          <span class="font-medium">{{ activity.action }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Resource Type Column -->
+      <ng-container matColumnDef="resourceType">
+        <th mat-header-cell *matHeaderCellDef>Resource</th>
+        <td mat-cell *matCellDef="let activity">{{ activity.resourceType }}</td>
+      </ng-container>
+
+      <!-- Description Column -->
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Description</th>
+        <td mat-cell *matCellDef="let activity">{{ activity.description }}</td>
+      </ng-container>
+
+      <!-- IP Address Column -->
+      <ng-container matColumnDef="ipAddress">
+        <th mat-header-cell *matHeaderCellDef>IP Address</th>
+        <td mat-cell *matCellDef="let activity">
+          <span class="font-mono text-sm">{{ activity.ipAddress || '—' }}</span>
+        </td>
+      </ng-container>
+    </app-data-table>
+  }
+</div>

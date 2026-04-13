@@ -1,0 +1,126 @@
+<div class="branch-form-container p-6">
+  <div class="flex items-center gap-3 mb-6">
+    <button mat-icon-button aria-label="Cancel" (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-2xl font-bold">{{ pageTitle() }}</h1>
+  </div>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="8" [columns]="2" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" />
+  }
+
+  <mat-card class="max-w-3xl">
+    <mat-card-content class="p-6">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <!-- Name -->
+          <mat-form-field appearance="outline" class="md:col-span-2">
+            <mat-label>Branch Name</mat-label>
+            <input matInput formControlName="name" placeholder="Central Blood Bank" />
+            @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+              <mat-error>Branch name is required</mat-error>
+            }
+            @if (form.controls.name.hasError('maxlength') && form.controls.name.touched) {
+              <mat-error>Maximum 200 characters</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Code -->
+          <mat-form-field appearance="outline">
+            <mat-label>Branch Code</mat-label>
+            <input matInput formControlName="code" placeholder="CBB-001" [readonly]="isEditMode()" />
+            @if (form.controls.code.hasError('required') && form.controls.code.touched) {
+              <mat-error>Branch code is required</mat-error>
+            }
+            @if (form.controls.code.hasError('pattern') && form.controls.code.touched) {
+              <mat-error>Only uppercase letters, numbers, hyphens, and underscores</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Capacity -->
+          <mat-form-field appearance="outline">
+            <mat-label>Daily Capacity</mat-label>
+            <input matInput type="number" formControlName="capacity" placeholder="100" />
+            @if (form.controls.capacity.hasError('required') && form.controls.capacity.touched) {
+              <mat-error>Capacity is required</mat-error>
+            }
+            @if (form.controls.capacity.hasError('min') && form.controls.capacity.touched) {
+              <mat-error>Capacity must be at least 1</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Address -->
+          <mat-form-field appearance="outline" class="md:col-span-2">
+            <mat-label>Address</mat-label>
+            <input matInput formControlName="address" placeholder="123 Main Street" />
+            @if (form.controls.address.hasError('required') && form.controls.address.touched) {
+              <mat-error>Address is required</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- City -->
+          <mat-form-field appearance="outline">
+            <mat-label>City</mat-label>
+            <input matInput formControlName="city" placeholder="Nairobi" />
+            @if (form.controls.city.hasError('required') && form.controls.city.touched) {
+              <mat-error>City is required</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Country -->
+          <mat-form-field appearance="outline">
+            <mat-label>Country</mat-label>
+            <input matInput formControlName="country" placeholder="Kenya" />
+            @if (form.controls.country.hasError('required') && form.controls.country.touched) {
+              <mat-error>Country is required</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Phone -->
+          <mat-form-field appearance="outline">
+            <mat-label>Phone</mat-label>
+            <input matInput formControlName="phone" placeholder="+254 700 000 000" />
+            @if (form.controls.phone.hasError('required') && form.controls.phone.touched) {
+              <mat-error>Phone is required</mat-error>
+            }
+            @if (form.controls.phone.hasError('pattern') && form.controls.phone.touched) {
+              <mat-error>Please enter a valid phone number</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Email -->
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="branch@bloodbank.org" />
+            @if (form.controls.email.hasError('required') && form.controls.email.touched) {
+              <mat-error>Email is required</mat-error>
+            }
+            @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+              <mat-error>Please enter a valid email address</mat-error>
+            }
+          </mat-form-field>
+
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-3 justify-end mt-6">
+          <button mat-stroked-button type="button" (click)="cancel()">Cancel</button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="saving()">
+            @if (saving()) {
+              <mat-spinner diameter="18" class="inline-spinner"></mat-spinner>
+            }
+            {{ submitLabel() }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

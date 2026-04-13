@@ -1,0 +1,116 @@
+<div class="system-settings-container p-6">
+  <h1 class="text-2xl font-bold mb-6">System Settings</h1>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="8" [columns]="4" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="loadSettings()" />
+  } @else if (categories().length === 0) {
+    <p class="text-gray-500 text-center py-12">No settings found.</p>
+  } @else {
+    <mat-tab-group animationDuration="200ms">
+      @for (category of categories(); track category) {
+        <mat-tab [label]="category">
+          <div class="p-4">
+            @if (getSettingsByCategory(category).length === 0) {
+              <p class="text-gray-500 text-center py-8">No settings in this category.</p>
+            } @else {
+              <table mat-table [dataSource]="getSettingsByCategory(category)" class="w-full">
+
+                <!-- Key Column -->
+                <ng-container matColumnDef="key">
+                  <th mat-header-cell *matHeaderCellDef>Key</th>
+                  <td mat-cell *matCellDef="let setting">
+                    <span class="font-mono text-sm">{{ setting.key }}</span>
+                  </td>
+                </ng-container>
+
+                <!-- Description Column -->
+                <ng-container matColumnDef="description">
+                  <th mat-header-cell *matHeaderCellDef>Description</th>
+                  <td mat-cell *matCellDef="let setting">
+                    <span class="text-sm text-gray-600">{{ setting.description }}</span>
+                  </td>
+                </ng-container>
+
+                <!-- Value Column -->
+                <ng-container matColumnDef="value">
+                  <th mat-header-cell *matHeaderCellDef>Value</th>
+                  <td mat-cell *matCellDef="let setting" class="value-cell">
+                    @if (editing() === setting.id) {
+                      <mat-form-field appearance="outline" class="inline-edit-field">
+                        <input
+                          matInput
+                          [ngModel]="editValue()"
+                          (ngModelChange)="editValue.set($event)"
+                          (keydown)="onEditKeydown($event, setting)"
+                          aria-label="Edit setting value"
+                          cdkFocusInitial />
+                      </mat-form-field>
+                    } @else {
+                      <span
+                        class="editable-value"
+                        [class.cursor-pointer]="setting.isEditable"
+                        [matTooltip]="setting.isEditable ? 'Click to edit' : 'Read only'"
+                        (click)="setting.isEditable ? startEdit(setting) : null">
+                        {{ setting.value }}
+                        @if (setting.isEditable) {
+                          <mat-icon class="edit-hint-icon">edit</mat-icon>
+                        } @else {
+                          <mat-icon class="lock-icon">lock</mat-icon>
+                        }
+                      </span>
+                    }
+                  </td>
+                </ng-container>
+
+                <!-- Updated At Column -->
+                <ng-container matColumnDef="updatedAt">
+                  <th mat-header-cell *matHeaderCellDef>Last Updated</th>
+                  <td mat-cell *matCellDef="let setting">
+                    <span class="text-sm text-gray-500">{{ setting.updatedAt | date:'mediumDate' }}</span>
+                  </td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let setting">
+                    @if (editing() === setting.id) {
+                      <button
+                        mat-icon-button
+                        matTooltip="Save (Enter)"
+                        color="primary"
+                        aria-label="Save setting"
+                        (click)="saveEdit(setting)">
+                        <mat-icon>check</mat-icon>
+                      </button>
+                      <button
+                        mat-icon-button
+                        matTooltip="Cancel (Esc)"
+                        aria-label="Cancel edit"
+                        (click)="cancelEdit()">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    } @else if (setting.isEditable) {
+                      <button
+                        mat-icon-button
+                        matTooltip="Edit"
+                        aria-label="Edit setting"
+                        (click)="startEdit(setting)">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                    }
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="settingColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: settingColumns"></tr>
+              </table>
+            }
+          </div>
+        </mat-tab>
+      }
+    </mat-tab-group>
+  }
+</div>
