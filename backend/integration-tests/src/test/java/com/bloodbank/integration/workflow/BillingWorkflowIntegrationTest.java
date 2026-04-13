@@ -178,7 +178,7 @@ class BillingWorkflowIntegrationTest extends AbstractWorkflowIntegrationTest {
 
         @Test
         @DisplayName("Invoices for different hospitals should not interfere with each other")
-        void invoicesForDifferentHospitalsShouldNotInterferere() {
+        void invoicesForDifferentHospitalsShouldNotInterfereWithEachOther() {
             UUID hospital1 = UUID.randomUUID();
             UUID hospital2 = UUID.randomUUID();
             UUID branchId = UUID.randomUUID();
