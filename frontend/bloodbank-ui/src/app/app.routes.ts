@@ -49,6 +49,14 @@ export const routes: Routes = [
             (m) => m.CAMP_ROUTES,
           ),
       },
+      {
+        path: 'lab',
+        data: { breadcrumb: 'Lab' },
+        loadChildren: () =>
+          import('@features/lab/lab.routes').then(
+            (m) => m.LAB_ROUTES,
+          ),
+      },
     ],
   },
 
