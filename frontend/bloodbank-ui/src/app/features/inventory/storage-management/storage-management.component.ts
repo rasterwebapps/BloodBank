@@ -29,6 +29,8 @@ import { LogisticsService } from '../services/logistics.service';
 import {
   StorageLocation,
   STORAGE_TYPE_OPTIONS,
+  CRITICAL_UTILIZATION_PCT,
+  WARNING_UTILIZATION_PCT,
 } from '../models/inventory.model';
 import { AddStorageDialogComponent } from './add-storage-dialog.component';
 
@@ -140,8 +142,8 @@ export class StorageManagementComponent implements OnInit {
 
   getUtilizationClass(location: StorageLocation): string {
     const pct = this.getUtilization(location);
-    if (pct >= 90) return 'util-critical';
-    if (pct >= 70) return 'util-warning';
+    if (pct >= CRITICAL_UTILIZATION_PCT) return 'util-critical';
+    if (pct >= WARNING_UTILIZATION_PCT) return 'util-warning';
     return 'util-ok';
   }
 

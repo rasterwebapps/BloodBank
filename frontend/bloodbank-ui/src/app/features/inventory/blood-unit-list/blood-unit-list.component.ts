@@ -29,6 +29,7 @@ import {
   BLOOD_GROUP_OPTIONS,
   COMPONENT_TYPE_OPTIONS,
   BLOOD_UNIT_STATUS_OPTIONS,
+  EXPIRY_WARNING_DAYS,
   getComponentTypeLabel,
 } from '../models/inventory.model';
 
@@ -162,9 +163,9 @@ export class BloodUnitListComponent implements OnInit {
 
   isExpiringSoon(unit: BloodUnit): boolean {
     const expiry = new Date(unit.expiryDate);
-    const threeDaysFromNow = new Date();
-    threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
-    return expiry <= threeDaysFromNow && expiry > new Date();
+    const warningDate = new Date();
+    warningDate.setDate(warningDate.getDate() + EXPIRY_WARNING_DAYS);
+    return expiry <= warningDate && expiry > new Date();
   }
 
   getComponentTypeLabel(value: string): string {

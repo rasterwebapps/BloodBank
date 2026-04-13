@@ -32,6 +32,8 @@ import {
   BloodStock,
   BLOOD_GROUP_OPTIONS,
   COMPONENT_TYPE_OPTIONS,
+  ADEQUATE_THRESHOLD,
+  LOW_THRESHOLD,
   getStockLevelClass,
   getBloodGroupLabel,
   getComponentTypeLabel,
@@ -208,16 +210,17 @@ export class StockDashboardComponent implements OnInit {
   }
 
   getCriticalCount(): number {
-    return this.stockCells().filter((c) => c.count < 3).length;
+    return this.stockCells().filter((c) => c.count < LOW_THRESHOLD).length;
   }
 
   getLowCount(): number {
-    return this.stockCells().filter((c) => c.count >= 3 && c.count < 10)
-      .length;
+    return this.stockCells().filter(
+      (c) => c.count >= LOW_THRESHOLD && c.count < ADEQUATE_THRESHOLD,
+    ).length;
   }
 
   getAdequateCount(): number {
-    return this.stockCells().filter((c) => c.count >= 10).length;
+    return this.stockCells().filter((c) => c.count >= ADEQUATE_THRESHOLD).length;
   }
 
   getCellForBloodGroupAndComponent(

@@ -149,10 +149,19 @@ export const STORAGE_TYPE_OPTIONS = [
   { value: StorageType.ROOM_TEMPERATURE, label: 'Room Temperature' },
 ] as const;
 
+/** Stock level thresholds. */
+export const ADEQUATE_THRESHOLD = 10;
+export const LOW_THRESHOLD = 3;
+/** Days before expiry to show a warning indicator. */
+export const EXPIRY_WARNING_DAYS = 3;
+/** Storage utilisation % thresholds. */
+export const CRITICAL_UTILIZATION_PCT = 90;
+export const WARNING_UTILIZATION_PCT = 70;
+
 /** Returns the stock level category for a given count. */
 export function getStockLevel(count: number): 'adequate' | 'low' | 'critical' {
-  if (count >= 10) return 'adequate';
-  if (count >= 3) return 'low';
+  if (count >= ADEQUATE_THRESHOLD) return 'adequate';
+  if (count >= LOW_THRESHOLD) return 'low';
   return 'critical';
 }
 
