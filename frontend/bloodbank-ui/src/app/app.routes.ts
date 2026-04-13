@@ -65,6 +65,14 @@ export const routes: Routes = [
             (m) => m.INVENTORY_ROUTES,
           ),
       },
+      {
+        path: 'transfusion',
+        data: { breadcrumb: 'Transfusion' },
+        loadChildren: () =>
+          import('@features/transfusion/transfusion.routes').then(
+            (m) => m.TRANSFUSION_ROUTES,
+          ),
+      },
     ],
   },
 

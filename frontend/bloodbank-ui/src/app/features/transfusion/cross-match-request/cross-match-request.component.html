@@ -1,0 +1,176 @@
+<div class="p-6">
+  <h1 class="text-2xl font-semibold mb-6">Cross-Match Request</h1>
+
+  <!-- New Request Form -->
+  <mat-card class="mb-6">
+    <mat-card-header>
+      <mat-card-title>New Cross-Match Request</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="pt-4">
+      <form
+        [formGroup]="form"
+        (ngSubmit)="onSubmit()"
+        class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <mat-form-field appearance="outline">
+          <mat-label>Patient Name</mat-label>
+          <input matInput formControlName="patientName" placeholder="Full patient name" />
+          @if (form.controls.patientName.invalid && form.controls.patientName.touched) {
+            <mat-error>Patient name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Patient ID</mat-label>
+          <input matInput formControlName="patientId" placeholder="Hospital patient ID" />
+          @if (form.controls.patientId.invalid && form.controls.patientId.touched) {
+            <mat-error>Patient ID is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Blood Group</mat-label>
+          <mat-select formControlName="bloodGroup">
+            <mat-option value="A">A</mat-option>
+            <mat-option value="B">B</mat-option>
+            <mat-option value="AB">AB</mat-option>
+            <mat-option value="O">O</mat-option>
+          </mat-select>
+          @if (form.controls.bloodGroup.invalid && form.controls.bloodGroup.touched) {
+            <mat-error>Blood group is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Rh Factor</mat-label>
+          <mat-select formControlName="rhFactor">
+            <mat-option value="POSITIVE">Positive (+)</mat-option>
+            <mat-option value="NEGATIVE">Negative (-)</mat-option>
+          </mat-select>
+          @if (form.controls.rhFactor.invalid && form.controls.rhFactor.touched) {
+            <mat-error>Rh factor is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Component Type</mat-label>
+          <mat-select formControlName="componentType">
+            <mat-option value="WHOLE_BLOOD">Whole Blood</mat-option>
+            <mat-option value="PACKED_RBC">Packed RBC</mat-option>
+            <mat-option value="PLATELETS">Platelets</mat-option>
+            <mat-option value="FRESH_FROZEN_PLASMA">Fresh Frozen Plasma</mat-option>
+            <mat-option value="CRYOPRECIPITATE">Cryoprecipitate</mat-option>
+          </mat-select>
+          @if (form.controls.componentType.invalid && form.controls.componentType.touched) {
+            <mat-error>Component type is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Units Requested</mat-label>
+          <input matInput type="number" formControlName="unitsRequested" min="1" />
+          @if (form.controls.unitsRequested.invalid && form.controls.unitsRequested.touched) {
+            <mat-error>At least 1 unit required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="md:col-span-2">
+          <mat-label>Urgency</mat-label>
+          <mat-select formControlName="urgency">
+            <mat-option value="ROUTINE">Routine</mat-option>
+            <mat-option value="URGENT">Urgent</mat-option>
+            <mat-option value="EMERGENCY">Emergency</mat-option>
+            <mat-option value="MASSIVE_TRANSFUSION">Massive Transfusion</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="md:col-span-2 flex justify-end gap-3">
+          <button
+            mat-button
+            type="button"
+            (click)="form.reset({ unitsRequested: 1, urgency: 'ROUTINE' })">
+            Reset
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="saving()">
+            @if (saving()) {
+              <mat-spinner diameter="20" class="inline-block mr-2" />
+            }
+            Submit Request
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Recent Requests Table -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Recent Cross-Match Requests</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @if (loading()) {
+        <app-loading-skeleton />
+      } @else if (error()) {
+        <app-error-card [message]="error()!" (retry)="loadRequests()" />
+      } @else if (requests().length === 0) {
+        <app-empty-state icon="science" message="No cross-match requests found" />
+      } @else {
+        <div class="overflow-x-auto">
+          <table mat-table [dataSource]="requests()" class="w-full">
+
+            <ng-container matColumnDef="requestNumber">
+              <th mat-header-cell *matHeaderCellDef>Request #</th>
+              <td mat-cell *matCellDef="let req">{{ req.requestNumber }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="patientName">
+              <th mat-header-cell *matHeaderCellDef>Patient</th>
+              <td mat-cell *matCellDef="let req">{{ req.patientName }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="bloodGroup">
+              <th mat-header-cell *matHeaderCellDef>Blood Group</th>
+              <td mat-cell *matCellDef="let req">
+                {{ req.bloodGroup }}{{ req.rhFactor === 'POSITIVE' ? '+' : '-' }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="componentType">
+              <th mat-header-cell *matHeaderCellDef>Component</th>
+              <td mat-cell *matCellDef="let req">{{ req.componentType }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="unitsRequested">
+              <th mat-header-cell *matHeaderCellDef>Units</th>
+              <td mat-cell *matCellDef="let req">{{ req.unitsRequested }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="urgency">
+              <th mat-header-cell *matHeaderCellDef>Urgency</th>
+              <td mat-cell *matCellDef="let req">{{ req.urgency }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let req">
+                <span [class]="getStatusClass(req.status)">{{ req.status }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="requestedAt">
+              <th mat-header-cell *matHeaderCellDef>Requested At</th>
+              <td mat-cell *matCellDef="let req">{{ req.requestedAt | date:'short' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>
