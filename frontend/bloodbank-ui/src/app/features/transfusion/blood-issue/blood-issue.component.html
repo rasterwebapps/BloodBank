@@ -1,0 +1,167 @@
+<div class="p-6">
+  <h1 class="text-2xl font-semibold mb-6">Issue Blood</h1>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Issue Form -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Issue Blood Unit</mat-card-title>
+        <mat-card-subtitle>Select a compatible cross-match request</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="pt-4">
+        <form
+          [formGroup]="form"
+          (ngSubmit)="onSubmit()"
+          class="flex flex-col gap-4">
+
+          <mat-form-field appearance="outline">
+            <mat-label>Cross-Match Request</mat-label>
+            <mat-select
+              formControlName="crossMatchRequestId"
+              (selectionChange)="onRequestChange($event.value)">
+              @for (req of compatibleRequests(); track req.id) {
+                <mat-option [value]="req.id">
+                  {{ req.patientName }} — {{ req.bloodGroup }}{{ req.rhFactor === 'POSITIVE' ? '+' : '-' }}
+                  ({{ req.requestNumber }})
+                </mat-option>
+              }
+            </mat-select>
+            @if (form.controls.crossMatchRequestId.invalid && form.controls.crossMatchRequestId.touched) {
+              <mat-error>Cross-match request is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Blood Unit ID</mat-label>
+            <input matInput formControlName="bloodUnitId" placeholder="Enter blood unit ID" />
+            @if (form.controls.bloodUnitId.invalid && form.controls.bloodUnitId.touched) {
+              <mat-error>Blood unit ID is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Notes</mat-label>
+            <textarea matInput formControlName="notes" rows="3" placeholder="Optional notes"></textarea>
+          </mat-form-field>
+
+          <div class="flex justify-end gap-3">
+            <button
+              mat-button
+              type="button"
+              (click)="form.reset(); selectedRequest.set(null)">
+              Clear
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="saving()">
+              @if (saving()) {
+                <mat-spinner diameter="20" class="inline-block mr-2" />
+              }
+              Issue Blood
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Patient Info Panel -->
+    @if (selectedRequest()) {
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Patient Information</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="pt-4">
+          <div class="patient-info-panel p-4 flex flex-col gap-2">
+            <div class="flex justify-between">
+              <span class="font-medium">Patient Name:</span>
+              <span>{{ selectedRequest()!.patientName }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-medium">Patient ID:</span>
+              <span>{{ selectedRequest()!.patientId }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-medium">Blood Group:</span>
+              <span>
+                {{ selectedRequest()!.bloodGroup }}{{ selectedRequest()!.rhFactor === 'POSITIVE' ? '+' : '-' }}
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-medium">Component:</span>
+              <span>{{ selectedRequest()!.componentType }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-medium">Units Requested:</span>
+              <span>{{ selectedRequest()!.unitsRequested }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-medium">Urgency:</span>
+              <span>{{ selectedRequest()!.urgency }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+
+  <!-- Recent Issues Table -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Recent Blood Issues</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @if (loading()) {
+        <app-loading-skeleton />
+      } @else if (error()) {
+        <app-error-card [message]="error()!" (retry)="loadData()" />
+      } @else if (recentIssues().length === 0) {
+        <app-empty-state icon="bloodtype" message="No blood issues recorded yet" />
+      } @else {
+        <div class="overflow-x-auto">
+          <table mat-table [dataSource]="recentIssues()" class="w-full">
+
+            <ng-container matColumnDef="issueNumber">
+              <th mat-header-cell *matHeaderCellDef>Issue #</th>
+              <td mat-cell *matCellDef="let issue">{{ issue.issueNumber }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="patientName">
+              <th mat-header-cell *matHeaderCellDef>Patient</th>
+              <td mat-cell *matCellDef="let issue">{{ issue.patientName }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="unitNumber">
+              <th mat-header-cell *matHeaderCellDef>Unit #</th>
+              <td mat-cell *matCellDef="let issue">{{ issue.unitNumber }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="componentType">
+              <th mat-header-cell *matHeaderCellDef>Component</th>
+              <td mat-cell *matCellDef="let issue">{{ issue.componentType }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="issuedBy">
+              <th mat-header-cell *matHeaderCellDef>Issued By</th>
+              <td mat-cell *matCellDef="let issue">{{ issue.issuedBy }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="issuedAt">
+              <th mat-header-cell *matHeaderCellDef>Issued At</th>
+              <td mat-cell *matCellDef="let issue">{{ issue.issuedAt | date:'short' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let issue">{{ issue.status }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

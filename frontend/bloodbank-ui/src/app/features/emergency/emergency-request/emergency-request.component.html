@@ -1,0 +1,263 @@
+<div class="emergency-request-container p-6">
+
+  <!-- Page header -->
+  <div class="flex items-center gap-3 mb-6">
+    <button
+      mat-icon-button
+      matTooltip="Back to Dashboard"
+      aria-label="Back to Emergency Dashboard"
+      (click)="goToDashboard()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div>
+      <h1 class="text-2xl font-bold text-red-700">New Emergency Blood Request</h1>
+      <p class="text-sm text-gray-500 mt-1">Submit an urgent request for blood units</p>
+    </div>
+  </div>
+
+  <!-- Create form -->
+  <mat-card class="mb-8">
+    <mat-card-content class="p-6">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <!-- Patient Information -->
+        <h2 class="text-lg font-semibold mb-4">Patient Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Patient Name</mat-label>
+            <input matInput formControlName="patientName" placeholder="Full name" required />
+            @if (patientNameCtrl.hasError('required') && patientNameCtrl.touched) {
+              <mat-error>Patient name is required</mat-error>
+            }
+            @if (patientNameCtrl.hasError('maxlength') && patientNameCtrl.touched) {
+              <mat-error>Maximum 200 characters</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Patient ID / MRN</mat-label>
+            <input matInput formControlName="patientId" placeholder="Medical record number" required />
+            @if (patientIdCtrl.hasError('required') && patientIdCtrl.touched) {
+              <mat-error>Patient ID is required</mat-error>
+            }
+          </mat-form-field>
+
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Hospital / Facility</mat-label>
+            <input matInput formControlName="hospitalName" placeholder="Requesting hospital name" required />
+            @if (hospitalNameCtrl.hasError('required') && hospitalNameCtrl.touched) {
+              <mat-error>Hospital name is required</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Priority Level -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Priority Level</mat-label>
+            <mat-select formControlName="priorityLevel" required>
+              @for (opt of priorityOptions; track opt.value) {
+                <mat-option [value]="opt.value">
+                  <span class="priority-badge {{ opt.cssClass }}">{{ opt.label }}</span>
+                </mat-option>
+              }
+            </mat-select>
+            @if (form.controls.priorityLevel.hasError('required') && form.controls.priorityLevel.touched) {
+              <mat-error>Priority level is required</mat-error>
+            }
+          </mat-form-field>
+
+        </div>
+
+        <mat-divider class="my-6" />
+
+        <!-- Blood Requirements -->
+        <h2 class="text-lg font-semibold mb-4">Blood Requirements</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Blood Group</mat-label>
+            <mat-select formControlName="bloodGroup" required>
+              @for (opt of bloodGroupOptions; track opt.value) {
+                <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+              }
+            </mat-select>
+            @if (form.controls.bloodGroup.hasError('required') && form.controls.bloodGroup.touched) {
+              <mat-error>Blood group is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Rh Factor</mat-label>
+            <mat-select formControlName="rhFactor" required>
+              @for (opt of rhFactorOptions; track opt.value) {
+                <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+              }
+            </mat-select>
+            @if (form.controls.rhFactor.hasError('required') && form.controls.rhFactor.touched) {
+              <mat-error>Rh factor is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Component Type</mat-label>
+            <mat-select formControlName="componentType" required>
+              @for (opt of componentTypeOptions; track opt.value) {
+                <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+              }
+            </mat-select>
+            @if (form.controls.componentType.hasError('required') && form.controls.componentType.touched) {
+              <mat-error>Component type is required</mat-error>
+            }
+          </mat-form-field>
+
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Units Required</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="unitsRequired"
+              min="1"
+              max="20"
+              required />
+            @if (unitsCtrl.hasError('required') && unitsCtrl.touched) {
+              <mat-error>Units required is mandatory</mat-error>
+            }
+            @if (unitsCtrl.hasError('min') && unitsCtrl.touched) {
+              <mat-error>Minimum 1 unit</mat-error>
+            }
+            @if (unitsCtrl.hasError('max') && unitsCtrl.touched) {
+              <mat-error>Maximum 20 units per request</mat-error>
+            }
+          </mat-form-field>
+
+        </div>
+
+        <mat-divider class="my-6" />
+
+        <!-- Additional Notes -->
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Clinical Notes (optional)</mat-label>
+          <textarea
+            matInput
+            formControlName="notes"
+            rows="3"
+            placeholder="Additional clinical information, urgency details…">
+          </textarea>
+          @if (notesCtrl.hasError('maxlength')) {
+            <mat-error>Maximum 1000 characters</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Form-level error -->
+        @if (formError()) {
+          <div class="mt-4">
+            <app-error-card [message]="formError()!" />
+          </div>
+        }
+
+        <!-- Actions -->
+        <div class="flex justify-end gap-3 mt-6">
+          <button
+            mat-button
+            type="button"
+            [disabled]="saving()"
+            (click)="goToDashboard()">
+            Cancel
+          </button>
+          <button
+            mat-raised-button
+            [color]="submitButtonColor()"
+            type="submit"
+            [disabled]="saving()">
+            @if (saving()) {
+              <mat-spinner diameter="20" role="status" aria-label="Submitting emergency request" />
+            } @else {
+              <mat-icon>emergency</mat-icon>
+              Submit Emergency Request
+            }
+          </button>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Recent requests table -->
+  <section aria-labelledby="recent-heading">
+    <h2 id="recent-heading" class="text-xl font-semibold mb-4">Recent Emergency Requests</h2>
+
+    @if (loadingRecent()) {
+      <app-loading-skeleton [rows]="5" [columns]="6" />
+    } @else if (recentError()) {
+      <app-error-card [message]="recentError()!" (retry)="loadRecentRequests()" />
+    } @else if (isRecentEmpty()) {
+      <app-empty-state
+        icon="emergency_home"
+        message="No emergency requests found" />
+    } @else {
+      <mat-card>
+        <mat-card-content>
+          <table mat-table [dataSource]="recentRequests()" class="w-full" aria-label="Recent emergency requests">
+
+            <!-- Request Number -->
+            <ng-container matColumnDef="requestNumber">
+              <th mat-header-cell *matHeaderCellDef>Request #</th>
+              <td mat-cell *matCellDef="let req">
+                <span class="font-medium text-sm">{{ req.requestNumber }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Patient Name -->
+            <ng-container matColumnDef="patientName">
+              <th mat-header-cell *matHeaderCellDef>Patient</th>
+              <td mat-cell *matCellDef="let req">{{ req.patientName }}</td>
+            </ng-container>
+
+            <!-- Blood Group -->
+            <ng-container matColumnDef="bloodGroup">
+              <th mat-header-cell *matHeaderCellDef>Blood Group</th>
+              <td mat-cell *matCellDef="let req">
+                <span class="font-semibold">{{ req.bloodGroup }}{{ req.rhFactor }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Priority -->
+            <ng-container matColumnDef="priorityLevel">
+              <th mat-header-cell *matHeaderCellDef>Priority</th>
+              <td mat-cell *matCellDef="let req">
+                <span class="priority-badge {{ getPriorityClass(req.priorityLevel) }}">
+                  {{ getPriorityLabel(req.priorityLevel) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Status -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let req">
+                <app-status-badge [status]="req.status" />
+              </td>
+            </ng-container>
+
+            <!-- Requested At -->
+            <ng-container matColumnDef="requestedAt">
+              <th mat-header-cell *matHeaderCellDef>Requested</th>
+              <td mat-cell *matCellDef="let req">{{ req.requestedAt | date:'short' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </mat-card-content>
+      </mat-card>
+    }
+  </section>
+</div>

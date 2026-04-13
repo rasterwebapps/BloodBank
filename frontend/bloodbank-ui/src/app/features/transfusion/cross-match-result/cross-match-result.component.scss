@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.compatible-badge {
+  color: #388e3c;
+  font-weight: 600;
+}
+
+.incompatible-badge {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.selected-row {
+  background-color: rgba(0, 0, 0, 0.04);
+}

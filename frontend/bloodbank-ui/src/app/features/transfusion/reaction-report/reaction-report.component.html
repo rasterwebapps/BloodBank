@@ -1,0 +1,121 @@
+<div class="p-6">
+  <h1 class="text-2xl font-semibold mb-6">Report Transfusion Reaction</h1>
+
+  <!-- Critical Reaction Warning -->
+  @if (isCriticalReaction) {
+    <div class="critical-warning p-4 mb-6 flex items-center gap-3 rounded">
+      <mat-icon class="text-red-700">warning</mat-icon>
+      <div>
+        <p class="font-bold text-red-800">CRITICAL REACTION DETECTED</p>
+        <p class="text-red-700 text-sm">
+          Immediate medical intervention may be required.
+          Notify the attending physician immediately.
+        </p>
+      </div>
+    </div>
+  }
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Reaction Report Form</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="pt-4">
+      @if (loading()) {
+        <app-loading-skeleton />
+      } @else if (error()) {
+        <app-error-card [message]="error()!" (retry)="loadTransfusions()" />
+      } @else {
+        <form
+          [formGroup]="form"
+          (ngSubmit)="onSubmit()"
+          class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <mat-form-field appearance="outline" class="md:col-span-2">
+            <mat-label>Transfusion</mat-label>
+            <mat-select formControlName="transfusionId">
+              @if (transfusions().length === 0) {
+                <mat-option [value]="''" disabled>No transfusions available</mat-option>
+              }
+              @for (t of transfusions(); track t.id) {
+                <mat-option [value]="t.id">
+                  {{ t.transfusionNumber }} — {{ t.patientName }}
+                </mat-option>
+              }
+            </mat-select>
+            @if (form.controls.transfusionId.invalid && form.controls.transfusionId.touched) {
+              <mat-error>Transfusion is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Reaction Type</mat-label>
+            <mat-select formControlName="reactionType">
+              @for (opt of reactionTypeOptions; track opt.value) {
+                <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+              }
+            </mat-select>
+            @if (form.controls.reactionType.invalid && form.controls.reactionType.touched) {
+              <mat-error>Reaction type is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Severity</mat-label>
+            <mat-select formControlName="severity">
+              @for (opt of reactionSeverityOptions; track opt.value) {
+                <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+              }
+            </mat-select>
+            @if (form.controls.severity.invalid && form.controls.severity.touched) {
+              <mat-error>Severity is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Onset Time</mat-label>
+            <input matInput type="datetime-local" formControlName="onsetTime" />
+            @if (form.controls.onsetTime.invalid && form.controls.onsetTime.touched) {
+              <mat-error>Onset time is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="md:col-span-2">
+            <mat-label>Actions Taken</mat-label>
+            <textarea
+              matInput
+              formControlName="actionsTaken"
+              rows="3"
+              placeholder="Describe actions taken..."></textarea>
+            @if (form.controls.actionsTaken.invalid && form.controls.actionsTaken.touched) {
+              <mat-error>Actions taken is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="md:col-span-2">
+            <mat-label>Additional Notes</mat-label>
+            <textarea matInput formControlName="notes" rows="3"></textarea>
+          </mat-form-field>
+
+          <div class="md:col-span-2 flex justify-end gap-3">
+            <button
+              mat-button
+              type="button"
+              (click)="resetForm()">
+              Reset
+            </button>
+            <button
+              mat-raised-button
+              color="warn"
+              type="submit"
+              [disabled]="saving()">
+              @if (saving()) {
+                <mat-spinner diameter="20" class="inline-block mr-2" />
+              }
+              Submit Report
+            </button>
+          </div>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

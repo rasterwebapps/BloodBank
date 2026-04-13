@@ -1,0 +1,244 @@
+<div class="p-6">
+  <h1 class="text-2xl font-semibold mb-6">Transfusion Record</h1>
+
+  <!-- Tab: Start / Complete -->
+  <mat-card class="mb-6">
+    <mat-card-content>
+      <mat-tab-group>
+
+        <!-- Start Transfusion Tab -->
+        <mat-tab label="Start Transfusion">
+          <div class="pt-4">
+            <form
+              [formGroup]="startForm"
+              (ngSubmit)="onStartSubmit()"
+              class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <mat-form-field appearance="outline">
+                <mat-label>Blood Unit ID</mat-label>
+                <input matInput formControlName="bloodUnitId" placeholder="Blood unit ID" />
+                @if (startForm.controls.bloodUnitId.invalid && startForm.controls.bloodUnitId.touched) {
+                  <mat-error>Blood unit ID is required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Patient Name</mat-label>
+                <input matInput formControlName="patientName" />
+                @if (startForm.controls.patientName.invalid && startForm.controls.patientName.touched) {
+                  <mat-error>Patient name is required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Patient ID</mat-label>
+                <input matInput formControlName="patientId" />
+                @if (startForm.controls.patientId.invalid && startForm.controls.patientId.touched) {
+                  <mat-error>Patient ID is required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Volume (mL)</mat-label>
+                <input matInput type="number" formControlName="volumeMl" min="1" />
+                @if (startForm.controls.volumeMl.invalid && startForm.controls.volumeMl.touched) {
+                  <mat-error>Volume must be at least 1 mL</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Start Time</mat-label>
+                <input matInput type="datetime-local" formControlName="startTime" />
+                @if (startForm.controls.startTime.invalid && startForm.controls.startTime.touched) {
+                  <mat-error>Start time is required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Pre-Transfusion Vitals</mat-label>
+                <input
+                  matInput
+                  formControlName="preTransfusionVitals"
+                  placeholder="BP, HR, Temp..." />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="md:col-span-2">
+                <mat-label>Notes</mat-label>
+                <textarea matInput formControlName="notes" rows="3"></textarea>
+              </mat-form-field>
+
+              <div class="md:col-span-2 flex justify-end gap-3">
+                <button
+                  mat-button
+                  type="button"
+                  (click)="startForm.reset({ volumeMl: 250 })">
+                  Reset
+                </button>
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="savingStart()">
+                  @if (savingStart()) {
+                    <mat-spinner diameter="20" class="inline-block mr-2" />
+                  }
+                  Start Transfusion
+                </button>
+              </div>
+            </form>
+          </div>
+        </mat-tab>
+
+        <!-- Complete Transfusion Tab -->
+        <mat-tab label="Complete Transfusion">
+          <div class="pt-4">
+            <form
+              [formGroup]="completeForm"
+              (ngSubmit)="onCompleteSubmit()"
+              class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <mat-form-field appearance="outline" class="md:col-span-2">
+                <mat-label>Select In-Progress Transfusion</mat-label>
+                <mat-select
+                  formControlName="transfusionId"
+                  (selectionChange)="onTransfusionSelect($event.value)">
+                  @for (t of inProgressTransfusions(); track t.id) {
+                    <mat-option [value]="t.id">
+                      {{ t.transfusionNumber }} — {{ t.patientName }} ({{ t.unitNumber }})
+                    </mat-option>
+                  }
+                </mat-select>
+                @if (completeForm.controls.transfusionId.invalid && completeForm.controls.transfusionId.touched) {
+                  <mat-error>Please select a transfusion</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>End Time</mat-label>
+                <input matInput type="datetime-local" formControlName="endTime" />
+                @if (completeForm.controls.endTime.invalid && completeForm.controls.endTime.touched) {
+                  <mat-error>End time is required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Volume Transfused (mL)</mat-label>
+                <input matInput type="number" formControlName="volumeMl" min="1" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Outcome</mat-label>
+                <mat-select formControlName="outcome">
+                  @for (opt of outcomeOptions; track opt.value) {
+                    <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+                  }
+                </mat-select>
+                @if (completeForm.controls.outcome.invalid && completeForm.controls.outcome.touched) {
+                  <mat-error>Outcome is required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Post-Transfusion Vitals</mat-label>
+                <input
+                  matInput
+                  formControlName="postTransfusionVitals"
+                  placeholder="BP, HR, Temp..." />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="md:col-span-2">
+                <mat-label>Notes</mat-label>
+                <textarea matInput formControlName="notes" rows="3"></textarea>
+              </mat-form-field>
+
+              <div class="md:col-span-2 flex justify-end gap-3">
+                <button
+                  mat-button
+                  type="button"
+                  (click)="resetCompleteForm()">
+                  Reset
+                </button>
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="savingComplete()">
+                  @if (savingComplete()) {
+                    <mat-spinner diameter="20" class="inline-block mr-2" />
+                  }
+                  Complete Transfusion
+                </button>
+              </div>
+            </form>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Recent Transfusions Table -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Recent Transfusions</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @if (loading()) {
+        <app-loading-skeleton />
+      } @else if (error()) {
+        <app-error-card [message]="error()!" (retry)="loadData()" />
+      } @else if (recentTransfusions().length === 0) {
+        <app-empty-state icon="water_drop" message="No transfusions recorded yet" />
+      } @else {
+        <div class="overflow-x-auto">
+          <table mat-table [dataSource]="recentTransfusions()" class="w-full">
+
+            <ng-container matColumnDef="transfusionNumber">
+              <th mat-header-cell *matHeaderCellDef>Transfusion #</th>
+              <td mat-cell *matCellDef="let t">{{ t.transfusionNumber }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="patientName">
+              <th mat-header-cell *matHeaderCellDef>Patient</th>
+              <td mat-cell *matCellDef="let t">{{ t.patientName }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="unitNumber">
+              <th mat-header-cell *matHeaderCellDef>Unit #</th>
+              <td mat-cell *matCellDef="let t">{{ t.unitNumber }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="componentType">
+              <th mat-header-cell *matHeaderCellDef>Component</th>
+              <td mat-cell *matCellDef="let t">{{ t.componentType }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="volumeMl">
+              <th mat-header-cell *matHeaderCellDef>Volume (mL)</th>
+              <td mat-cell *matCellDef="let t">{{ t.volumeMl }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let t">{{ t.status }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="startTime">
+              <th mat-header-cell *matHeaderCellDef>Started</th>
+              <td mat-cell *matCellDef="let t">{{ t.startTime | date:'short' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="endTime">
+              <th mat-header-cell *matHeaderCellDef>Ended</th>
+              <td mat-cell *matCellDef="let t">
+                {{ t.endTime ? (t.endTime | date:'short') : '—' }}
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

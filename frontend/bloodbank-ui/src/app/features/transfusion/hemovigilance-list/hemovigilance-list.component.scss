@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.severity-mild {
+  color: #388e3c;
+  font-weight: 600;
+}
+
+.severity-moderate {
+  color: #f57c00;
+  font-weight: 600;
+}
+
+.severity-severe {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.severity-life-threatening {
+  color: #7b1fa2;
+  font-weight: 700;
+}
