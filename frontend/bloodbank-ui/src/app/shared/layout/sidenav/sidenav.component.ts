@@ -64,6 +64,12 @@ export class SidenavComponent {
     { label: 'Documents', icon: 'description', route: '/staff/documents', roles: ['*'] },
     { label: 'Emergency', icon: 'emergency', route: '/staff/emergency', roles: ['DOCTOR', 'BRANCH_MANAGER'] },
     { label: 'Settings', icon: 'settings', route: '/staff/settings', roles: ['BRANCH_ADMIN', 'SUPER_ADMIN'] },
+    // Hospital Portal navigation
+    { label: 'Dashboard', icon: 'dashboard', route: '/hospital/dashboard', roles: ['HOSPITAL_USER'] },
+    { label: 'Request Blood', icon: 'water_drop', route: '/hospital/request-blood', roles: ['HOSPITAL_USER'] },
+    { label: 'My Requests', icon: 'list_alt', route: '/hospital/my-requests', roles: ['HOSPITAL_USER'] },
+    { label: 'Contract', icon: 'handshake', route: '/hospital/contract', roles: ['HOSPITAL_USER'] },
+    { label: 'Feedback', icon: 'rate_review', route: '/hospital/feedback', roles: ['HOSPITAL_USER'] },
   ];
 
   /** Filtered navigation items based on user roles */

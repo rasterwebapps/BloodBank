@@ -160,11 +160,10 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
-        path: 'dashboard',
-        data: { breadcrumb: 'Dashboard' },
+        path: '',
         loadChildren: () =>
-          import('@features/dashboard/dashboard.routes').then(
-            (m) => m.DASHBOARD_ROUTES,
+          import('@features/hospital-portal/hospital-portal.routes').then(
+            (m) => m.HOSPITAL_PORTAL_ROUTES,
           ),
       },
     ],
