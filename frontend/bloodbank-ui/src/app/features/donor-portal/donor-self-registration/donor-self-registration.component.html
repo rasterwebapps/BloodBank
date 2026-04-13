@@ -1,0 +1,119 @@
+<div class="p-6 max-w-2xl mx-auto">
+  <mat-card>
+    <mat-card-header>
+      <mat-icon mat-card-avatar color="primary">volunteer_activism</mat-icon>
+      <mat-card-title>Donor Self-Registration</mat-card-title>
+      <mat-card-subtitle>Join the BloodBank donor community</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content class="pt-4">
+      @if (success()) {
+        <div class="flex flex-col items-center py-8 gap-4">
+          <mat-icon class="text-green-600" style="font-size:64px;width:64px;height:64px">check_circle</mat-icon>
+          <h2 class="text-xl font-bold text-green-700">Registration Submitted!</h2>
+          <p class="text-gray-600 text-center">Thank you for registering. You will receive a confirmation email shortly.</p>
+        </div>
+      } @else {
+        @if (error()) {
+          <div class="bg-red-50 border border-red-200 rounded p-3 mb-4 flex items-center gap-2">
+            <mat-icon color="warn">error</mat-icon>
+            <span class="text-red-700">{{ error() }}</span>
+          </div>
+        }
+        <form [formGroup]="form" (ngSubmit)="register()" class="flex flex-col gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <mat-form-field appearance="outline">
+              <mat-label>First Name</mat-label>
+              <input matInput formControlName="firstName" />
+              @if (form.controls.firstName.invalid && form.controls.firstName.touched) {
+                <mat-error>First name is required (min 2 chars)</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Last Name</mat-label>
+              <input matInput formControlName="lastName" />
+              @if (form.controls.lastName.invalid && form.controls.lastName.touched) {
+                <mat-error>Last name is required (min 2 chars)</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Blood Group</mat-label>
+              <mat-select formControlName="bloodGroup">
+                @for (bg of bloodGroups; track bg) {
+                  <mat-option [value]="bg">{{ bg }}</mat-option>
+                }
+              </mat-select>
+              @if (form.controls.bloodGroup.invalid && form.controls.bloodGroup.touched) {
+                <mat-error>Blood group is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Date of Birth</mat-label>
+              <input matInput [matDatepicker]="dobPicker" formControlName="dateOfBirth" [max]="maxDob" />
+              <mat-datepicker-toggle matSuffix [for]="dobPicker" />
+              <mat-datepicker #dobPicker />
+              @if (form.controls.dateOfBirth.invalid && form.controls.dateOfBirth.touched) {
+                <mat-error>Date of birth is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" formControlName="email" />
+              @if (form.controls.email.invalid && form.controls.email.touched) {
+                <mat-error>Valid email is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Phone</mat-label>
+              <input matInput formControlName="phone" placeholder="+1234567890" />
+              @if (form.controls.phone.invalid && form.controls.phone.touched) {
+                <mat-error>Valid phone number is required</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Address</mat-label>
+            <input matInput formControlName="address" />
+            @if (form.controls.address.invalid && form.controls.address.touched) {
+              <mat-error>Address is required</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <mat-form-field appearance="outline">
+              <mat-label>City</mat-label>
+              <input matInput formControlName="city" />
+              @if (form.controls.city.invalid && form.controls.city.touched) {
+                <mat-error>City is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>State</mat-label>
+              <input matInput formControlName="state" />
+              @if (form.controls.state.invalid && form.controls.state.touched) {
+                <mat-error>State is required</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <mat-checkbox formControlName="consentGiven">
+            I consent to donate blood and agree to the BloodBank terms and conditions.
+          </mat-checkbox>
+          @if (form.controls.consentGiven.invalid && form.controls.consentGiven.touched) {
+            <mat-error>You must give consent to register</mat-error>
+          }
+
+          <button mat-raised-button color="primary" type="submit" [disabled]="loading()">
+            @if (loading()) { Submitting... } @else { Register as Donor }
+          </button>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

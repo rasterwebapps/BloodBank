@@ -1,0 +1,6 @@
+@media print {
+  .donor-card {
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+}

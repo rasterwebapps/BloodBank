@@ -1,0 +1,98 @@
+<div class="p-6 max-w-2xl mx-auto">
+  <h1 class="text-2xl font-bold mb-6">Book a Donation Appointment</h1>
+
+  @if (booked()) {
+    <div class="flex flex-col items-center py-8 gap-4">
+      <mat-icon class="text-green-600" style="font-size:64px;width:64px;height:64px">check_circle</mat-icon>
+      <h2 class="text-xl font-bold text-green-700">Appointment Confirmed!</h2>
+      <p class="text-gray-600">{{ booked()!.branchName }} · {{ booked()!.date | date:'mediumDate' }} · {{ booked()!.timeSlot }}</p>
+    </div>
+  } @else {
+    @if (error()) {
+      <div class="bg-red-50 border border-red-200 rounded p-3 mb-4 flex items-center gap-2">
+        <mat-icon color="warn">error</mat-icon>
+        <span class="text-red-700">{{ error() }}</span>
+      </div>
+    }
+
+    <mat-stepper linear>
+      <!-- Step 1: Branch -->
+      <mat-step [stepControl]="branchForm" label="Select Branch">
+        <form [formGroup]="branchForm">
+          <mat-form-field appearance="outline" class="w-full mt-4">
+            <mat-label>Branch</mat-label>
+            <mat-select formControlName="branchId">
+              @for (b of branches(); track b.id) {
+                <mat-option [value]="b.id">{{ b.name }} — {{ b.city }}</mat-option>
+              }
+            </mat-select>
+            @if (branchForm.controls.branchId.invalid && branchForm.controls.branchId.touched) {
+              <mat-error>Please select a branch</mat-error>
+            }
+          </mat-form-field>
+          <div class="flex gap-2 mt-2">
+            <button mat-raised-button color="primary" matStepperNext>Next</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 2: Date -->
+      <mat-step [stepControl]="dateForm" label="Select Date">
+        <form [formGroup]="dateForm">
+          <mat-form-field appearance="outline" class="w-full mt-4">
+            <mat-label>Appointment Date</mat-label>
+            <input matInput [matDatepicker]="apptPicker" formControlName="date" [min]="minDate" />
+            <mat-datepicker-toggle matSuffix [for]="apptPicker" />
+            <mat-datepicker #apptPicker />
+            @if (dateForm.controls.date.invalid && dateForm.controls.date.touched) {
+              <mat-error>Please select a date</mat-error>
+            }
+          </mat-form-field>
+          <div class="flex gap-2 mt-2">
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-raised-button color="primary" matStepperNext>Next</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 3: Time Slot -->
+      <mat-step [stepControl]="slotForm" label="Select Time">
+        <form [formGroup]="slotForm">
+          <div class="mt-4">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Time Slot</mat-label>
+              <mat-select formControlName="timeSlot">
+                @for (slot of timeSlots; track slot) {
+                  <mat-option [value]="slot">{{ slot }}</mat-option>
+                }
+              </mat-select>
+              @if (slotForm.controls.timeSlot.invalid && slotForm.controls.timeSlot.touched) {
+                <mat-error>Please select a time slot</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          <div class="flex gap-2 mt-2">
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-raised-button color="primary" matStepperNext>Next</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 4: Confirm -->
+      <mat-step label="Confirm">
+        <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+          <h3 class="font-semibold mb-3">Appointment Summary</h3>
+          <p><strong>Branch:</strong> {{ selectedBranch?.name }} — {{ selectedBranch?.city }}</p>
+          <p><strong>Date:</strong> {{ dateForm.value.date | date:'fullDate' }}</p>
+          <p><strong>Time:</strong> {{ slotForm.value.timeSlot }}</p>
+        </div>
+        <div class="flex gap-2 mt-4">
+          <button mat-button matStepperPrevious>Back</button>
+          <button mat-raised-button color="primary" (click)="confirmBooking()" [disabled]="submitting()">
+            @if (submitting()) { Booking... } @else { Confirm Appointment }
+          </button>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  }
+</div>

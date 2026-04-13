@@ -1,0 +1,61 @@
+<div class="p-6">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Donation History</mat-card-title>
+      <mat-card-subtitle>{{ totalElements() }} total donations</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      @if (loading()) {
+        <app-loading-skeleton />
+      } @else if (error()) {
+        <app-error-card [message]="error()!" (retry)="load()" />
+      } @else if (donations().length === 0) {
+        <div class="flex flex-col items-center py-10 gap-3">
+          <mat-icon style="font-size:48px;width:48px;height:48px" class="text-gray-300">volunteer_activism</mat-icon>
+          <p class="text-gray-500">No donations yet. Book your first appointment!</p>
+        </div>
+      } @else {
+        <table mat-table [dataSource]="donations()" class="w-full">
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let d">{{ d.date | date:'mediumDate' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="location">
+            <th mat-header-cell *matHeaderCellDef>Location</th>
+            <td mat-cell *matCellDef="let d">{{ d.location }}</td>
+          </ng-container>
+          <ng-container matColumnDef="volume">
+            <th mat-header-cell *matHeaderCellDef>Volume</th>
+            <td mat-cell *matCellDef="let d">{{ d.volume }} mL</td>
+          </ng-container>
+          <ng-container matColumnDef="bloodGroup">
+            <th mat-header-cell *matHeaderCellDef>Blood Group</th>
+            <td mat-cell *matCellDef="let d">{{ d.bloodGroup }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let d"><app-status-badge [status]="d.status" /></td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Certificate</th>
+            <td mat-cell *matCellDef="let d">
+              @if (d.certificateUrl) {
+                <button mat-icon-button aria-label="Download certificate" (click)="downloadCertificate(d)">
+                  <mat-icon>download</mat-icon>
+                </button>
+              }
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        <mat-paginator
+          [length]="totalElements()"
+          [pageSize]="pageSize()"
+          [pageSizeOptions]="[5, 10, 25]"
+          (page)="onPage($event)"
+        />
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

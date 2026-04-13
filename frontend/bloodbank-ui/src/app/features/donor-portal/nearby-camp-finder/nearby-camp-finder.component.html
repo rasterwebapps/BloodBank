@@ -1,0 +1,70 @@
+<div class="p-6">
+  <h1 class="text-2xl font-bold mb-4">Find Nearby Blood Camps</h1>
+
+  @if (geoDenied()) {
+    <div class="mb-4 p-3 bg-yellow-50 border border-yellow-300 rounded flex items-center gap-2">
+      <mat-icon class="text-yellow-600">location_off</mat-icon>
+      <span class="text-yellow-800">Location access denied. Search by city below.</span>
+    </div>
+    <form [formGroup]="cityForm" (ngSubmit)="searchByCity()" class="flex gap-2 mb-6">
+      <mat-form-field appearance="outline" class="flex-1">
+        <mat-label>City</mat-label>
+        <input matInput formControlName="city" placeholder="Enter your city" />
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit" [disabled]="loading()">
+        <mat-icon>search</mat-icon> Search
+      </button>
+    </form>
+  }
+
+  @if (loading()) {
+    <div class="flex justify-center py-8">
+      <mat-icon class="animate-spin text-gray-400" style="font-size:36px;width:36px;height:36px">autorenew</mat-icon>
+    </div>
+  } @else if (error()) {
+    <div class="bg-red-50 border border-red-200 rounded p-4 flex items-center gap-2">
+      <mat-icon color="warn">error</mat-icon>
+      <span class="text-red-700">{{ error() }}</span>
+    </div>
+  } @else if (camps().length === 0) {
+    <div class="flex flex-col items-center py-10 gap-3">
+      <mat-icon style="font-size:48px;width:48px;height:48px" class="text-gray-300">location_on</mat-icon>
+      <p class="text-gray-500">No camps found in your area. Try searching by city.</p>
+      @if (!geoDenied()) {
+        <button mat-stroked-button (click)="geoDenied.set(true)">Search by City</button>
+      }
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (camp of camps(); track camp.id) {
+        <mat-card>
+          <mat-card-header>
+            <mat-icon mat-card-avatar color="primary">bloodtype</mat-icon>
+            <mat-card-title>{{ camp.name }}</mat-card-title>
+            <mat-card-subtitle>{{ camp.date }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p class="flex items-start gap-1 text-sm text-gray-600 mb-1">
+              <mat-icon class="text-sm" style="font-size:16px;width:16px;height:16px">location_on</mat-icon>
+              {{ camp.address }}
+            </p>
+            <p class="text-sm text-gray-600 mb-2">
+              <mat-icon class="text-sm" style="font-size:16px;width:16px;height:16px">schedule</mat-icon>
+              {{ camp.startTime }} – {{ camp.endTime }}
+            </p>
+            <mat-chip-set>
+              <mat-chip [color]="camp.availableSlots > 0 ? 'primary' : 'warn'" highlighted>
+                {{ camp.availableSlots }} slots available
+              </mat-chip>
+            </mat-chip-set>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-raised-button color="primary" [disabled]="camp.availableSlots === 0">
+              Register
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

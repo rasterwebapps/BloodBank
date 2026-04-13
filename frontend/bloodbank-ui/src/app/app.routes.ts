@@ -169,26 +169,15 @@ export const routes: Routes = [
     ],
   },
 
-  // Donor Portal (wrapped in shell layout)
+  // Donor Portal
   {
     path: 'donor',
-    loadComponent: () =>
-      import('@shared/layout/shell/shell.component').then(
-        (m) => m.ShellComponent,
-      ),
     canActivate: [roleGuard],
     data: { roles: [Role.DONOR] },
-    children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      {
-        path: 'dashboard',
-        data: { breadcrumb: 'Dashboard' },
-        loadChildren: () =>
-          import('@features/dashboard/dashboard.routes').then(
-            (m) => m.DASHBOARD_ROUTES,
-          ),
-      },
-    ],
+    loadChildren: () =>
+      import('@features/donor-portal/donor-portal.routes').then(
+        (m) => m.DONOR_PORTAL_ROUTES,
+      ),
   },
 
   // Error pages (no guard required — no shell)
