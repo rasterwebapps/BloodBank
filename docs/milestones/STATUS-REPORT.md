@@ -1,6 +1,6 @@
 # 🩸 BloodBank — Development Status Report
 
-**Report Date:** 2026-04-09
+**Report Date:** 2026-04-13
 **Data Source:** GitHub Pull Requests #1–#15+ (descriptions, reviews, merge status, codebase verification)
 **Total PRs Reviewed:** 15+ (all merged)
 **PR Review Comments:** 0 (no reviewer comments or review threads found on any PR)
@@ -16,7 +16,7 @@
 | **M2** | ✅ COMPLETE | 100% | 54/54 | #7, #8, #9, #10 |
 | **M3** | ✅ COMPLETE | 100% | 43/43 | #11+ |
 | **M4** | ✅ COMPLETE | 100% | 66/66 | #12+ |
-| **M5** | 🟡 IN PROGRESS | ~29% | 15/52 | #15 |
+| **M5** | 🟡 NEARLY COMPLETE | 98% | 51/52 | #15+ |
 | **M6** | 🔴 NOT STARTED | 0% | 0/30 | — |
 | **M7** | 🔴 NOT STARTED | 0% | 0/46 | — |
 | **M8** | 🔴 NOT STARTED | 0% | 0/28 | — |
@@ -26,7 +26,7 @@
 | **M12** | 🔴 NOT STARTED | 0% | 0/20 | — |
 | **M13** | 🔴 NOT STARTED | 0% | 0/33 | — |
 
-**Overall Progress: ~86% of coding milestones (M0–M5: 235/272), ~44% of total project (235/530)**
+**Overall Progress: ~99% of coding milestones (M0–M5: 271/272), ~51% of total project (271/530)**
 
 ---
 
@@ -193,19 +193,23 @@
 
 ---
 
-### M5: API Gateway + Frontend — 🟡 IN PROGRESS (~29%)
+### M5: API Gateway + Frontend — 🟡 NEARLY COMPLETE (98%)
 
 | Section | Issues | Status | PR |
 |---|---|---|---|
 | API Gateway (M5-001–010) | 10 | ✅ Complete (7 main files, 10 test files, 30 tests) | #15 |
 | Config Server (M5-011–015) | 5 | ✅ Complete (2 main files, 1 test file, 10 tests) | #15 |
 | Config Repository | — | ✅ Complete (16 YAML files for 12 services + 3 environments) | #15 |
-| Angular Core & Shared (M5-016–024) | 9 | ❌ Not started (no frontend/ dir) |
-| Staff Portal Features (M5-025–040) | 16 | ❌ Not started |
-| Hospital Portal (M5-041–045) | 5 | ❌ Not started |
-| Donor Portal (M5-046–052) | 7 | ❌ Not started |
+| Angular Scaffold (M5-016) | 1 | ✅ Complete (app.ts, app.config.ts, app.routes.ts, angular.json) | |
+| Angular Core (M5-017–018) | 2 | ✅ Complete (auth/, guards/, interceptors/, models/, services/ — 12 files) | |
+| Angular Shared Components (M5-019–020) | 2 | ✅ Complete (10 components + 5 layout + 2 directives + 3 pipes + 3 models — 52 files) | |
+| Angular Core Features (M5-021–022, M5-024) | 3 | ✅ Complete (roleGuard, shared models, Material + Tailwind design system) | |
+| i18n (M5-023) | 1 | ⚠️ Incomplete (no assets/i18n/ directory — en/es/fr JSON missing) | |
+| Staff Portal Features (M5-025–040) | 16 | ✅ Complete (all 16 feature modules implemented) | |
+| Hospital Portal (M5-041–045) | 5 | ✅ Complete (dashboard, blood-request-form, request-tracking, contract-view, feedback-form) | |
+| Donor Portal (M5-046–052) | 7 | ✅ Complete (self-registration, history, appointment, eligibility, camps, card, referral) | |
 
-**PR #15 — MERGED to main (2026-04-07)**
+**Verified 2026-04-13 — Angular frontend fully implemented.**
 
 **api-gateway (on main):**
 - 7 main files, 10 test files (30 tests, >80% JaCoCo coverage)
@@ -226,13 +230,22 @@
 - Environment-specific configs: application-dev.yml, application-staging.yml, application-prod.yml
 - Encryption support for sensitive properties (ENCRYPT_KEY env var)
 
+**Angular frontend (complete — 1 issue remaining):**
+- Angular 21 standalone components, signals, zoneless change detection, OnPush everywhere
+- `core/`: 12 files — AuthService (Keycloak), role.guard, branch.guard, auth.interceptor, branch.interceptor, error.interceptor, BranchContextService, role.enum (16 roles), user.model
+- `shared/`: 52 files — 10 components (DataTable, SearchBar, FormField, StatusBadge, ConfirmDialog, BloodGroupBadge, EmptyState, ErrorCard, LoadingSkeleton, UnauthorizedPage), 5 layout (Shell, Sidenav, Topbar, Breadcrumb, Footer), 2 directives (hasRole, autoFocus), 3 pipes (blood-group, date-ago, truncate), 3 models (ApiResponse, PagedResponse, Branch)
+- `app.routes.ts`: 3 portals (staff/*, hospital/*, donor/*), all routes with roleGuard, lazy-loaded feature modules
+- **16 Staff Portal features**: dashboard, donor, collection, camp, lab, inventory, transfusion, emergency, branch, user-management, settings, billing, compliance, notification, reporting, document
+- **Hospital Portal** (5 components): hospital-dashboard, blood-request-form, request-tracking, contract-view, feedback-form
+- **Donor Portal** (8 components): donor-dashboard, donor-self-registration, donation-history, appointment-booking, eligibility-check, nearby-camp-finder, digital-donor-card, referral
+- Design system: Angular Material M3 + Tailwind CSS 4 (preflight disabled), healthcare color palette, custom typography
+- ⚠️ **M5-023 OPEN**: No `src/assets/i18n/` directory — en/es/fr translation JSON files not created
+
 #### 🔧 REMAINING WORK
 
 | # | Issue | Severity | Description |
 |---|---|---|---|
-| 1 | **Angular frontend not started** | 🔴 HIGH | 37 issues remaining (M5-016 to M5-052). frontend/ directory does not exist. Needs Angular 21 scaffolding with standalone components, signals, zoneless change detection. |
-| 2 | **All backend services ready** | 🟢 INFO | M3 clinical and M4 support services all complete — all backend APIs available for frontend feature development. |
-| 3 | **API Gateway and Config Server ready** | 🟢 INFO | Backend gateway infrastructure complete — frontend can connect through gateway once scaffolded. |
+| 1 | **M5-023: i18n language files** | 🟡 MEDIUM | Create `src/assets/i18n/en.json`, `es.json`, `fr.json`. Add `@ngx-translate/core` or Angular built-in i18n. Replace hardcoded strings in templates. |
 
 ---
 
@@ -321,45 +334,57 @@
    - All backend services now available — no more blockers from M3/M4
    - Estimated effort: ~2-3 weeks
 
-### 🟢 Recent Progress (2026-04-09)
+### 🟢 Recent Progress (2026-04-13)
 
-1. **M4 Support Services — COMPLETE** ✅
+1. **M5 Angular Frontend — NEARLY COMPLETE** (51/52 issues)
+   - Angular 21 project scaffolded with standalone components, signals, zoneless CD, OnPush
+   - Core: 12 files (AuthService, Keycloak init, role/branch guards, interceptors, 16 roles)
+   - Shared: 52 files (10 components, 5 layout, 2 directives, 3 pipes, 3 models)
+   - 16 Staff Portal feature modules all implemented
+   - Hospital Portal: 5 components (dashboard, blood-request-form, request-tracking, contract-view, feedback-form)
+   - Donor Portal: 8 components (dashboard, self-registration, history, appointments, eligibility, camps, card, referral)
+   - Design system: Angular Material M3 + Tailwind CSS 4, healthcare color palette
+   - ⚠️ Only M5-023 (i18n files) remains — no `src/assets/i18n/` directory
+
+2. **M4 Support Services — COMPLETE** ✅
    - compliance-service: 51 main files, 10 test files, 5 entities, 11 DTOs, 5 services, 5 controllers, 152 tests
    - document-service tests: 4 test files, 34 @Test methods
    - All 66/66 M4 issues verified complete
    - M5 frontend compliance features UNBLOCKED
 
-2. **M3 Clinical Services — COMPLETE** ✅
+3. **M3 Clinical Services — COMPLETE** ✅
    - hospital-service: 38 main files, 8 test files, 4 entities, 8 DTOs, 4 services, 4 controllers, RabbitMQ, 150 tests
    - request-matching-service: 34 main files, 6 test files, 3 entities, 6 DTOs, 3 services, 3 controllers, RabbitMQ, 103 tests
    - Cross-service integration tests: 3 workflow classes, 27 tests
    - M5 frontend clinical features UNBLOCKED
 
-2. **API Gateway fully implemented** (PR #15 — 2026-04-07)
+4. **API Gateway fully implemented** (PR #15 — 2026-04-07)
    - 7 main files, 10 test files, 30 tests passing, >80% coverage
    - JWT validation, branch isolation, rate limiting, circuit breaker, CORS, logging
 
-3. **Config Server fully implemented** (PR #15 — 2026-04-07)
+5. **Config Server fully implemented** (PR #15 — 2026-04-07)
    - Native profile with config-repo/ directory (16 YAML files)
    - Environment-specific configs for dev/staging/prod
    - Encryption support for sensitive properties
 
-4. **M5 no longer "NOT STARTED"** — 15/52 issues complete (29%)
-
 ### 🟡 Opportunities
 
-1. **M7 (Infrastructure) can start NOW**
+1. **M5-023 (i18n) — 1 remaining issue**
+   - Create `src/assets/i18n/en.json`, `es.json`, `fr.json`
+   - Add `@ngx-translate/core` dependency or use Angular built-in i18n
+   - Replace hardcoded strings in templates with translation keys
+   - After this, M5 can be marked ✅ COMPLETE
+
+2. **M7 (Infrastructure) can start NOW**
    - Only depends on M2 (complete)
    - Docker, K8s, Jenkins, Keycloak, Monitoring work is parallelizable
    - Would save 2+ weeks on critical path
 
-2. **Angular frontend core + ALL features can start NOW**
-   - API Gateway is ready — frontend can connect through it
-   - M3 clinical services complete — hospital, transfusion, matching APIs available
-   - M4 support services complete — compliance, document, billing, notification, reporting APIs available
-   - All backend APIs are now available for frontend development
+3. **M6 (Integration + Security Testing) can start**
+   - M5 is 98% complete — Angular frontend + API Gateway ready for E2E testing
+   - Only blocked by M5-023 (i18n) which is a minor gap
 
-3. **No PR review feedback exists**
+4. **No PR review feedback exists**
    - All 15 PRs have 0 review comments and 0 review threads
    - Risk: code quality issues may be accumulating without human review
    - Recommendation: conduct code review on merged PRs, especially M2 services
@@ -382,7 +407,9 @@
 1. ~~**IMMEDIATE**: Complete hospital-service and request-matching-service~~ ✅ DONE
 2. ~~**IMMEDIATE**: Implement compliance-service (M4-055 to M4-066)~~ ✅ DONE
 3. ~~**IMMEDIATE**: Add tests for document-service (M4-053, M4-054)~~ ✅ DONE
-4. **NEXT**: Scaffold Angular 21 frontend (M5-016 to M5-024) — API Gateway is ready, all backend services complete (M0–M4 done)
-5. **PARALLEL**: Start M7 infrastructure work (Docker, K8s, Jenkins, Keycloak) — not blocked
-6. **PROCESS**: Establish PR review process — all 15 PRs merged without review comments
-7. **TRACKING**: Convert milestone issues to GitHub Issues for better project tracking
+4. ~~**NEXT**: Scaffold Angular 21 frontend (M5-016 to M5-024)~~ ✅ DONE
+5. **NEXT**: Complete M5-023 — create `src/assets/i18n/en.json`, `es.json`, `fr.json` translation files to close M5
+6. **PARALLEL**: Start M7 infrastructure work (Docker, K8s, Jenkins, Keycloak) — not blocked
+7. **PARALLEL**: Start M6 integration testing — M5 is 98% done, API Gateway + all 17 features ready
+8. **PROCESS**: Establish PR review process — all 15 PRs merged without review comments
+9. **TRACKING**: Convert milestone issues to GitHub Issues for better project tracking
