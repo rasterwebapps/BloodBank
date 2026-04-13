@@ -1,0 +1,140 @@
+<div class="p-6 max-w-2xl mx-auto">
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6">
+    <button mat-icon-button (click)="goToDashboard()" aria-label="Back to dashboard">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-2xl font-bold">Dispose Blood Units</h1>
+  </div>
+
+  @if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="reset()" />
+  }
+
+  @if (successState()) {
+    <!-- Success state -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Disposal Complete</mat-card-title>
+        <mat-card-subtitle>
+          {{ disposedCount() }} unit(s) have been disposed
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p class="mt-4 text-gray-600">
+          The units have been marked as disposed in the system.
+        </p>
+      </mat-card-content>
+      <mat-card-actions class="flex gap-2 p-4">
+        <button mat-raised-button color="primary" (click)="reset()">
+          <mat-icon>delete_outline</mat-icon>
+          Dispose More Units
+        </button>
+        <button mat-stroked-button (click)="goToDashboard()">
+          <mat-icon>dashboard</mat-icon>
+          Dashboard
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  } @else {
+    <!-- Disposal form -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Record Blood Unit Disposal</mat-card-title>
+        <mat-card-subtitle>
+          Mark units as disposed with a documented reason
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4 mt-4">
+
+          <!-- Unit IDs chip input -->
+          <mat-form-field appearance="outline">
+            <mat-label>Unit IDs to Dispose</mat-label>
+            <mat-chip-grid #chipGrid aria-label="Unit IDs for disposal">
+              @for (id of unitIds(); track id) {
+                <mat-chip-row
+                  [removable]="true"
+                  (removed)="removeUnitId(id)">
+                  {{ id }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip-row>
+              }
+              <input
+                placeholder="Add unit ID and press Enter..."
+                [matChipInputFor]="chipGrid"
+                [matChipInputSeparatorKeyCodes]="separatorKeyCodes"
+                (matChipInputTokenEnd)="addUnitId($event)" />
+            </mat-chip-grid>
+            <mat-hint>Press Enter or comma to add each unit ID</mat-hint>
+          </mat-form-field>
+
+          @if (!hasUnits() && form.touched) {
+            <p class="text-red-600 text-sm">
+              Please add at least one unit ID to dispose
+            </p>
+          }
+
+          <mat-divider />
+
+          <!-- Disposal Reason -->
+          <mat-form-field appearance="outline">
+            <mat-label>Disposal Reason</mat-label>
+            <mat-select formControlName="reason">
+              @for (opt of disposalReasonOptions; track opt.value) {
+                <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+              }
+            </mat-select>
+            @if (reasonCtrl.hasError('required') && reasonCtrl.touched) {
+              <mat-error>Disposal reason is required</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Notes -->
+          <mat-form-field appearance="outline">
+            <mat-label>Additional Notes (optional)</mat-label>
+            <textarea
+              matInput
+              formControlName="notes"
+              rows="3"
+              placeholder="Any additional observations or details..."></textarea>
+          </mat-form-field>
+
+          <!-- Warning notice -->
+          <div class="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded">
+            <mat-icon class="text-amber-600 mt-0.5">warning</mat-icon>
+            <p class="text-sm text-amber-800">
+              <strong>Warning:</strong> This action will permanently mark the selected
+              units as disposed. You will be asked to confirm before proceeding.
+            </p>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-3">
+            <button
+              mat-raised-button
+              color="warn"
+              type="submit"
+              [disabled]="saving()">
+              @if (saving()) {
+                <mat-progress-spinner diameter="20" mode="indeterminate" />
+              }
+              @if (!saving()) {
+                <mat-icon>delete_outline</mat-icon>
+              }
+              {{ saving() ? 'Disposing...' : 'Dispose Units' }}
+            </button>
+            <button
+              mat-stroked-button
+              type="button"
+              (click)="goToDashboard()"
+              [disabled]="saving()">
+              Cancel
+            </button>
+          </div>
+
+        </form>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

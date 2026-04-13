@@ -1,0 +1,147 @@
+<div class="p-6 max-w-2xl mx-auto">
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6">
+    <button mat-icon-button (click)="goToDashboard()" aria-label="Back to dashboard">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-2xl font-bold">Initiate Transfer</h1>
+  </div>
+
+  @if (error()) {
+    <app-error-card [message]="error() ?? ''" (retry)="reset()" />
+  }
+
+  @if (createdTransfer(); as transfer) {
+    <!-- Success state -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Transfer Initiated</mat-card-title>
+        <mat-card-subtitle>Transfer ID: {{ transfer.id }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="flex flex-col gap-2 mt-4">
+          <p><strong>Status:</strong> {{ transfer.status }}</p>
+          <p><strong>Units:</strong> {{ transfer.units.length }}</p>
+          @if (transfer.notes) {
+            <p><strong>Notes:</strong> {{ transfer.notes }}</p>
+          }
+        </div>
+      </mat-card-content>
+      <mat-card-actions class="flex gap-2 p-4">
+        <button mat-raised-button color="primary" (click)="reset()">
+          <mat-icon>swap_horiz</mat-icon>
+          New Transfer
+        </button>
+        <button mat-stroked-button (click)="goToDashboard()">
+          <mat-icon>dashboard</mat-icon>
+          Dashboard
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  } @else {
+    <!-- Transfer form -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Transfer Blood Units to Another Branch</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4 mt-4">
+
+          <!-- Source Branch (read-only) -->
+          <mat-form-field appearance="outline">
+            <mat-label>Source Branch</mat-label>
+            <input
+              matInput
+              readonly
+              [value]="branchContext.branchName()"
+              aria-readonly="true" />
+            <mat-hint>Your current branch — cannot be changed</mat-hint>
+          </mat-form-field>
+
+          <mat-divider />
+
+          <!-- Destination Branch -->
+          <mat-form-field appearance="outline">
+            <mat-label>Destination Branch</mat-label>
+            <mat-select formControlName="destinationBranchId">
+              @if (availableBranches().length === 0) {
+                <mat-option disabled value="">No other branches available</mat-option>
+              } @else {
+                @for (branch of availableBranches(); track branch.id) {
+                  <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
+                }
+              }
+            </mat-select>
+            @if (destinationBranchIdCtrl.hasError('required') && destinationBranchIdCtrl.touched) {
+              <mat-error>Destination branch is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-divider />
+
+          <!-- Unit IDs chip input -->
+          <mat-form-field appearance="outline">
+            <mat-label>Unit IDs to Transfer</mat-label>
+            <mat-chip-grid #chipGrid aria-label="Unit IDs">
+              @for (id of unitIds(); track id) {
+                <mat-chip-row
+                  [removable]="true"
+                  (removed)="removeUnitId(id)">
+                  {{ id }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip-row>
+              }
+              <input
+                placeholder="Add unit ID and press Enter..."
+                [matChipInputFor]="chipGrid"
+                [matChipInputSeparatorKeyCodes]="separatorKeyCodes"
+                (matChipInputTokenEnd)="addUnitId($event)" />
+            </mat-chip-grid>
+            <mat-hint>Press Enter or comma to add each unit ID</mat-hint>
+          </mat-form-field>
+
+          @if (!hasUnits() && form.touched) {
+            <p class="text-red-600 text-sm">Please add at least one unit ID</p>
+          }
+
+          <mat-divider />
+
+          <!-- Notes -->
+          <mat-form-field appearance="outline">
+            <mat-label>Transfer Notes (optional)</mat-label>
+            <textarea
+              matInput
+              formControlName="notes"
+              rows="3"
+              placeholder="Reason for transfer, handling instructions..."></textarea>
+          </mat-form-field>
+
+          <!-- Actions -->
+          <div class="flex gap-3">
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="saving()">
+              @if (saving()) {
+                <mat-progress-spinner diameter="20" mode="indeterminate" />
+              }
+              @if (!saving()) {
+                <mat-icon>swap_horiz</mat-icon>
+              }
+              {{ saving() ? 'Submitting...' : 'Initiate Transfer' }}
+            </button>
+            <button
+              mat-stroked-button
+              type="button"
+              (click)="goToDashboard()"
+              [disabled]="saving()">
+              Cancel
+            </button>
+          </div>
+
+        </form>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

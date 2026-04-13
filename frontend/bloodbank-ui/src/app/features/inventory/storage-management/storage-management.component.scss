@@ -1,0 +1,11 @@
+.util-ok ::ng-deep .mdc-linear-progress__bar-inner {
+  border-color: #4caf50;
+}
+
+.util-warning ::ng-deep .mdc-linear-progress__bar-inner {
+  border-color: #ff9800;
+}
+
+.util-critical ::ng-deep .mdc-linear-progress__bar-inner {
+  border-color: #f44336;
+}

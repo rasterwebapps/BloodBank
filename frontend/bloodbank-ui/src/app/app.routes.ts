@@ -57,6 +57,14 @@ export const routes: Routes = [
             (m) => m.LAB_ROUTES,
           ),
       },
+      {
+        path: 'inventory',
+        data: { breadcrumb: 'Inventory' },
+        loadChildren: () =>
+          import('@features/inventory/inventory.routes').then(
+            (m) => m.INVENTORY_ROUTES,
+          ),
+      },
     ],
   },
 
