@@ -23,7 +23,10 @@ import {
 @Injectable({ providedIn: 'root' })
 export class LabService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = environment.apiUrl;
+  private readonly testOrdersUrl = `${environment.apiUrl}/api/v1/test-orders`;
+  private readonly testResultsUrl = `${environment.apiUrl}/api/v1/test-results`;
+  private readonly qcUrl = `${environment.apiUrl}/api/v1/qc`;
+  private readonly instrumentsUrl = `${environment.apiUrl}/api/v1/instruments`;
 
   // ── Test Orders ─────────────────────────────────────────────────
 
@@ -41,7 +44,7 @@ export class LabService {
     }
     const response = await firstValueFrom(
       this.http.get<ApiResponse<PagedResponse<TestOrder>>>(
-        `${this.apiUrl}/api/v1/test-orders`,
+        this.testOrdersUrl,
         { params },
       ),
     );
@@ -52,7 +55,7 @@ export class LabService {
   async getTestOrder(id: string): Promise<TestOrder> {
     const response = await firstValueFrom(
       this.http.get<ApiResponse<TestOrder>>(
-        `${this.apiUrl}/api/v1/test-orders/${id}`,
+        `${this.testOrdersUrl}/${id}`,
       ),
     );
     return response.data;
@@ -64,7 +67,7 @@ export class LabService {
   async getTestResults(testOrderId: string): Promise<TestResult[]> {
     const response = await firstValueFrom(
       this.http.get<ApiResponse<TestResult[]>>(
-        `${this.apiUrl}/api/v1/test-results/order/${testOrderId}`,
+        `${this.testResultsUrl}/order/${testOrderId}`,
       ),
     );
     return response.data;
@@ -74,7 +77,7 @@ export class LabService {
   async createTestResult(request: TestResultCreateRequest): Promise<TestResult> {
     const response = await firstValueFrom(
       this.http.post<ApiResponse<TestResult>>(
-        `${this.apiUrl}/api/v1/test-results`,
+        this.testResultsUrl,
         request,
       ),
     );
@@ -88,7 +91,7 @@ export class LabService {
   ): Promise<TestResult> {
     const response = await firstValueFrom(
       this.http.put<ApiResponse<TestResult>>(
-        `${this.apiUrl}/api/v1/test-results/${resultId}/review`,
+        `${this.testResultsUrl}/${resultId}/review`,
         request,
       ),
     );
@@ -105,7 +108,7 @@ export class LabService {
       .set('size', size.toString());
     const response = await firstValueFrom(
       this.http.get<ApiResponse<PagedResponse<TestResult>>>(
-        `${this.apiUrl}/api/v1/test-results/pending-review`,
+        `${this.testResultsUrl}/pending-review`,
         { params },
       ),
     );
@@ -128,7 +131,7 @@ export class LabService {
     }
     const response = await firstValueFrom(
       this.http.get<ApiResponse<PagedResponse<QcRecord>>>(
-        `${this.apiUrl}/api/v1/qc`,
+        this.qcUrl,
         { params },
       ),
     );
@@ -139,7 +142,7 @@ export class LabService {
   async createQcRecord(request: QcRecordCreateRequest): Promise<QcRecord> {
     const response = await firstValueFrom(
       this.http.post<ApiResponse<QcRecord>>(
-        `${this.apiUrl}/api/v1/qc`,
+        this.qcUrl,
         request,
       ),
     );
@@ -158,7 +161,7 @@ export class LabService {
       .set('size', size.toString());
     const response = await firstValueFrom(
       this.http.get<ApiResponse<PagedResponse<LabInstrument>>>(
-        `${this.apiUrl}/api/v1/instruments`,
+        this.instrumentsUrl,
         { params },
       ),
     );
@@ -169,7 +172,7 @@ export class LabService {
   async getInstrument(id: string): Promise<LabInstrument> {
     const response = await firstValueFrom(
       this.http.get<ApiResponse<LabInstrument>>(
-        `${this.apiUrl}/api/v1/instruments/${id}`,
+        `${this.instrumentsUrl}/${id}`,
       ),
     );
     return response.data;
@@ -179,7 +182,7 @@ export class LabService {
   async createInstrument(request: InstrumentCreateRequest): Promise<LabInstrument> {
     const response = await firstValueFrom(
       this.http.post<ApiResponse<LabInstrument>>(
-        `${this.apiUrl}/api/v1/instruments`,
+        this.instrumentsUrl,
         request,
       ),
     );
@@ -193,7 +196,7 @@ export class LabService {
   ): Promise<LabInstrument> {
     const response = await firstValueFrom(
       this.http.put<ApiResponse<LabInstrument>>(
-        `${this.apiUrl}/api/v1/instruments/${id}`,
+        `${this.instrumentsUrl}/${id}`,
         request,
       ),
     );

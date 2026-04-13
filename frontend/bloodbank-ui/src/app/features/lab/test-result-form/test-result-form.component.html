@@ -2,7 +2,7 @@
   @if (loading()) {
     <app-loading-skeleton [rows]="8" [columns]="2" />
   } @else if (error() && !testOrder()) {
-    <app-error-card [message]="error() ?? ''" (retry)="loadTestOrder(testOrder()?.id ?? '')" />
+    <app-error-card [message]="error() ?? ''" (retry)="loadTestOrder(orderId()!)" />
   } @else if (testOrder(); as order) {
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
@@ -66,8 +66,8 @@
                     </td>
                     <td class="p-2 text-sm">{{ result.testedBy }}</td>
                     <td class="p-2">
-                      <span class="review-badge review-{{ result.reviewStatus.toLowerCase().replace('_', '-') }}">
-                        {{ result.reviewStatus === 'PENDING_REVIEW' ? 'Pending' : result.reviewStatus === 'REVIEWED' ? 'Confirmed' : 'Rejected' }}
+                      <span class="review-badge" [class]="getReviewBadgeClass(result.reviewStatus)">
+                        {{ getReviewStatusLabel(result.reviewStatus) }}
                       </span>
                     </td>
                     <td class="p-2 text-sm">

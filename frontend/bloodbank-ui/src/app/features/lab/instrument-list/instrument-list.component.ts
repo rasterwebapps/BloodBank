@@ -125,7 +125,20 @@ export class InstrumentListComponent implements OnInit {
   }
 
   getStatusClass(status: InstrumentStatusEnum): string {
-    return `instrument-status instrument-${status.toLowerCase().replace(/_/g, '-')}`;
+    switch (status) {
+      case InstrumentStatusEnum.ACTIVE:
+        return 'instrument-status instrument-active';
+      case InstrumentStatusEnum.INACTIVE:
+        return 'instrument-status instrument-inactive';
+      case InstrumentStatusEnum.MAINTENANCE:
+        return 'instrument-status instrument-maintenance';
+      case InstrumentStatusEnum.CALIBRATION_DUE:
+        return 'instrument-status instrument-calibration-due';
+      case InstrumentStatusEnum.OUT_OF_SERVICE:
+        return 'instrument-status instrument-out-of-service';
+      default:
+        return 'instrument-status';
+    }
   }
 
   getStatusLabel(status: InstrumentStatusEnum): string {

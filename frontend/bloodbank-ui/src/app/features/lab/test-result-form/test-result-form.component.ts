@@ -77,6 +77,7 @@ export class TestResultFormComponent implements OnInit {
   private readonly notification = inject(NotificationService);
 
   // ── State ──────────────────────────────────────────────────────
+  readonly orderId = signal<string | null>(null);
   readonly testOrder = signal<TestOrder | null>(null);
   readonly existingResults = signal<TestResult[]>([]);
   readonly loading = signal(false);
@@ -156,6 +157,7 @@ export class TestResultFormComponent implements OnInit {
   ngOnInit(): void {
     const orderId = this.route.snapshot.paramMap.get('id');
     if (orderId) {
+      this.orderId.set(orderId);
       void this.loadTestOrder(orderId);
     }
   }
@@ -288,5 +290,31 @@ export class TestResultFormComponent implements OnInit {
       result === TestResultValueEnum.REACTIVE ||
       result === TestResultValueEnum.POSITIVE
     );
+  }
+
+  getReviewBadgeClass(reviewStatus: string): string {
+    switch (reviewStatus) {
+      case ReviewStatusEnum.PENDING_REVIEW:
+        return 'review-pending-review';
+      case ReviewStatusEnum.REVIEWED:
+        return 'review-reviewed';
+      case ReviewStatusEnum.REJECTED:
+        return 'review-rejected';
+      default:
+        return '';
+    }
+  }
+
+  getReviewStatusLabel(reviewStatus: string): string {
+    switch (reviewStatus) {
+      case ReviewStatusEnum.PENDING_REVIEW:
+        return 'Pending';
+      case ReviewStatusEnum.REVIEWED:
+        return 'Confirmed';
+      case ReviewStatusEnum.REJECTED:
+        return 'Rejected';
+      default:
+        return reviewStatus;
+    }
   }
 }
