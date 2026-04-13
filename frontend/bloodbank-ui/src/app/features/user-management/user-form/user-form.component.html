@@ -1,0 +1,138 @@
+<div class="user-form-container p-6">
+  <div class="flex items-center gap-3 mb-6">
+    <button mat-icon-button aria-label="Cancel" (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-2xl font-bold">{{ pageTitle() }}</h1>
+  </div>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="8" [columns]="2" />
+  } @else if (error()) {
+    <app-error-card [message]="error() ?? ''" />
+  }
+
+  <mat-card class="max-w-3xl">
+    <mat-card-content class="p-6">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <!-- Username (create only) -->
+          @if (!isEditMode()) {
+            <mat-form-field appearance="outline" class="md:col-span-2">
+              <mat-label>Username</mat-label>
+              <input matInput formControlName="username" placeholder="john.doe" autocomplete="off" />
+              @if (form.controls.username.hasError('required') && form.controls.username.touched) {
+                <mat-error>Username is required</mat-error>
+              }
+              @if (form.controls.username.hasError('pattern') && form.controls.username.touched) {
+                <mat-error>Only letters, numbers, dots, hyphens, and underscores</mat-error>
+              }
+              @if (form.controls.username.hasError('minlength') && form.controls.username.touched) {
+                <mat-error>Minimum 3 characters</mat-error>
+              }
+            </mat-form-field>
+          }
+
+          <!-- First Name -->
+          <mat-form-field appearance="outline">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName" placeholder="John" />
+            @if (form.controls.firstName.hasError('required') && form.controls.firstName.touched) {
+              <mat-error>First name is required</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Last Name -->
+          <mat-form-field appearance="outline">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName" placeholder="Doe" />
+            @if (form.controls.lastName.hasError('required') && form.controls.lastName.touched) {
+              <mat-error>Last name is required</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Email -->
+          <mat-form-field appearance="outline" class="md:col-span-2">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="john.doe@bloodbank.org" />
+            @if (form.controls.email.hasError('required') && form.controls.email.touched) {
+              <mat-error>Email is required</mat-error>
+            }
+            @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+              <mat-error>Please enter a valid email address</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Temporary Password (create only) -->
+          @if (!isEditMode()) {
+            <mat-form-field appearance="outline" class="md:col-span-2">
+              <mat-label>Temporary Password</mat-label>
+              <input matInput type="password" formControlName="temporaryPassword" autocomplete="new-password" />
+              @if (form.controls.temporaryPassword.hasError('required') && form.controls.temporaryPassword.touched) {
+                <mat-error>Temporary password is required</mat-error>
+              }
+              @if (form.controls.temporaryPassword.hasError('minlength') && form.controls.temporaryPassword.touched) {
+                <mat-error>Minimum 8 characters</mat-error>
+              }
+            </mat-form-field>
+          }
+
+          <!-- Branch -->
+          <mat-form-field appearance="outline">
+            <mat-label>Branch (optional)</mat-label>
+            <mat-select formControlName="branchId" aria-label="Select branch">
+              <mat-option [value]="null">None</mat-option>
+              @for (branch of branches(); track branch.id) {
+                <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Status (edit only) -->
+          @if (isEditMode()) {
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status" aria-label="Select status">
+                @for (status of statusOptions; track status) {
+                  <mat-option [value]="status">{{ status }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+        </div>
+
+        <!-- Roles Section -->
+        <mat-divider class="my-6" />
+        <h3 class="text-base font-semibold mb-3">Roles</h3>
+        @if (form.controls.roles.hasError('required') && form.controls.roles.touched) {
+          <p class="text-red-600 text-sm mb-2">At least one role is required</p>
+        }
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+          @for (role of assignableRoles; track role) {
+            <mat-checkbox
+              [checked]="isRoleSelected(role)"
+              (change)="toggleRole(role)">
+              {{ role }}
+            </mat-checkbox>
+          }
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-3 justify-end mt-8">
+          <button mat-stroked-button type="button" (click)="cancel()">Cancel</button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="saving()">
+            @if (saving()) {
+              <mat-spinner diameter="18" class="inline-spinner"></mat-spinner>
+            }
+            {{ submitLabel() }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

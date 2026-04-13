@@ -1,0 +1,21 @@
+.branch-detail-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.detail-row {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  font-size: 0.875rem;
+}

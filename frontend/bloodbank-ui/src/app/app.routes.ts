@@ -81,6 +81,30 @@ export const routes: Routes = [
             (m) => m.EMERGENCY_ROUTES,
           ),
       },
+      {
+        path: 'branches',
+        data: { breadcrumb: 'Branches' },
+        loadChildren: () =>
+          import('@features/branch/branch.routes').then(
+            (m) => m.BRANCH_ROUTES,
+          ),
+      },
+      {
+        path: 'users',
+        data: { breadcrumb: 'Users' },
+        loadChildren: () =>
+          import('@features/user-management/user-management.routes').then(
+            (m) => m.USER_MANAGEMENT_ROUTES,
+          ),
+      },
+      {
+        path: 'settings',
+        data: { breadcrumb: 'Settings' },
+        loadChildren: () =>
+          import('@features/settings/settings.routes').then(
+            (m) => m.SETTINGS_ROUTES,
+          ),
+      },
     ],
   },
 

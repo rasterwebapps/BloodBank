@@ -1,0 +1,13 @@
+.feature-flags-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+mat-card.flag-enabled {
+  border-left: 4px solid #16a34a;
+}
+
+mat-card.flag-disabled {
+  border-left: 4px solid #e5e7eb;
+  opacity: 0.85;
+}
