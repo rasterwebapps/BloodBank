@@ -1,0 +1,113 @@
+<div class="p-6 max-w-2xl mx-auto">
+  <div class="flex items-center gap-3 mb-6">
+    <button mat-icon-button (click)="cancel()" aria-label="Go back">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-2xl font-bold">Request Blood</h1>
+  </div>
+
+  @if (error()) {
+    <app-error-card [message]="error()!" class="mb-4" />
+  }
+
+  <mat-card>
+    <mat-card-content class="p-6">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Blood Group -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Blood Group</mat-label>
+            <mat-select formControlName="bloodGroup" required>
+              @for (opt of bloodGroupOptions; track opt.value) {
+                <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+              }
+            </mat-select>
+            @if (form.controls.bloodGroup.hasError('required') && form.controls.bloodGroup.touched) {
+              <mat-error>Blood group is required</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Component Type -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Component Type</mat-label>
+            <mat-select formControlName="componentType" required>
+              @for (opt of componentTypeOptions; track opt.value) {
+                <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+              }
+            </mat-select>
+            @if (form.controls.componentType.hasError('required') && form.controls.componentType.touched) {
+              <mat-error>Component type is required</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Quantity -->
+          <app-form-field
+            label="Quantity (units)"
+            [control]="quantityCtrl"
+            type="number"
+            [required]="true"
+            [errorMessages]="{ required: 'Quantity is required', min: 'Min 1 unit', max: 'Max 100 units' }" />
+
+          <!-- Priority -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Priority</mat-label>
+            <mat-select formControlName="priority" required>
+              @for (opt of priorityOptions; track opt.value) {
+                <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+              }
+            </mat-select>
+            @if (form.controls.priority.hasError('required') && form.controls.priority.touched) {
+              <mat-error>Priority is required</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <!-- Required Date -->
+        <mat-form-field appearance="outline" class="w-full mb-4">
+          <mat-label>Required Date</mat-label>
+          <input
+            matInput
+            [matDatepicker]="datePicker"
+            formControlName="requiredDate"
+            [min]="today"
+            placeholder="Select date"
+            required />
+          <mat-datepicker-toggle matIconSuffix [for]="datePicker" />
+          <mat-datepicker #datePicker />
+          @if (form.controls.requiredDate.hasError('required') && form.controls.requiredDate.touched) {
+            <mat-error>Required date is required</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Clinical Notes -->
+        <mat-form-field appearance="outline" class="w-full mb-4">
+          <mat-label>Clinical Notes</mat-label>
+          <textarea
+            matInput
+            formControlName="clinicalNotes"
+            rows="4"
+            placeholder="Provide clinical context..."
+            maxlength="1000"></textarea>
+          @if (form.controls.clinicalNotes.hasError('maxlength')) {
+            <mat-error>Maximum 1000 characters</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="flex gap-3 justify-end">
+          <button mat-stroked-button type="button" (click)="cancel()">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+            @if (saving()) {
+              <mat-spinner diameter="20" />
+            } @else {
+              Submit Request
+            }
+          </button>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

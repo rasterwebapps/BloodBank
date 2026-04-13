@@ -1,0 +1,91 @@
+<div class="p-6 max-w-3xl mx-auto">
+  <h1 class="text-2xl font-bold mb-6">Contract Details</h1>
+
+  @if (loading()) {
+    <app-loading-skeleton [rows]="6" [columns]="2" />
+  } @else if (error()) {
+    <app-error-card [message]="error()!" />
+  } @else if (contract()) {
+    <!-- Contract Info Card -->
+    <mat-card class="mb-6">
+      <mat-card-header>
+        <mat-card-title class="flex items-center gap-2">
+          <mat-icon>handshake</mat-icon>
+          Contract Information
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div class="text-sm text-gray-500">Contract Number</div>
+            <div class="font-semibold">{{ contract()!.contractNumber }}</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500">Hospital</div>
+            <div class="font-semibold">{{ contract()!.hospitalName }}</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500">Start Date</div>
+            <div class="font-semibold">{{ contract()!.startDate | date:'mediumDate' }}</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500">End Date</div>
+            <div class="font-semibold">{{ contract()!.endDate | date:'mediumDate' }}</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500">Status</div>
+            @if (contract()!.isActive) {
+              <mat-chip color="primary" highlighted>Active</mat-chip>
+            } @else {
+              <mat-chip color="warn" highlighted>Inactive</mat-chip>
+            }
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- SLA Metrics Card -->
+    <mat-card class="mb-6">
+      <mat-card-header>
+        <mat-card-title class="flex items-center gap-2">
+          <mat-icon>speed</mat-icon>
+          SLA Metrics
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <div class="text-sm text-gray-500 mb-1">Response Time SLA</div>
+            <div class="text-2xl font-bold">{{ contract()!.slaResponseHours }}h</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500 mb-1">Fulfilment Rate Target</div>
+            <div class="text-2xl font-bold">
+              {{ contract()!.slaFulfillmentRate | number:'1.0-1' }}%
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Blood Unit Usage Card -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title class="flex items-center gap-2">
+          <mat-icon>water_drop</mat-icon>
+          Blood Unit Utilization
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="p-4">
+        <div class="flex justify-between mb-2">
+          <span class="text-sm text-gray-500">Used: {{ contract()!.usedUnits }}</span>
+          <span class="text-sm text-gray-500">Contracted: {{ contract()!.contractedUnits }}</span>
+        </div>
+        <mat-progress-bar mode="determinate" [value]="utilizationPercent()" />
+        <div class="text-right mt-1 text-sm">{{ utilizationPercent() }}% utilized</div>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <p class="text-gray-500">No contract information available.</p>
+  }
+</div>
