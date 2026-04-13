@@ -1,0 +1,104 @@
+<div class="camp-donor-registration-container p-6">
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6">
+    <button mat-icon-button matTooltip="Cancel" aria-label="Go back" (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-2xl font-bold">Register Donor at Camp</h1>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-card>
+      <mat-card-content class="p-6">
+
+        <!-- Existing Donor Lookup -->
+        <h2 class="text-lg font-semibold mb-4">Existing Donor (Optional)</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <app-form-field
+            label="Donor ID"
+            [control]="donorIdCtrl"
+            placeholder="Enter existing donor ID if known"
+            hint="Leave blank for walk-in donors" />
+        </div>
+
+        <mat-divider class="my-6" />
+
+        <!-- Donor Information -->
+        <h2 class="text-lg font-semibold mb-4">Donor Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <app-form-field
+            label="First Name"
+            [control]="firstNameCtrl"
+            [errorMessages]="errorMessages['firstName']"
+            [required]="true" />
+          <app-form-field
+            label="Last Name"
+            [control]="lastNameCtrl"
+            [errorMessages]="errorMessages['lastName']"
+            [required]="true" />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <!-- Blood Group -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Blood Group</mat-label>
+            <mat-select formControlName="bloodGroup" required>
+              @for (option of bloodGroupOptions; track option.value) {
+                <mat-option [value]="option.value">{{ option.label }}</mat-option>
+              }
+            </mat-select>
+            @if (form.controls.bloodGroup.hasError('required') && form.controls.bloodGroup.touched) {
+              <mat-error>Blood group is required</mat-error>
+            }
+          </mat-form-field>
+
+          <app-form-field
+            label="Phone"
+            type="tel"
+            [control]="phoneCtrl"
+            [errorMessages]="errorMessages['phone']"
+            [required]="true"
+            placeholder="+1 234 567 8900" />
+
+          <app-form-field
+            label="Email"
+            type="email"
+            [control]="emailCtrl"
+            [errorMessages]="errorMessages['email']"
+            placeholder="donor@example.com" />
+        </div>
+      </mat-card-content>
+
+      <!-- Actions -->
+      <mat-card-actions class="flex justify-end gap-3 p-4">
+        <button
+          mat-button
+          type="button"
+          (click)="cancel()"
+          [disabled]="saving()">
+          Cancel
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="saving()">
+          @if (saving()) {
+            <mat-spinner diameter="20" role="status" aria-label="Registering donor" />
+          } @else {
+            <ng-container>
+              <mat-icon>person_add</mat-icon>
+              Register Donor
+            </ng-container>
+          }
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    @if (error()) {
+      <div class="mt-4">
+        <app-error-card [message]="error() ?? ''" />
+      </div>
+    }
+  </form>
+</div>

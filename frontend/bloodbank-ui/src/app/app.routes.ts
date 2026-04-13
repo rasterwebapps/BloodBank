@@ -33,6 +33,22 @@ export const routes: Routes = [
             (m) => m.DONOR_ROUTES,
           ),
       },
+      {
+        path: 'collections',
+        data: { breadcrumb: 'Collections' },
+        loadChildren: () =>
+          import('@features/collection/collection.routes').then(
+            (m) => m.COLLECTION_ROUTES,
+          ),
+      },
+      {
+        path: 'camps',
+        data: { breadcrumb: 'Camps' },
+        loadChildren: () =>
+          import('@features/camp/camp.routes').then(
+            (m) => m.CAMP_ROUTES,
+          ),
+      },
     ],
   },
 

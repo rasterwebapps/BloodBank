@@ -1,0 +1,13 @@
+.camp-list-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.camp-name-link {
+  text-decoration: none;
+  color: var(--mat-sys-primary);
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
