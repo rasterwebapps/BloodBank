@@ -13,6 +13,10 @@ dependencies {
     testImplementation("com.fasterxml.jackson.core:jackson-databind")
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // Security integration test dependencies
+    testImplementation("org.springframework.security:spring-security-oauth2-jose")
+    testRuntimeOnly("org.postgresql:postgresql")
 }
 
 // Integration tests do not produce a bootable JAR

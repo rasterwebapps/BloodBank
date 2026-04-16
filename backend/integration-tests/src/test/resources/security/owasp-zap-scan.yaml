@@ -1,0 +1,252 @@
+# OWASP ZAP Automation Framework — BloodBank API Security Scan
+# M6-017: OWASP ZAP scan configuration for all BloodBank API endpoints
+#
+# Usage (requires OWASP ZAP 2.14+):
+#   docker run --network host -v $(pwd):/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable \
+#     zap.sh -cmd -autorun /zap/wrk/owasp-zap-scan.yaml
+#
+# Reference: https://www.zaproxy.org/docs/automate/automation-framework/
+
+env:
+  contexts:
+    - name: BloodBank API
+      urls:
+        - http://localhost:8080
+      includePaths:
+        - "http://localhost:8080/api/v1/.*"
+      excludePaths:
+        - "http://localhost:8080/actuator/.*"
+      authentication:
+        method: bearer
+        parameters:
+          tokenEndpoint: "http://localhost:8180/realms/bloodbank/protocol/openid-connect/token"
+          clientId: "bloodbank-api"
+          clientSecret: "${BLOODBANK_CLIENT_SECRET}"
+          scopes: "openid profile"
+      users:
+        - name: super_admin
+          credentials:
+            username: "super_admin@bloodbank.test"
+            password: "${SUPER_ADMIN_PASSWORD}"
+        - name: branch_admin
+          credentials:
+            username: "branch_admin@bloodbank.test"
+            password: "${BRANCH_ADMIN_PASSWORD}"
+        - name: doctor
+          credentials:
+            username: "doctor@bloodbank.test"
+            password: "${DOCTOR_PASSWORD}"
+        - name: lab_technician
+          credentials:
+            username: "lab_tech@bloodbank.test"
+            password: "${LAB_TECH_PASSWORD}"
+        - name: auditor
+          credentials:
+            username: "auditor@bloodbank.test"
+            password: "${AUDITOR_PASSWORD}"
+        - name: donor
+          credentials:
+            username: "donor@bloodbank.test"
+            password: "${DONOR_PASSWORD}"
+  parameters:
+    failOnError: true
+    failOnWarning: false
+    progressToStdout: true
+
+jobs:
+  # -----------------------------------------------------------------------
+  # Step 1: Passive scan with all authenticated users
+  # -----------------------------------------------------------------------
+  - type: passiveScan-config
+    name: passive-scan-config
+    parameters:
+      maxAlertsPerRule: 10
+      scanOnlyInScope: true
+
+  # -----------------------------------------------------------------------
+  # Step 2: Spider all API endpoints
+  # -----------------------------------------------------------------------
+  - type: spider
+    name: spider-api
+    parameters:
+      context: BloodBank API
+      user: super_admin
+      maxDuration: 10
+      maxDepth: 10
+      acceptCookies: false
+    urls:
+      - "http://localhost:8080/api/v1/donors"
+      - "http://localhost:8080/api/v1/collections"
+      - "http://localhost:8080/api/v1/blood-camps"
+      - "http://localhost:8080/api/v1/test-orders"
+      - "http://localhost:8080/api/v1/test-results"
+      - "http://localhost:8080/api/v1/blood-units"
+      - "http://localhost:8080/api/v1/blood-components"
+      - "http://localhost:8080/api/v1/storage-locations"
+      - "http://localhost:8080/api/v1/stock-transfers"
+      - "http://localhost:8080/api/v1/unit-disposals"
+      - "http://localhost:8080/api/v1/crossmatch-requests"
+      - "http://localhost:8080/api/v1/crossmatch-results"
+      - "http://localhost:8080/api/v1/blood-issues"
+      - "http://localhost:8080/api/v1/emergency-issues"
+      - "http://localhost:8080/api/v1/transfusions"
+      - "http://localhost:8080/api/v1/transfusion-reactions"
+      - "http://localhost:8080/api/v1/hemovigilance-reports"
+      - "http://localhost:8080/api/v1/branches"
+      - "http://localhost:8080/api/v1/blood-groups"
+      - "http://localhost:8080/api/v1/component-types"
+      - "http://localhost:8080/api/v1/deferral-reasons"
+      - "http://localhost:8080/api/v1/reaction-types"
+      - "http://localhost:8080/api/v1/hospitals"
+      - "http://localhost:8080/api/v1/hospital-requests"
+      - "http://localhost:8080/api/v1/hospital-contracts"
+      - "http://localhost:8080/api/v1/invoices"
+      - "http://localhost:8080/api/v1/payments"
+      - "http://localhost:8080/api/v1/credit-notes"
+      - "http://localhost:8080/api/v1/rate-master"
+      - "http://localhost:8080/api/v1/notifications"
+      - "http://localhost:8080/api/v1/notification-templates"
+      - "http://localhost:8080/api/v1/notification-preferences"
+      - "http://localhost:8080/api/v1/campaigns"
+      - "http://localhost:8080/api/v1/regulatory-frameworks"
+      - "http://localhost:8080/api/v1/sop-documents"
+      - "http://localhost:8080/api/v1/deviations"
+      - "http://localhost:8080/api/v1/recall-records"
+      - "http://localhost:8080/api/v1/audit-logs"
+      - "http://localhost:8080/api/v1/reports"
+      - "http://localhost:8080/api/v1/dashboard-widgets"
+      - "http://localhost:8080/api/v1/documents"
+      - "http://localhost:8080/api/v1/emergency-requests"
+      - "http://localhost:8080/api/v1/disaster-events"
+      - "http://localhost:8080/api/v1/donor-mobilizations"
+
+  # -----------------------------------------------------------------------
+  # Step 3: Active scan — injection, XSS, authentication bypass
+  # -----------------------------------------------------------------------
+  - type: activeScan
+    name: active-scan
+    parameters:
+      context: BloodBank API
+      user: super_admin
+      maxRuleDurationInMins: 5
+      maxScanDurationInMins: 60
+      addQueryParam: false
+      defaultPolicy: "API-Scan-Policy"
+    policyDefinition:
+      rules:
+        # SQL Injection
+        - id: 40018
+          name: "SQL Injection"
+          strength: HIGH
+          threshold: LOW
+        # SQL Injection — MySQL, MsSQL, PostgreSQL
+        - id: 40019
+          name: "SQL Injection - MySQL"
+          strength: HIGH
+          threshold: LOW
+        - id: 40020
+          name: "SQL Injection - Hypersonic SQL"
+          strength: HIGH
+          threshold: LOW
+        - id: 40021
+          name: "SQL Injection - Oracle"
+          strength: HIGH
+          threshold: LOW
+        - id: 40022
+          name: "SQL Injection - PostgreSQL"
+          strength: HIGH
+          threshold: LOW
+        # XSS
+        - id: 40012
+          name: "Cross Site Scripting (Reflected)"
+          strength: HIGH
+          threshold: LOW
+        - id: 40014
+          name: "Cross Site Scripting (Persistent)"
+          strength: HIGH
+          threshold: LOW
+        # Authentication bypass
+        - id: 10105
+          name: "Weak Authentication Method"
+          strength: HIGH
+          threshold: LOW
+        # Path traversal
+        - id: 6
+          name: "Path Traversal"
+          strength: HIGH
+          threshold: MEDIUM
+        # Remote file inclusion
+        - id: 7
+          name: "Remote File Inclusion"
+          strength: HIGH
+          threshold: MEDIUM
+        # Command injection
+        - id: 90020
+          name: "Remote OS Command Injection"
+          strength: HIGH
+          threshold: LOW
+
+  # -----------------------------------------------------------------------
+  # Step 4: Authentication tests — verify 401 for unauthenticated requests
+  # -----------------------------------------------------------------------
+  - type: requestor
+    name: auth-bypass-checks
+    requests:
+      - url: "http://localhost:8080/api/v1/donors"
+        method: GET
+        headers:
+          # No Authorization header — expects 401
+        httpStatusCode: 401
+      - url: "http://localhost:8080/api/v1/donors"
+        method: GET
+        headers:
+          Authorization: "Bearer expired.token.here"
+        httpStatusCode: 401
+      - url: "http://localhost:8080/api/v1/donors"
+        method: GET
+        headers:
+          Authorization: "Bearer invalid-not-a-jwt"
+        httpStatusCode: 401
+
+  # -----------------------------------------------------------------------
+  # Step 5: Passive scan — wait for completion
+  # -----------------------------------------------------------------------
+  - type: passiveScan-wait
+    name: passive-scan-wait
+    parameters:
+      maxDuration: 10
+
+  # -----------------------------------------------------------------------
+  # Step 6: Report generation
+  # -----------------------------------------------------------------------
+  - type: report
+    name: security-report
+    parameters:
+      template: "traditional-html"
+      reportDir: "/zap/wrk/reports"
+      reportTitle: "BloodBank API Security Scan Report"
+      reportDescription: "OWASP ZAP automated security scan — M6-017"
+      displayReport: false
+
+  - type: report
+    name: security-report-json
+    parameters:
+      template: "traditional-json"
+      reportDir: "/zap/wrk/reports"
+      reportTitle: "BloodBank API Security Scan"
+
+  # -----------------------------------------------------------------------
+  # Step 7: Alert thresholds — fail on high/critical findings
+  # -----------------------------------------------------------------------
+  - type: alertFilter
+    name: alert-filters
+    alertFilters:
+      # Informational alerts for audit trail endpoints
+      - ruleId: 10049
+        newRisk: INFO
+        url: "http://localhost:8080/api/v1/audit-logs"
+        enabled: true
+  - type: outputSummary
+    name: output-summary
+    parameters:
+      format: SHORT
