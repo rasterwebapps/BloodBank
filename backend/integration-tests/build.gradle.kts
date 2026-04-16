@@ -5,6 +5,8 @@ plugins {
 
 dependencies {
     testImplementation(project(":shared-libs:common-events"))
+    testImplementation(project(":shared-libs:common-dto"))
+    testImplementation(project(":shared-libs:common-exceptions"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-amqp")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
