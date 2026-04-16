@@ -1,4 +1,33 @@
+x-backend-env: &backend-env
+  SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
+  SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bloodbank_db
+  DB_USERNAME: bloodbank
+  DB_PASSWORD: bloodbank
+  SPRING_DATA_REDIS_HOST: redis
+  SPRING_DATA_REDIS_PORT: "6379"
+  SPRING_RABBITMQ_HOST: rabbitmq
+  SPRING_RABBITMQ_PORT: "5672"
+  RABBITMQ_USERNAME: guest
+  RABBITMQ_PASSWORD: guest
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/bloodbank
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8180/realms/bloodbank/protocol/openid-connect/certs
+
+x-backend-depends: &backend-depends
+  postgres:
+    condition: service_healthy
+  redis:
+    condition: service_healthy
+  rabbitmq:
+    condition: service_healthy
+  keycloak:
+    condition: service_healthy
+  config-server:
+    condition: service_healthy
+
 services:
+
+  # ─── Infrastructure ───────────────────────────────────────────────────────────
 
   postgres:
     image: postgres:17
@@ -106,6 +135,347 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+
+  # ─── Config Server (must start before all other backend services) ─────────────
+
+  config-server:
+    build:
+      context: .
+      dockerfile: backend/config-server/Dockerfile
+    image: bloodbank/config-server:latest
+    container_name: bloodbank-config-server
+    environment:
+      ENCRYPT_KEY: bloodbank-config-encryption-key-change-in-production
+    ports:
+      - "8888:8888"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8888/actuator/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # ─── Flyway Migration (runs once before application services) ─────────────────
+
+  flyway-migration:
+    build:
+      context: .
+      dockerfile: shared-libs/db-migration/Dockerfile
+    image: bloodbank/db-migration:latest
+    container_name: bloodbank-flyway-migration
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bloodbank_db
+      DB_USERNAME: bloodbank
+      DB_PASSWORD: bloodbank
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  # ─── Backend Services ─────────────────────────────────────────────────────────
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: backend/api-gateway/Dockerfile
+    image: bloodbank/api-gateway:latest
+    container_name: bloodbank-api-gateway
+    environment:
+      <<: *backend-env
+    ports:
+      - "8080:8080"
+    depends_on:
+      <<: *backend-depends
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  branch-service:
+    build:
+      context: .
+      dockerfile: backend/branch-service/Dockerfile
+    image: bloodbank/branch-service:latest
+    container_name: bloodbank-branch-service
+    environment:
+      <<: *backend-env
+    ports:
+      - "8081:8081"
+    depends_on:
+      <<: *backend-depends
+      flyway-migration:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  donor-service:
+    build:
+      context: .
+      dockerfile: backend/donor-service/Dockerfile
+    image: bloodbank/donor-service:latest
+    container_name: bloodbank-donor-service
+    environment:
+      <<: *backend-env
+    ports:
+      - "8082:8082"
+    depends_on:
+      <<: *backend-depends
+      flyway-migration:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  lab-service:
+    build:
+      context: .
+      dockerfile: backend/lab-service/Dockerfile
+    image: bloodbank/lab-service:latest
+    container_name: bloodbank-lab-service
+    environment:
+      <<: *backend-env
+    ports:
+      - "8083:8083"
+    depends_on:
+      <<: *backend-depends
+      flyway-migration:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  inventory-service:
+    build:
+      context: .
+      dockerfile: backend/inventory-service/Dockerfile
+    image: bloodbank/inventory-service:latest
+    container_name: bloodbank-inventory-service
+    environment:
+      <<: *backend-env
+    ports:
+      - "8084:8084"
+    depends_on:
+      <<: *backend-depends
+      flyway-migration:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8084/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  transfusion-service:
+    build:
+      context: .
+      dockerfile: backend/transfusion-service/Dockerfile
+    image: bloodbank/transfusion-service:latest
+    container_name: bloodbank-transfusion-service
+    environment:
+      <<: *backend-env
+    ports:
+      - "8085:8085"
+    depends_on:
+      <<: *backend-depends
+      flyway-migration:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8085/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  hospital-service:
+    build:
+      context: .
+      dockerfile: backend/hospital-service/Dockerfile
+    image: bloodbank/hospital-service:latest
+    container_name: bloodbank-hospital-service
+    environment:
+      <<: *backend-env
+    ports:
+      - "8086:8086"
+    depends_on:
+      <<: *backend-depends
+      flyway-migration:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8086/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  request-matching-service:
+    build:
+      context: .
+      dockerfile: backend/request-matching-service/Dockerfile
+    image: bloodbank/request-matching-service:latest
+    container_name: bloodbank-request-matching-service
+    environment:
+      <<: *backend-env
+    ports:
+      - "8087:8087"
+    depends_on:
+      <<: *backend-depends
+      flyway-migration:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8087/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  billing-service:
+    build:
+      context: .
+      dockerfile: backend/billing-service/Dockerfile
+    image: bloodbank/billing-service:latest
+    container_name: bloodbank-billing-service
+    environment:
+      <<: *backend-env
+    ports:
+      - "8088:8088"
+    depends_on:
+      <<: *backend-depends
+      flyway-migration:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8088/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: backend/notification-service/Dockerfile
+    image: bloodbank/notification-service:latest
+    container_name: bloodbank-notification-service
+    environment:
+      <<: *backend-env
+      SPRING_MAIL_HOST: mailhog
+      SPRING_MAIL_PORT: "1025"
+    ports:
+      - "8089:8089"
+    depends_on:
+      <<: *backend-depends
+      flyway-migration:
+        condition: service_completed_successfully
+      mailhog:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8089/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  reporting-service:
+    build:
+      context: .
+      dockerfile: backend/reporting-service/Dockerfile
+    image: bloodbank/reporting-service:latest
+    container_name: bloodbank-reporting-service
+    environment:
+      <<: *backend-env
+    ports:
+      - "8090:8090"
+    depends_on:
+      <<: *backend-depends
+      flyway-migration:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8090/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  document-service:
+    build:
+      context: .
+      dockerfile: backend/document-service/Dockerfile
+    image: bloodbank/document-service:latest
+    container_name: bloodbank-document-service
+    environment:
+      <<: *backend-env
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    ports:
+      - "8091:8091"
+    depends_on:
+      <<: *backend-depends
+      flyway-migration:
+        condition: service_completed_successfully
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8091/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  compliance-service:
+    build:
+      context: .
+      dockerfile: backend/compliance-service/Dockerfile
+    image: bloodbank/compliance-service:latest
+    container_name: bloodbank-compliance-service
+    environment:
+      <<: *backend-env
+    ports:
+      - "8092:8092"
+    depends_on:
+      <<: *backend-depends
+      flyway-migration:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8092/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # ─── Frontend ─────────────────────────────────────────────────────────────────
+
+  frontend:
+    build:
+      context: frontend/bloodbank-ui
+      dockerfile: Dockerfile
+    image: bloodbank/frontend:latest
+    container_name: bloodbank-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
 volumes:
   postgres-data:
