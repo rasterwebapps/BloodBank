@@ -11,6 +11,7 @@ WORKDIR /app
 COPY --from=builder /workspace/backend/config-server/build/libs/*.jar app.jar
 # Copy config-repo for native profile
 COPY --from=builder /workspace/config-repo /config-repo
+RUN apk add --no-cache wget
 USER bloodbank
 EXPOSE 8888
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \

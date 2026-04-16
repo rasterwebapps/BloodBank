@@ -9,6 +9,7 @@ RUN npx ng build --configuration=production
 # Stage 2: Serve
 FROM nginx:alpine-slim
 RUN addgroup -S nginx-app && adduser -S nginx-app -G nginx-app
+RUN apk add --no-cache wget
 COPY --chown=nginx-app:nginx-app --from=builder /app/dist/bloodbank-ui/browser /usr/share/nginx/html
 COPY --chown=nginx-app:nginx-app nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
