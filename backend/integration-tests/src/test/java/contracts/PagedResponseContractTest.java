@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p>Reference: {@code shared-libs/common-dto/src/main/java/com/bloodbank/common/dto/PagedResponse.java}
  *
  * <p>Tests verify the contract against the {@code PagedResponse} record definition
- * and Jackson serialisation. Parameterised tests encode the known set of paginated
+ * and Jackson serialization. Parameterised tests encode the known set of paginated
  * endpoints across all 14 services.
  */
 @DisplayName("M6-029: Paginated Response — PagedResponse<T> Structure Contract")

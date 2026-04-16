@@ -45,7 +45,7 @@ class ApiPrefixContractTest {
     /**
      * The canonical list of all registered base paths across all 14 services.
      * Derived from scanning every {@code @RequestMapping} annotation in
-     * {@code backend/{service}/src/main/java/**\/Controller.java}.
+     * each {@code backend/{service}/src/main/java/} controller class.
      */
     static Stream<String> allRegisteredEndpoints() {
         return Stream.of(
