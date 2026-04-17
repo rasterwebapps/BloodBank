@@ -1,0 +1,24 @@
+# api-gateway Service — LoadBalancer (external access)
+# Namespace options: bloodbank-dev | bloodbank-staging | bloodbank-uat | bloodbank-prod
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+  namespace: bloodbank-prod
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: bloodbank
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: api-gateway
+    version: blue
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+    - name: https
+      port: 443
+      targetPort: 8080
+      protocol: TCP

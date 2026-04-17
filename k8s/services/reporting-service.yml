@@ -1,0 +1,19 @@
+# reporting-service Service — ClusterIP (internal only)
+# Namespace options: bloodbank-dev | bloodbank-staging | bloodbank-uat | bloodbank-prod
+apiVersion: v1
+kind: Service
+metadata:
+  name: reporting-service
+  namespace: bloodbank-prod
+  labels:
+    app.kubernetes.io/name: reporting-service
+    app.kubernetes.io/part-of: bloodbank
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: reporting-service
+  ports:
+    - name: http
+      port: 8090
+      targetPort: 8090
+      protocol: TCP

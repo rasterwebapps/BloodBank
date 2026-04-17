@@ -1,0 +1,22 @@
+# Shared infrastructure configuration for all BloodBank services.
+# To target a different namespace, update the namespace field below.
+# Namespace options: bloodbank-dev | bloodbank-staging | bloodbank-uat | bloodbank-prod
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bloodbank-shared-config
+  namespace: bloodbank-prod
+  labels:
+    app.kubernetes.io/part-of: bloodbank
+    app.kubernetes.io/managed-by: kubectl
+data:
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/bloodbank_db"
+  SPRING_DATA_REDIS_HOST: "redis"
+  SPRING_DATA_REDIS_PORT: "6379"
+  SPRING_RABBITMQ_HOST: "rabbitmq"
+  SPRING_RABBITMQ_PORT: "5672"
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://keycloak:8180/realms/bloodbank"
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: "http://keycloak:8180/realms/bloodbank/protocol/openid-connect/certs"
+  SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
+  SPRING_CLOUD_CONFIG_URI: "http://config-server:8888"
+  SPRING_PROFILES_ACTIVE: "prod"

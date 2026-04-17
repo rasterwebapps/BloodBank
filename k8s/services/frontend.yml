@@ -1,0 +1,21 @@
+# frontend Service — ClusterIP (internal only, accessed via Ingress)
+# Blue-Green: switch selector version: blue → green to cut over
+# Namespace options: bloodbank-dev | bloodbank-staging | bloodbank-uat | bloodbank-prod
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: bloodbank-prod
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/part-of: bloodbank
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: frontend
+    version: blue
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      protocol: TCP

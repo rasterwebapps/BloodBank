@@ -1,0 +1,51 @@
+# NGINX Ingress for BloodBank — routes external traffic to frontend and api-gateway
+# Prerequisites: nginx ingress controller must be installed in the cluster
+#   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.0/deploy/static/provider/cloud/deploy.yaml
+# TLS: create a secret named bloodbank-tls with your certificate:
+#   kubectl create secret tls bloodbank-tls --cert=tls.crt --key=tls.key -n bloodbank-prod
+# Namespace options: bloodbank-dev | bloodbank-staging | bloodbank-uat | bloodbank-prod
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bloodbank-ingress
+  namespace: bloodbank-prod
+  labels:
+    app.kubernetes.io/name: bloodbank-ingress
+    app.kubernetes.io/part-of: bloodbank
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - bloodbank.example.com
+      secretName: bloodbank-tls
+  rules:
+    - host: bloodbank.example.com
+      http:
+        paths:
+          - path: /api/
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+          - path: /actuator/
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80

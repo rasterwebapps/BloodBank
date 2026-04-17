@@ -1,0 +1,19 @@
+# branch-service Service — ClusterIP (internal only)
+# Namespace options: bloodbank-dev | bloodbank-staging | bloodbank-uat | bloodbank-prod
+apiVersion: v1
+kind: Service
+metadata:
+  name: branch-service
+  namespace: bloodbank-prod
+  labels:
+    app.kubernetes.io/name: branch-service
+    app.kubernetes.io/part-of: bloodbank
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: branch-service
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+      protocol: TCP
