@@ -1,0 +1,32 @@
+# Per-service application configuration.
+# To target a different namespace, update the namespace field below.
+# Namespace options: bloodbank-dev | bloodbank-staging | bloodbank-uat | bloodbank-prod
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bloodbank-services-config
+  namespace: bloodbank-prod
+  labels:
+    app.kubernetes.io/part-of: bloodbank
+    app.kubernetes.io/managed-by: kubectl
+data:
+  # Config Server
+  SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS: "classpath:/config-repo"
+
+  # Notification Service
+  SPRING_MAIL_HOST: "mailhog"
+  SPRING_MAIL_PORT: "1025"
+  SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "false"
+  SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "false"
+
+  # Document Service
+  MINIO_ENDPOINT: "http://minio:9000"
+
+  # Keycloak Service
+  KEYCLOAK_ADMIN: "admin"
+
+  # Actuator
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,metrics,prometheus"
+  MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: "always"
+  MANAGEMENT_HEALTH_LIVENESSSTATE_ENABLED: "true"
+  MANAGEMENT_HEALTH_READINESSSTATE_ENABLED: "true"

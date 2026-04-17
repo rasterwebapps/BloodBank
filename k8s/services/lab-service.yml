@@ -1,0 +1,21 @@
+# lab-service Service — ClusterIP (internal only)
+# Blue-Green: switch selector version: blue → green to cut over
+# Namespace options: bloodbank-dev | bloodbank-staging | bloodbank-uat | bloodbank-prod
+apiVersion: v1
+kind: Service
+metadata:
+  name: lab-service
+  namespace: bloodbank-prod
+  labels:
+    app.kubernetes.io/name: lab-service
+    app.kubernetes.io/part-of: bloodbank
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: lab-service
+    version: blue
+  ports:
+    - name: http
+      port: 8083
+      targetPort: 8083
+      protocol: TCP

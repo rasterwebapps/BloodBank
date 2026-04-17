@@ -1,0 +1,19 @@
+# notification-service Service — ClusterIP (internal only)
+# Namespace options: bloodbank-dev | bloodbank-staging | bloodbank-uat | bloodbank-prod
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  namespace: bloodbank-prod
+  labels:
+    app.kubernetes.io/name: notification-service
+    app.kubernetes.io/part-of: bloodbank
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: notification-service
+  ports:
+    - name: http
+      port: 8089
+      targetPort: 8089
+      protocol: TCP
