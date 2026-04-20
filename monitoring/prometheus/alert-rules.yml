@@ -1,0 +1,374 @@
+groups:
+  # ─── Service Availability ─────────────────────────────────────────────────────
+  - name: service_availability
+    interval: 30s
+    rules:
+      - alert: ServiceDown
+        expr: up{job=~"api-gateway|config-server|branch-service|donor-service|lab-service|inventory-service|transfusion-service|hospital-service|request-matching-service|billing-service|notification-service|reporting-service|document-service|compliance-service"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Service {{ $labels.service }} is down"
+          description: "{{ $labels.service }} (instance {{ $labels.instance }}) has been down for more than 1 minute."
+          runbook_url: "https://wiki.bloodbank.internal/runbooks/service-down"
+
+      - alert: HealthCheckFailing
+        expr: |
+          (
+            sum by (service) (
+              rate(http_server_requests_seconds_count{uri="/actuator/health",status!~"2.."}[5m])
+            )
+            /
+            sum by (service) (
+              rate(http_server_requests_seconds_count{uri="/actuator/health"}[5m])
+            )
+          ) > 0.5
+        for: 2m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Health check failing for {{ $labels.service }}"
+          description: "More than 50% of health checks are failing for {{ $labels.service }}."
+
+  # ─── Error Rate ───────────────────────────────────────────────────────────────
+  - name: error_rate
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum by (service) (
+              rate(http_server_requests_seconds_count{status=~"5.."}[5m])
+            )
+            /
+            sum by (service) (
+              rate(http_server_requests_seconds_count[5m])
+            )
+          ) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "High error rate on {{ $labels.service }}"
+          description: "Error rate for {{ $labels.service }} is {{ $value | humanizePercentage }} (threshold: 5%)."
+          runbook_url: "https://wiki.bloodbank.internal/runbooks/high-error-rate"
+
+      - alert: ElevatedErrorRate
+        expr: |
+          (
+            sum by (service) (
+              rate(http_server_requests_seconds_count{status=~"5.."}[5m])
+            )
+            /
+            sum by (service) (
+              rate(http_server_requests_seconds_count[5m])
+            )
+          ) > 0.01
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Elevated error rate on {{ $labels.service }}"
+          description: "Error rate for {{ $labels.service }} is {{ $value | humanizePercentage }} (threshold: 1%)."
+
+  # ─── Latency ──────────────────────────────────────────────────────────────────
+  - name: latency
+    interval: 30s
+    rules:
+      - alert: HighP95Latency
+        expr: |
+          histogram_quantile(0.95,
+            sum by (service, le) (
+              rate(http_server_requests_seconds_bucket[5m])
+            )
+          ) > 0.5
+        for: 5m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "P95 latency exceeds 500ms for {{ $labels.service }}"
+          description: "P95 response time for {{ $labels.service }} is {{ $value | humanizeDuration }} (SLO: 500ms)."
+          runbook_url: "https://wiki.bloodbank.internal/runbooks/high-latency"
+
+      - alert: HighP95LatencyWarning
+        expr: |
+          histogram_quantile(0.95,
+            sum by (service, le) (
+              rate(http_server_requests_seconds_bucket[5m])
+            )
+          ) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "P95 latency exceeds 200ms SLO for {{ $labels.service }}"
+          description: "P95 response time for {{ $labels.service }} is {{ $value | humanizeDuration }} (internal SLO: 200ms)."
+
+      - alert: HighP99Latency
+        expr: |
+          histogram_quantile(0.99,
+            sum by (service, le) (
+              rate(http_server_requests_seconds_bucket[5m])
+            )
+          ) > 1.0
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "P99 latency exceeds 1s for {{ $labels.service }}"
+          description: "P99 response time for {{ $labels.service }} is {{ $value | humanizeDuration }}."
+
+  # ─── Blood Stock ──────────────────────────────────────────────────────────────
+  - name: blood_stock
+    interval: 60s
+    rules:
+      - alert: BloodStockCritical
+        expr: bloodbank_stock_units_available{status="available"} < 10
+        for: 0m
+        labels:
+          severity: critical
+          team: clinical
+          domain: inventory
+        annotations:
+          summary: "Critical blood stock: {{ $labels.blood_group }} at {{ $labels.branch }}"
+          description: "Blood group {{ $labels.blood_group }} at branch {{ $labels.branch }} has only {{ $value }} units available (critical threshold: 10)."
+          runbook_url: "https://wiki.bloodbank.internal/runbooks/blood-stock-critical"
+
+      - alert: BloodStockLow
+        expr: bloodbank_stock_units_available{status="available"} < 20
+        for: 5m
+        labels:
+          severity: warning
+          team: clinical
+          domain: inventory
+        annotations:
+          summary: "Low blood stock: {{ $labels.blood_group }} at {{ $labels.branch }}"
+          description: "Blood group {{ $labels.blood_group }} at branch {{ $labels.branch }} has {{ $value }} units available (warning threshold: 20)."
+
+      - alert: BloodUnitsExpiringIn24h
+        expr: bloodbank_units_expiring_soon{window="24h"} > 0
+        for: 0m
+        labels:
+          severity: warning
+          team: clinical
+          domain: inventory
+        annotations:
+          summary: "{{ $value }} blood units expiring within 24h at {{ $labels.branch }}"
+          description: "{{ $value }} units of blood group {{ $labels.blood_group }} are expiring within 24 hours at branch {{ $labels.branch }}."
+          runbook_url: "https://wiki.bloodbank.internal/runbooks/expiring-units"
+
+      - alert: BloodUnitsExpiringIn48h
+        expr: bloodbank_units_expiring_soon{window="48h"} > 5
+        for: 0m
+        labels:
+          severity: info
+          team: clinical
+          domain: inventory
+        annotations:
+          summary: "{{ $value }} blood units expiring within 48h at {{ $labels.branch }}"
+          description: "{{ $value }} units of blood group {{ $labels.blood_group }} are expiring within 48 hours at branch {{ $labels.branch }}."
+
+  # ─── JVM / Infrastructure ─────────────────────────────────────────────────────
+  - name: jvm
+    interval: 30s
+    rules:
+      - alert: HighHeapUsage
+        expr: |
+          (
+            jvm_memory_used_bytes{area="heap"}
+            /
+            jvm_memory_max_bytes{area="heap"}
+          ) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High JVM heap usage on {{ $labels.service }}"
+          description: "JVM heap usage for {{ $labels.service }} is {{ $value | humanizePercentage }} (threshold: 85%)."
+
+      - alert: CriticalHeapUsage
+        expr: |
+          (
+            jvm_memory_used_bytes{area="heap"}
+            /
+            jvm_memory_max_bytes{area="heap"}
+          ) > 0.95
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Critical JVM heap usage on {{ $labels.service }}"
+          description: "JVM heap usage for {{ $labels.service }} is {{ $value | humanizePercentage }}. OOM risk imminent."
+
+      - alert: HighGCPause
+        expr: |
+          rate(jvm_gc_pause_seconds_sum[5m])
+          /
+          rate(jvm_gc_pause_seconds_count[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High GC pause time on {{ $labels.service }}"
+          description: "Average GC pause for {{ $labels.service }} is {{ $value | humanizeDuration }}."
+
+  # ─── Disk Usage ───────────────────────────────────────────────────────────────
+  - name: disk
+    interval: 60s
+    rules:
+      - alert: DiskSpaceWarning
+        expr: |
+          (
+            1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"}
+                 / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"})
+          ) > 0.80
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Disk usage above 80% on {{ $labels.instance }}"
+          description: "Disk usage on {{ $labels.instance }} ({{ $labels.mountpoint }}) is {{ $value | humanizePercentage }}."
+
+      - alert: DiskSpaceCritical
+        expr: |
+          (
+            1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"}
+                 / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"})
+          ) > 0.90
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Disk usage above 90% on {{ $labels.instance }}"
+          description: "Disk usage on {{ $labels.instance }} ({{ $labels.mountpoint }}) is {{ $value | humanizePercentage }}. Immediate action required."
+
+  # ─── Database ─────────────────────────────────────────────────────────────────
+  - name: database
+    interval: 30s
+    rules:
+      - alert: PostgresConnectionPoolExhausted
+        expr: |
+          pg_stat_database_numbackends
+          /
+          pg_settings_max_connections > 0.85
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "PostgreSQL connection pool near exhaustion"
+          description: "PostgreSQL is using {{ $value | humanizePercentage }} of max connections."
+
+      - alert: PostgresSlowQueries
+        expr: pg_stat_activity_max_tx_duration{state="active"} > 30
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Long-running PostgreSQL queries detected"
+          description: "Queries running longer than 30 seconds detected in PostgreSQL."
+
+  # ─── Message Queue ────────────────────────────────────────────────────────────
+  - name: rabbitmq
+    interval: 30s
+    rules:
+      - alert: RabbitMQQueueDepthHigh
+        expr: rabbitmq_queue_messages > 1000
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "RabbitMQ queue depth high: {{ $labels.queue }}"
+          description: "Queue {{ $labels.queue }} has {{ $value }} messages pending (threshold: 1000)."
+
+      - alert: RabbitMQDeadLetterQueueGrowing
+        expr: rabbitmq_queue_messages{queue="bloodbank.dlq"} > 10
+        for: 2m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Dead letter queue growing: {{ $value }} messages"
+          description: "The dead letter queue has {{ $value }} messages. Events may be failing to process."
+          runbook_url: "https://wiki.bloodbank.internal/runbooks/dlq-messages"
+
+  # ─── SLO Burn Rate ────────────────────────────────────────────────────────────
+  - name: slo_burn_rate
+    interval: 30s
+    rules:
+      - alert: SLOErrorBudgetBurnRateHigh
+        # Burn rate > 14.4x means the monthly error budget (0.1% = 0.001) will be
+        # exhausted in less than 2 days if this rate continues.
+        expr: |
+          (
+            sum(rate(http_server_requests_seconds_count{status=~"5.."}[1h]))
+            /
+            sum(rate(http_server_requests_seconds_count[1h]))
+          ) > 14.4 * 0.001
+        for: 5m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "SLO error budget burning too fast"
+          description: "Error budget burn rate is {{ $value | humanize }}x the allowed rate. The monthly error budget will be exhausted in less than 2 days."
+
+      - alert: SLOErrorBudgetBurnRateWarning
+        # Burn rate > 6x over 6h means the monthly error budget (0.1% = 0.001) will be
+        # exhausted in less than 5 days if this rate continues.
+        expr: |
+          (
+            sum(rate(http_server_requests_seconds_count{status=~"5.."}[6h]))
+            /
+            sum(rate(http_server_requests_seconds_count[6h]))
+          ) > 6 * 0.001
+        for: 15m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "SLO error budget burn rate elevated"
+          description: "Error budget burn rate is {{ $value | humanize }}x over 6 hours. Monitor closely."
+
+  # ─── Emergency / Clinical Alerts ─────────────────────────────────────────────
+  - name: clinical
+    interval: 30s
+    rules:
+      - alert: EmergencyBloodRequestUnmatched
+        expr: bloodbank_emergency_requests_pending > 0
+        for: 5m
+        labels:
+          severity: critical
+          team: clinical
+          domain: transfusion
+        annotations:
+          summary: "{{ $value }} emergency blood request(s) unmatched for >5 minutes"
+          description: "{{ $value }} emergency blood requests have been pending without a match for more than 5 minutes."
+          runbook_url: "https://wiki.bloodbank.internal/runbooks/emergency-request"
+
+      - alert: TransfusionReactionReported
+        expr: increase(bloodbank_transfusion_reactions_total[1h]) > 0
+        for: 0m
+        labels:
+          severity: critical
+          team: clinical
+          domain: hemovigilance
+        annotations:
+          summary: "Transfusion reaction reported at {{ $labels.branch }}"
+          description: "A transfusion reaction has been reported. Immediate hemovigilance protocol must be initiated."
+          runbook_url: "https://wiki.bloodbank.internal/runbooks/transfusion-reaction"

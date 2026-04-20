@@ -1,0 +1,149 @@
+global:
+  resolve_timeout: 5m
+  smtp_smarthost: mailhog:1025
+  smtp_from: alerts@bloodbank.internal
+  smtp_require_tls: false
+
+templates:
+  - /etc/alertmanager/templates/*.tmpl
+
+route:
+  group_by: ['alertname', 'service', 'severity']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: default-email
+
+  routes:
+    # Critical clinical alerts → PagerDuty (immediate) + SMS
+    - matchers:
+        - severity = critical
+        - domain = clinical
+      receiver: clinical-critical
+      group_wait: 0s
+      group_interval: 1m
+      repeat_interval: 30m
+      continue: false
+
+    # Critical infrastructure alerts → PagerDuty
+    - matchers:
+        - severity = critical
+      receiver: pagerduty-critical
+      group_wait: 30s
+      group_interval: 2m
+      repeat_interval: 1h
+      continue: true
+
+    # Warning alerts → Slack
+    - matchers:
+        - severity = warning
+      receiver: slack-warning
+      group_wait: 1m
+      group_interval: 5m
+      repeat_interval: 4h
+      continue: true
+
+    # Info / business alerts → Email
+    - matchers:
+        - severity = info
+      receiver: email-info
+      group_wait: 5m
+      group_interval: 30m
+      repeat_interval: 24h
+
+    # SLO burn rate → Slack + PagerDuty
+    - matchers:
+        - alertname =~ "SLOErrorBudget.*"
+        - severity = critical
+      receiver: slo-critical
+      group_wait: 0s
+      repeat_interval: 2h
+
+inhibit_rules:
+  # Suppress warning when critical is firing for same service
+  - source_matchers:
+      - severity = critical
+    target_matchers:
+      - severity = warning
+    equal: ['alertname', 'service']
+
+  # Suppress service-level alerts when service is already down
+  - source_matchers:
+      - alertname = ServiceDown
+    target_matchers:
+      - alertname =~ "HighErrorRate|HighP95Latency"
+    equal: ['service']
+
+receivers:
+  - name: default-email
+    email_configs:
+      - to: ops-team@bloodbank.internal
+        send_resolved: true
+        html: '{{ template "email.bloodbank.html" . }}'
+        subject: '{{ template "email.bloodbank.subject" . }}'
+
+  - name: clinical-critical
+    pagerduty_configs:
+      - routing_key: ${PAGERDUTY_CLINICAL_KEY}
+        send_resolved: true
+        description: '{{ template "pagerduty.bloodbank.description" . }}'
+        severity: critical
+        client: BloodBank Alertmanager
+        client_url: http://grafana:3000
+        details:
+          service: '{{ .CommonLabels.service }}'
+          branch: '{{ .CommonLabels.branch }}'
+    webhook_configs:
+      - url: ${SMS_WEBHOOK_URL}
+        send_resolved: false
+        http_config:
+          bearer_token: ${SMS_WEBHOOK_TOKEN}
+
+  - name: pagerduty-critical
+    pagerduty_configs:
+      - routing_key: ${PAGERDUTY_PLATFORM_KEY}
+        send_resolved: true
+        description: '{{ template "pagerduty.bloodbank.description" . }}'
+        severity: '{{ .CommonLabels.severity }}'
+        client: BloodBank Alertmanager
+        client_url: http://grafana:3000
+        details:
+          service: '{{ .CommonLabels.service }}'
+          runbook: '{{ .CommonAnnotations.runbook_url }}'
+
+  - name: slack-warning
+    slack_configs:
+      - api_url: ${SLACK_WEBHOOK_URL}
+        channel: '#bloodbank-alerts'
+        send_resolved: true
+        title: '{{ template "slack.bloodbank.title" . }}'
+        text: '{{ template "slack.bloodbank.text" . }}'
+        color: '{{ if eq .Status "firing" }}{{ if eq .CommonLabels.severity "critical" }}danger{{ else }}warning{{ end }}{{ else }}good{{ end }}'
+        actions:
+          - type: button
+            text: View in Grafana
+            url: 'http://grafana:3000/alerting'
+          - type: button
+            text: Runbook
+            url: '{{ .CommonAnnotations.runbook_url }}'
+
+  - name: email-info
+    email_configs:
+      - to: clinical-team@bloodbank.internal
+        send_resolved: true
+        html: '{{ template "email.bloodbank.html" . }}'
+        subject: '{{ template "email.bloodbank.subject" . }}'
+
+  - name: slo-critical
+    pagerduty_configs:
+      - routing_key: ${PAGERDUTY_PLATFORM_KEY}
+        send_resolved: true
+        description: 'SLO Error Budget Alert: {{ .CommonAnnotations.summary }}'
+        severity: critical
+    slack_configs:
+      - api_url: ${SLACK_WEBHOOK_URL}
+        channel: '#bloodbank-slo'
+        send_resolved: true
+        title: '🔥 SLO Alert: {{ .CommonAnnotations.summary }}'
+        text: '{{ .CommonAnnotations.description }}'
+        color: danger

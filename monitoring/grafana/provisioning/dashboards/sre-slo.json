@@ -1,0 +1,171 @@
+{
+  "title": "SRE — SLO Dashboard",
+  "uid": "bloodbank-sre-slo",
+  "tags": ["bloodbank", "sre", "slo"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "1m",
+  "time": { "from": "now-30d", "to": "now" },
+  "panels": [
+    {
+      "type": "row",
+      "title": "SLO Status",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 1 },
+      "collapsed": false
+    },
+    {
+      "type": "stat",
+      "title": "Availability SLO (Target: 99.9%)",
+      "description": "Percentage of time all services were available over the past 30 days",
+      "gridPos": { "x": 0, "y": 1, "w": 6, "h": 5 },
+      "options": { "colorMode": "background", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 3,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.999 }, { "color": "green", "value": 0.9995 }] }
+        }
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "avg_over_time(avg(up{job!~\"prometheus|node-exporter|postgres|redis|rabbitmq\"})[30d:5m])", "legendFormat": "Availability" }]
+    },
+    {
+      "type": "stat",
+      "title": "P95 Latency SLO (Target: <200ms)",
+      "description": "P95 response time across all services over the last hour",
+      "gridPos": { "x": 6, "y": 1, "w": 6, "h": 5 },
+      "options": { "colorMode": "background", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.2 }, { "color": "red", "value": 0.5 }] }
+        }
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_requests_seconds_bucket[1h])))", "legendFormat": "P95" }]
+    },
+    {
+      "type": "stat",
+      "title": "Error Rate SLO (Target: <0.1%)",
+      "description": "Percentage of requests returning 5xx errors over the last hour",
+      "gridPos": { "x": 12, "y": 1, "w": 6, "h": 5 },
+      "options": { "colorMode": "background", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 3,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.001 }, { "color": "red", "value": 0.005 }] }
+        }
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(http_server_requests_seconds_count{status=~\"5..\"}[1h])) / sum(rate(http_server_requests_seconds_count[1h]))", "legendFormat": "Error Rate" }]
+    },
+    {
+      "type": "stat",
+      "title": "Error Budget Remaining (30d)",
+      "description": "Monthly error budget consumed. Budget = 0.1% of requests (43.2min/month)",
+      "gridPos": { "x": 18, "y": 1, "w": 6, "h": 5 },
+      "options": { "colorMode": "background", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 1,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.25 }, { "color": "green", "value": 0.5 }] }
+        }
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "1 - clamp_min((sum(increase(http_server_requests_seconds_count{status=~\"5..\"}[30d])) / sum(increase(http_server_requests_seconds_count[30d]))) / 0.001, 0)", "legendFormat": "Budget Remaining" }]
+    },
+    {
+      "type": "row",
+      "title": "Error Budget",
+      "gridPos": { "x": 0, "y": 6, "w": 24, "h": 1 },
+      "collapsed": false
+    },
+    {
+      "type": "timeseries",
+      "title": "Error Budget Burn Rate (1h vs 6h)",
+      "description": "Burn rate > 14.4x (1h) or > 6x (6h) triggers critical alert",
+      "gridPos": { "x": 0, "y": 7, "w": 24, "h": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "1h Burn Rate" }, "properties": [{ "id": "custom.thresholdsStyle", "value": { "mode": "line" } }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "transparent", "value": null }, { "color": "red", "value": 14.4 }] } }] },
+          { "matcher": { "id": "byName", "options": "6h Burn Rate" }, "properties": [{ "id": "custom.thresholdsStyle", "value": { "mode": "line" } }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "transparent", "value": null }, { "color": "orange", "value": 6 }] } }] }
+        ]
+      },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "(sum(rate(http_server_requests_seconds_count{status=~\"5..\"}[1h])) / sum(rate(http_server_requests_seconds_count[1h]))) / 0.001", "legendFormat": "1h Burn Rate" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "(sum(rate(http_server_requests_seconds_count{status=~\"5..\"}[6h])) / sum(rate(http_server_requests_seconds_count[6h]))) / 0.001", "legendFormat": "6h Burn Rate" }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "SLO Trends",
+      "gridPos": { "x": 0, "y": 15, "w": 24, "h": 1 },
+      "collapsed": false
+    },
+    {
+      "type": "timeseries",
+      "title": "Availability Over Time (30d)",
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0.99,
+          "max": 1
+        },
+        "overrides": [
+          { "matcher": { "id": "byType", "options": "number" }, "properties": [
+            { "id": "custom.thresholdsStyle", "value": { "mode": "area" } },
+            { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.999 }, { "color": "transparent", "value": 0.9995 }] } }
+          ]}
+        ]
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "avg_over_time(avg(up{job!~\"prometheus|node-exporter|postgres|redis|rabbitmq\"})[1d:5m])", "legendFormat": "Daily Availability" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "P95 Latency Trend (30d)",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "s" },
+        "overrides": [
+          { "matcher": { "id": "byType", "options": "number" }, "properties": [
+            { "id": "custom.thresholdsStyle", "value": { "mode": "area" } },
+            { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "transparent", "value": null }, { "color": "yellow", "value": 0.2 }, { "color": "red", "value": 0.5 }] } }
+          ]}
+        ]
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_requests_seconds_bucket[6h])))", "legendFormat": "P95 (6h window)" }]
+    },
+    {
+      "type": "row",
+      "title": "Per-Service SLO",
+      "gridPos": { "x": 0, "y": 24, "w": 24, "h": 1 },
+      "collapsed": false
+    },
+    {
+      "type": "table",
+      "title": "Per-Service SLO Status",
+      "gridPos": { "x": 0, "y": 25, "w": 24, "h": 10 },
+      "options": { "sortBy": [{ "displayName": "P95 Latency", "desc": true }] },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Availability" }, "properties": [{ "id": "unit", "value": "percentunit" }, { "id": "decimals", "value": 3 }, { "id": "custom.displayMode", "value": "color-background" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.999 }, { "color": "green", "value": 0.9995 }] } }] },
+          { "matcher": { "id": "byName", "options": "Error Rate" }, "properties": [{ "id": "unit", "value": "percentunit" }, { "id": "decimals", "value": 3 }, { "id": "custom.displayMode", "value": "color-background" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.001 }, { "color": "red", "value": 0.005 }] } }] },
+          { "matcher": { "id": "byName", "options": "P95 Latency" }, "properties": [{ "id": "unit", "value": "s" }, { "id": "custom.displayMode", "value": "color-background" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.2 }, { "color": "red", "value": 0.5 }] } }] },
+          { "matcher": { "id": "byName", "options": "RPS" }, "properties": [{ "id": "unit", "value": "reqps" }] }
+        ]
+      },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "avg_over_time(up{job!~\"prometheus|node-exporter|postgres|redis|rabbitmq\"}[1h])", "legendFormat": "{{job}}", "instant": true, "refId": "avail" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (job) (rate(http_server_requests_seconds_count{status=~\"5..\"}[1h])) / sum by (job) (rate(http_server_requests_seconds_count[1h]))", "legendFormat": "{{job}}", "instant": true, "refId": "err" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.95, sum by (job, le) (rate(http_server_requests_seconds_bucket[1h])))", "legendFormat": "{{job}}", "instant": true, "refId": "p95" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (job) (rate(http_server_requests_seconds_count[5m]))", "legendFormat": "{{job}}", "instant": true, "refId": "rps" }
+      ],
+      "transformations": [
+        { "id": "merge", "options": {} },
+        { "id": "organize", "options": { "renameByName": { "job": "Service", "Value #avail": "Availability", "Value #err": "Error Rate", "Value #p95": "P95 Latency", "Value #rps": "RPS" } } }
+      ]
+    }
+  ]
+}
