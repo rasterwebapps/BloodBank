@@ -72,10 +72,10 @@ PKCE is enforced via `pkce.code.challenge.method=S256` in the client attributes.
 |---|---|---|---|
 | `BRANCH_ADMIN` | Day-to-day branch administration | **Required** | Idle 15 min / Max 8 h |
 | `BRANCH_MANAGER` | Clinical and operational oversight | Optional | Idle 30 min / Max 12 h |
-| `DOCTOR` | Clinical assessments and approvals | **Optional** | Idle 30 min / Max 12 h |
-| `LAB_TECHNICIAN` | Blood testing and QC | **Optional** | Idle 30 min / Max 12 h |
+| `DOCTOR` | Clinical assessments and approvals | Optional | Idle 30 min / Max 12 h |
+| `LAB_TECHNICIAN` | Blood testing and QC | Optional | Idle 30 min / Max 12 h |
 | `PHLEBOTOMIST` | Blood collection procedures | None | Idle 30 min / Max 12 h |
-| `NURSE` | Clinical procedures and donor care | **Optional** | Idle 30 min / Max 12 h |
+| `NURSE` | Clinical procedures and donor care | Optional | Idle 30 min / Max 12 h |
 | `INVENTORY_MANAGER` | Blood unit stock management | None | Idle 30 min / Max 12 h |
 | `BILLING_CLERK` | Invoices and payment processing | None | Idle 30 min / Max 12 h |
 | `CAMP_COORDINATOR` | Donation camp organisation | None | Idle 30 min / Max 12 h |
@@ -205,7 +205,7 @@ bloodbank-browser (top-level)
 |---|---|---|
 | `mfa_required` | `true` | SUPER_ADMIN, REGIONAL_ADMIN, SYSTEM_ADMIN, AUDITOR, BRANCH_ADMIN |
 | `mfa_optional` | `true` | DOCTOR, LAB_TECHNICIAN, NURSE |
-| _(neither)_ | — | BRANCH_MANAGER, PHLEBOTOMIST, NURSE, INVENTORY_MANAGER, BILLING_CLERK, CAMP_COORDINATOR, RECEPTIONIST, HOSPITAL_USER, DONOR |
+| _(neither)_ | — | BRANCH_MANAGER, PHLEBOTOMIST, INVENTORY_MANAGER, BILLING_CLERK, CAMP_COORDINATOR, RECEPTIONIST, HOSPITAL_USER, DONOR |
 
 Set these attributes on users via the admin console or LDAP mapper.
 
@@ -223,7 +223,9 @@ Set these attributes on users via the admin console or LDAP mapper.
 
 ## LDAP Federation
 
-The LDAP federation provider is pre-configured in `realm-export.json` under `components.org.keycloak.storage.UserStorageProvider` with the following settings:
+The LDAP federation provider is pre-configured in `realm-export.json` under `components.org.keycloak.storage.UserStorageProvider` with the following settings.
+
+> **Note:** LDAP federation is a production integration — it is not used in local development. When running locally via `docker-compose`, Keycloak will import the realm but the LDAP provider will be disabled until a real LDAP/AD server is reachable at `ldaps://ldap.bloodbank.internal:636`. Add an entry to `/etc/hosts` pointing that hostname at your directory server, or disable the LDAP component in the admin console for local work.
 
 | Setting | Value |
 |---|---|
@@ -255,7 +257,7 @@ The LDAP federation provider is pre-configured in `realm-export.json` under `com
 1. Add the LDAP server's CA certificate to the Keycloak trust store:
    ```bash
    keytool -import -alias ldap-ca -file ldap-ca.crt \
-     -keystore /opt/keycloak/conf/trustore.jks \
+     -keystore /opt/keycloak/conf/truststore.jks \
      -storepass changeit
    ```
 2. Set `KC_SPI_TRUSTSTORE_FILE_FILE` and `KC_SPI_TRUSTSTORE_FILE_PASSWORD` env vars.
