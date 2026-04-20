@@ -40,6 +40,9 @@ pipeline {
 
         // Snyk (optional)
         SNYK_TOKEN        = credentials('snyk-token')
+
+        // Canary monitoring window between promotion phases (seconds)
+        CANARY_MONITOR_SECS = '60'
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -305,6 +308,7 @@ pipeline {
                     parallel buildSteps
 
                     // Run Trivy vulnerability scan against each pushed image
+                    // exit-code 1 enforces that CRITICAL/HIGH findings fail the build
                     def scanSteps = (services + ['db-migration', 'frontend']).collectEntries { svc ->
                         ["scan-${svc}": {
                             sh """
@@ -314,7 +318,7 @@ pipeline {
                                     --format sarif \
                                     --output trivy-image-${svc}.sarif \
                                     --ignore-unfixed \
-                                    ${REGISTRY}/${IMAGE_PREFIX}/${svc}:${IMAGE_TAG} || true
+                                    ${REGISTRY}/${IMAGE_PREFIX}/${svc}:${IMAGE_TAG}
                             """
                         }]
                     }
@@ -592,11 +596,7 @@ pipeline {
     post {
         always {
             archiveArtifacts(
-                artifacts: [
-                    '**/build/reports/**',
-                    '**/build/test-results/**',
-                    'trivy-*.sarif'
-                ].join(', '),
+                artifacts: '**/build/reports/**, **/build/test-results/**, trivy-*.sarif',
                 allowEmptyArchive: true,
                 fingerprint: true
             )
@@ -750,20 +750,22 @@ void canaryDeploy(List services) {
               | kubectl apply -f - -n ${ns}
             kubectl rollout status deployment/${svcName}-canary -n ${ns} --timeout=180s
         """
-        echo "Canary 10% live for ${svcName} — monitoring 60 s..."
-        sleep 60
+        echo "Canary 10% live for ${svcName} — monitoring ${env.CANARY_MONITOR_SECS} s..."
+        sleep(env.CANARY_MONITOR_SECS.toInteger())
         assertCanaryHealthy(svcName, ns, kubeconfig)
 
-        // Phase 2 — 50%
+        // Phase 2 — 50% (canary gets half of total capacity, rounded down; stable takes the rest)
+        def canaryReplicas50 = stableReplicas.intdiv(2)
+        def stableReplicas50 = stableReplicas - canaryReplicas50
         sh """
             export KUBECONFIG=${kubeconfig}
             kubectl scale deployment/${svcName}-stable \
-                --replicas=\$(( ${stableReplicas} / 2 )) -n ${ns}
+                --replicas=${stableReplicas50} -n ${ns}
             kubectl scale deployment/${svcName}-canary \
-                --replicas=\$(( ${stableReplicas} / 2 )) -n ${ns}
+                --replicas=${canaryReplicas50} -n ${ns}
         """
-        echo "Canary 50% live for ${svcName} — monitoring 60 s..."
-        sleep 60
+        echo "Canary 50% live for ${svcName} — monitoring ${env.CANARY_MONITOR_SECS} s..."
+        sleep(env.CANARY_MONITOR_SECS.toInteger())
         assertCanaryHealthy(svcName, ns, kubeconfig)
 
         // Phase 3 — 100% (remove stable, scale up canary, rename)
