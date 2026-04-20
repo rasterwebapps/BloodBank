@@ -1,0 +1,1994 @@
+{
+  "id": "bloodbank",
+  "realm": "bloodbank",
+  "displayName": "BloodBank Management System",
+  "displayNameHtml": "<b>BloodBank</b> Management System",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "registrationEmailAsUsername": false,
+  "rememberMe": false,
+  "verifyEmail": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxFailureWaitSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxDeltaTimeSeconds": 43200,
+  "failureFactor": 5,
+  "passwordPolicy": "length(12) and upperCase(1) and lowerCase(1) and digits(1) and specialChars(1) and passwordHistory(5) and forceExpiredPasswordChange(90)",
+  "otpPolicyType": "totp",
+  "otpPolicyAlgorithm": "HmacSHA1",
+  "otpPolicyInitialCounter": 0,
+  "otpPolicyDigits": 6,
+  "otpPolicyLookAheadWindow": 1,
+  "otpPolicyPeriod": 30,
+  "otpPolicyCodeReusable": false,
+  "otpSupportedApplications": [
+    "totpAppFreeOTPName",
+    "totpAppGoogleName",
+    "totpAppMicrosoftAuthenticatorName"
+  ],
+  "accessTokenLifespan": 300,
+  "accessTokenLifespanForImplicitFlow": 900,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 43200,
+  "ssoSessionIdleTimeoutRememberMe": 0,
+  "ssoSessionMaxLifespanRememberMe": 0,
+  "offlineSessionIdleTimeout": 2592000,
+  "offlineSessionMaxLifespanEnabled": false,
+  "offlineSessionMaxLifespan": 5184000,
+  "clientSessionIdleTimeout": 0,
+  "clientSessionMaxLifespan": 0,
+  "clientOfflineSessionIdleTimeout": 0,
+  "clientOfflineSessionMaxLifespan": 0,
+  "accessCodeLifespan": 60,
+  "accessCodeLifespanUserAction": 300,
+  "accessCodeLifespanLogin": 1800,
+  "actionTokenGeneratedByAdminLifespan": 43200,
+  "actionTokenGeneratedByUserLifespan": 300,
+  "defaultSignatureAlgorithm": "RS256",
+  "revokeRefreshToken": false,
+  "refreshTokenMaxReuse": 0,
+  "loginTheme": "keycloak",
+  "accountTheme": "keycloak.v3",
+  "adminTheme": "keycloak.v2",
+  "emailTheme": "keycloak",
+  "internationalizationEnabled": true,
+  "supportedLocales": ["en", "fr", "es", "ar"],
+  "defaultLocale": "en",
+  "smtpServer": {},
+  "eventsEnabled": true,
+  "eventsExpiration": 2592000,
+  "eventsListeners": ["jboss-logging"],
+  "enabledEventTypes": [
+    "LOGIN",
+    "LOGIN_ERROR",
+    "LOGOUT",
+    "REGISTER",
+    "REGISTER_ERROR",
+    "UPDATE_PASSWORD",
+    "UPDATE_PASSWORD_ERROR",
+    "CLIENT_LOGIN",
+    "CLIENT_LOGIN_ERROR",
+    "RESET_PASSWORD",
+    "RESET_PASSWORD_ERROR",
+    "SEND_RESET_PASSWORD",
+    "TOKEN_EXCHANGE",
+    "TOKEN_EXCHANGE_ERROR"
+  ],
+  "adminEventsEnabled": true,
+  "adminEventsDetailsEnabled": true,
+  "browserSecurityHeaders": {
+    "contentSecurityPolicyReportOnly": "",
+    "xContentTypeOptions": "nosniff",
+    "xRobotsTag": "none",
+    "xFrameOptions": "SAMEORIGIN",
+    "contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
+    "xXSSProtection": "1; mode=block",
+    "strictTransportSecurity": "max-age=31536000; includeSubDomains"
+  },
+
+  "roles": {
+    "realm": [
+      {
+        "id": "aa000001-0000-0000-0000-000000000001",
+        "name": "SUPER_ADMIN",
+        "description": "Super administrator with full system access across all branches and regions",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "bloodbank",
+        "attributes": {
+          "session_idle_timeout": ["900"],
+          "session_max_lifetime": ["28800"]
+        }
+      },
+      {
+        "id": "aa000001-0000-0000-0000-000000000002",
+        "name": "REGIONAL_ADMIN",
+        "description": "Regional administrator managing multiple branches within a region",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "bloodbank",
+        "attributes": {
+          "session_idle_timeout": ["900"],
+          "session_max_lifetime": ["28800"]
+        }
+      },
+      {
+        "id": "aa000001-0000-0000-0000-000000000003",
+        "name": "SYSTEM_ADMIN",
+        "description": "System administrator managing configuration and infrastructure",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "bloodbank",
+        "attributes": {
+          "session_idle_timeout": ["900"],
+          "session_max_lifetime": ["28800"]
+        }
+      },
+      {
+        "id": "aa000001-0000-0000-0000-000000000004",
+        "name": "AUDITOR",
+        "description": "Read-only auditor with access to compliance reports and audit trails",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "bloodbank",
+        "attributes": {
+          "session_idle_timeout": ["900"],
+          "session_max_lifetime": ["28800"]
+        }
+      },
+      {
+        "id": "aa000001-0000-0000-0000-000000000099",
+        "name": "default-roles-bloodbank",
+        "description": "${role_default-roles}",
+        "composite": true,
+        "composites": {
+          "realm": ["offline_access", "uma_authorization"],
+          "client": {
+            "account": ["manage-account", "view-profile"]
+          }
+        },
+        "clientRole": false,
+        "containerId": "bloodbank"
+      }
+    ],
+    "client": {
+      "bloodbank-api": [
+        {
+          "id": "bb000002-0000-0000-0000-000000000001",
+          "name": "BRANCH_ADMIN",
+          "description": "Branch administrator managing day-to-day branch operations",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "bloodbank-api"
+        },
+        {
+          "id": "bb000002-0000-0000-0000-000000000002",
+          "name": "BRANCH_MANAGER",
+          "description": "Branch manager overseeing clinical and operational staff",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "bloodbank-api"
+        },
+        {
+          "id": "bb000002-0000-0000-0000-000000000003",
+          "name": "DOCTOR",
+          "description": "Medical doctor performing clinical assessments and approvals",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "bloodbank-api"
+        },
+        {
+          "id": "bb000002-0000-0000-0000-000000000004",
+          "name": "LAB_TECHNICIAN",
+          "description": "Laboratory technician performing blood tests and quality control",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "bloodbank-api"
+        },
+        {
+          "id": "bb000002-0000-0000-0000-000000000005",
+          "name": "PHLEBOTOMIST",
+          "description": "Phlebotomist responsible for blood collection",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "bloodbank-api"
+        },
+        {
+          "id": "bb000002-0000-0000-0000-000000000006",
+          "name": "NURSE",
+          "description": "Nurse assisting with clinical procedures and donor care",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "bloodbank-api"
+        },
+        {
+          "id": "bb000002-0000-0000-0000-000000000007",
+          "name": "INVENTORY_MANAGER",
+          "description": "Inventory manager controlling blood unit stock and storage",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "bloodbank-api"
+        },
+        {
+          "id": "bb000002-0000-0000-0000-000000000008",
+          "name": "BILLING_CLERK",
+          "description": "Billing clerk managing invoices and payments",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "bloodbank-api"
+        },
+        {
+          "id": "bb000002-0000-0000-0000-000000000009",
+          "name": "CAMP_COORDINATOR",
+          "description": "Camp coordinator organising blood donation camps",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "bloodbank-api"
+        },
+        {
+          "id": "bb000002-0000-0000-0000-000000000010",
+          "name": "RECEPTIONIST",
+          "description": "Receptionist handling donor registration and appointments",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "bloodbank-api"
+        },
+        {
+          "id": "bb000002-0000-0000-0000-000000000011",
+          "name": "HOSPITAL_USER",
+          "description": "Hospital portal user requesting blood units",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "bloodbank-api"
+        },
+        {
+          "id": "bb000002-0000-0000-0000-000000000012",
+          "name": "DONOR",
+          "description": "Registered blood donor accessing the donor self-service portal",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "bloodbank-api"
+        }
+      ]
+    }
+  },
+
+  "groups": [
+    {
+      "id": "cc000003-0000-0000-0000-000000000001",
+      "name": "global",
+      "path": "/global",
+      "subGroups": []
+    },
+    {
+      "id": "cc000003-0000-0000-0000-000000000002",
+      "name": "regions",
+      "path": "/regions",
+      "subGroups": [
+        {
+          "id": "cc000003-0000-0000-0000-000000000010",
+          "name": "north-india",
+          "path": "/regions/north-india",
+          "subGroups": [
+            {
+              "id": "cc000003-0000-0000-0000-000000000011",
+              "name": "delhi-branch",
+              "path": "/regions/north-india/delhi-branch",
+              "attributes": {
+                "branch_id": ["bb000000-0000-0000-0000-000000000001"]
+              },
+              "subGroups": []
+            },
+            {
+              "id": "cc000003-0000-0000-0000-000000000012",
+              "name": "punjab-branch",
+              "path": "/regions/north-india/punjab-branch",
+              "attributes": {
+                "branch_id": ["bb000000-0000-0000-0000-000000000002"]
+              },
+              "subGroups": []
+            }
+          ]
+        },
+        {
+          "id": "cc000003-0000-0000-0000-000000000020",
+          "name": "south-india",
+          "path": "/regions/south-india",
+          "subGroups": [
+            {
+              "id": "cc000003-0000-0000-0000-000000000021",
+              "name": "chennai-branch",
+              "path": "/regions/south-india/chennai-branch",
+              "attributes": {
+                "branch_id": ["bb000000-0000-0000-0000-000000000003"]
+              },
+              "subGroups": []
+            },
+            {
+              "id": "cc000003-0000-0000-0000-000000000022",
+              "name": "bangalore-branch",
+              "path": "/regions/south-india/bangalore-branch",
+              "attributes": {
+                "branch_id": ["bb000000-0000-0000-0000-000000000004"]
+              },
+              "subGroups": []
+            }
+          ]
+        },
+        {
+          "id": "cc000003-0000-0000-0000-000000000030",
+          "name": "west-india",
+          "path": "/regions/west-india",
+          "subGroups": [
+            {
+              "id": "cc000003-0000-0000-0000-000000000031",
+              "name": "mumbai-branch",
+              "path": "/regions/west-india/mumbai-branch",
+              "attributes": {
+                "branch_id": ["bb000000-0000-0000-0000-000000000005"]
+              },
+              "subGroups": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cc000003-0000-0000-0000-000000000100",
+      "name": "hospitals",
+      "path": "/hospitals",
+      "subGroups": [
+        {
+          "id": "cc000003-0000-0000-0000-000000000101",
+          "name": "city-general-hospital",
+          "path": "/hospitals/city-general-hospital",
+          "subGroups": []
+        },
+        {
+          "id": "cc000003-0000-0000-0000-000000000102",
+          "name": "apollo-hospital",
+          "path": "/hospitals/apollo-hospital",
+          "subGroups": []
+        },
+        {
+          "id": "cc000003-0000-0000-0000-000000000103",
+          "name": "fortis-hospital",
+          "path": "/hospitals/fortis-hospital",
+          "subGroups": []
+        }
+      ]
+    },
+    {
+      "id": "cc000003-0000-0000-0000-000000000200",
+      "name": "mfa",
+      "path": "/mfa",
+      "subGroups": [
+        {
+          "id": "cc000003-0000-0000-0000-000000000201",
+          "name": "mfa-required",
+          "path": "/mfa/mfa-required",
+          "subGroups": []
+        },
+        {
+          "id": "cc000003-0000-0000-0000-000000000202",
+          "name": "mfa-optional",
+          "path": "/mfa/mfa-optional",
+          "subGroups": []
+        }
+      ]
+    }
+  ],
+
+  "clients": [
+    {
+      "id": "dd000004-0000-0000-0000-000000000001",
+      "clientId": "bloodbank-api",
+      "name": "BloodBank API",
+      "description": "Confidential backend API client with service account",
+      "rootUrl": "",
+      "adminUrl": "",
+      "baseUrl": "",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "bloodbank-api-secret-change-in-production",
+      "redirectUris": ["http://localhost:8080/*"],
+      "webOrigins": ["http://localhost:8080"],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "oidc.ciba.grant.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "post.logout.redirect.uris": "+",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "saml.assertion.signature": "false",
+        "saml.force.post.binding": "false",
+        "saml.multivalued.roles": "false",
+        "saml.encrypt": "false",
+        "saml.server.signature": "false",
+        "saml.server.signature.keyinfo.ext": "false",
+        "exclude.session.state.from.auth.response": "false",
+        "saml_force_name_id_format": "false",
+        "saml.client.signature": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "saml.authnstatement": "false",
+        "display.on.consent.screen": "false",
+        "saml.onetimeuse.condition": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": false,
+      "nodeReRegistrationTimeout": -1,
+      "protocolMappers": [
+        {
+          "id": "ee000005-0000-0000-0000-000000000001",
+          "name": "branch-id-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "branch_id",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "branch_id",
+            "jsonType.label": "String",
+            "multivalued": "false",
+            "aggregate.attrs": "false"
+          }
+        },
+        {
+          "id": "ee000005-0000-0000-0000-000000000002",
+          "name": "realm-roles-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "realm_roles",
+            "jsonType.label": "String",
+            "multivalued": "true"
+          }
+        },
+        {
+          "id": "ee000005-0000-0000-0000-000000000003",
+          "name": "client-roles-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-client-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "usermodel.clientRoleMapping.clientId": "bloodbank-api"
+          }
+        },
+        {
+          "id": "ee000005-0000-0000-0000-000000000004",
+          "name": "audience-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "included.client.audience": "bloodbank-api",
+            "included.custom.audience": ""
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "roles",
+        "profile",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "id": "dd000004-0000-0000-0000-000000000002",
+      "clientId": "bloodbank-ui",
+      "name": "BloodBank UI",
+      "description": "Public Angular SPA client with PKCE, for donor, staff and hospital portals",
+      "rootUrl": "http://localhost:4200",
+      "adminUrl": "",
+      "baseUrl": "http://localhost:4200",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [
+        "http://localhost:4200/*",
+        "https://bloodbank.example.com/*"
+      ],
+      "webOrigins": [
+        "http://localhost:4200",
+        "https://bloodbank.example.com"
+      ],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "publicClient": true,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "oidc.ciba.grant.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "post.logout.redirect.uris": "http://localhost:4200/*",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "pkce.code.challenge.method": "S256",
+        "display.on.consent.screen": "false"
+      },
+      "authenticationFlowBindingOverrides": {
+        "browser": "bloodbank-browser"
+      },
+      "fullScopeAllowed": false,
+      "nodeReRegistrationTimeout": -1,
+      "protocolMappers": [
+        {
+          "id": "ee000005-0000-0000-0000-000000000011",
+          "name": "branch-id-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "branch_id",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "branch_id",
+            "jsonType.label": "String",
+            "multivalued": "false",
+            "aggregate.attrs": "false"
+          }
+        },
+        {
+          "id": "ee000005-0000-0000-0000-000000000012",
+          "name": "realm-roles-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "realm_roles",
+            "jsonType.label": "String",
+            "multivalued": "true"
+          }
+        },
+        {
+          "id": "ee000005-0000-0000-0000-000000000013",
+          "name": "client-roles-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-client-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "usermodel.clientRoleMapping.clientId": "bloodbank-api"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "roles",
+        "profile",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    }
+  ],
+
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "id": "ff000006-0000-0000-0000-000000000001",
+        "name": "bloodbank-ldap",
+        "providerId": "ldap",
+        "subComponents": {
+          "org.keycloak.storage.ldap.mappers.LDAPStorageMapper": [
+            {
+              "id": "ff000006-0000-0000-0001-000000000001",
+              "name": "username",
+              "providerId": "user-attribute-ldap-mapper",
+              "subComponents": {},
+              "config": {
+                "ldap.attribute": ["uid"],
+                "is.mandatory.in.ldap": ["true"],
+                "always.read.value.from.ldap": ["false"],
+                "read.only": ["true"],
+                "user.model.attribute": ["username"]
+              }
+            },
+            {
+              "id": "ff000006-0000-0000-0001-000000000002",
+              "name": "email",
+              "providerId": "user-attribute-ldap-mapper",
+              "subComponents": {},
+              "config": {
+                "ldap.attribute": ["mail"],
+                "is.mandatory.in.ldap": ["false"],
+                "always.read.value.from.ldap": ["false"],
+                "read.only": ["true"],
+                "user.model.attribute": ["email"]
+              }
+            },
+            {
+              "id": "ff000006-0000-0000-0001-000000000003",
+              "name": "first name",
+              "providerId": "user-attribute-ldap-mapper",
+              "subComponents": {},
+              "config": {
+                "ldap.attribute": ["givenName"],
+                "is.mandatory.in.ldap": ["true"],
+                "always.read.value.from.ldap": ["true"],
+                "read.only": ["true"],
+                "user.model.attribute": ["firstName"]
+              }
+            },
+            {
+              "id": "ff000006-0000-0000-0001-000000000004",
+              "name": "last name",
+              "providerId": "user-attribute-ldap-mapper",
+              "subComponents": {},
+              "config": {
+                "ldap.attribute": ["sn"],
+                "is.mandatory.in.ldap": ["true"],
+                "always.read.value.from.ldap": ["true"],
+                "read.only": ["true"],
+                "user.model.attribute": ["lastName"]
+              }
+            },
+            {
+              "id": "ff000006-0000-0000-0001-000000000005",
+              "name": "branch-id-ldap-mapper",
+              "providerId": "user-attribute-ldap-mapper",
+              "subComponents": {},
+              "config": {
+                "ldap.attribute": ["bloodbankBranchId"],
+                "is.mandatory.in.ldap": ["false"],
+                "always.read.value.from.ldap": ["true"],
+                "read.only": ["true"],
+                "user.model.attribute": ["branch_id"]
+              }
+            },
+            {
+              "id": "ff000006-0000-0000-0001-000000000006",
+              "name": "groups",
+              "providerId": "group-ldap-mapper",
+              "subComponents": {},
+              "config": {
+                "mode": ["READ_ONLY"],
+                "membership.attribute.type": ["DN"],
+                "user.roles.retrieve.strategy": ["LOAD_GROUPS_BY_MEMBER_ATTRIBUTE"],
+                "group.name.ldap.attribute": ["cn"],
+                "membership.ldap.attribute": ["member"],
+                "preserve.group.inheritance": ["true"],
+                "ignore.missing.groups": ["false"],
+                "group.object.classes": ["groupOfNames"],
+                "groups.dn": ["ou=groups,dc=bloodbank,dc=internal"],
+                "drop.non.existing.groups.during.sync": ["false"]
+              }
+            }
+          ]
+        },
+        "config": {
+          "enabled": ["true"],
+          "priority": ["0"],
+          "editMode": ["READ_ONLY"],
+          "importEnabled": ["true"],
+          "syncRegistrations": ["false"],
+          "vendor": ["other"],
+          "usernameLDAPAttribute": ["uid"],
+          "rdnLDAPAttribute": ["uid"],
+          "uuidLDAPAttribute": ["entryUUID"],
+          "userObjectClasses": ["inetOrgPerson, organizationalPerson"],
+          "connectionUrl": ["ldaps://ldap.bloodbank.internal:636"],
+          "usersDn": ["ou=users,dc=bloodbank,dc=internal"],
+          "authType": ["simple"],
+          "bindDn": ["cn=keycloak,ou=service-accounts,dc=bloodbank,dc=internal"],
+          "bindCredential": ["**CHANGE_IN_PRODUCTION**"],
+          "customUserSearchFilter": [""],
+          "searchScope": ["2"],
+          "validatePasswordPolicy": ["false"],
+          "trustEmail": ["true"],
+          "useTruststoreSpi": ["ldapsOnly"],
+          "connectionPooling": ["true"],
+          "connectionPoolingAuthentication": ["none simple"],
+          "connectionPoolingDebug": ["false"],
+          "connectionPoolingInitSize": ["1"],
+          "connectionPoolingMaxSize": ["1000"],
+          "connectionPoolingPrefSize": ["5"],
+          "connectionPoolingProtocol": ["plain"],
+          "connectionPoolingTimeout": ["300000"],
+          "connectionPoolingType": ["none"],
+          "connectionTimeout": ["5000"],
+          "readTimeout": ["10000"],
+          "pagination": ["true"],
+          "batchSizeForSync": ["1000"],
+          "fullSyncPeriod": ["86400"],
+          "changedSyncPeriod": ["900"],
+          "cachePolicy": ["DEFAULT"],
+          "evictionDay": [],
+          "evictionHour": [],
+          "evictionMinute": [],
+          "maxLifespan": [],
+          "allowKerberosAuthentication": ["false"],
+          "debug": ["false"],
+          "useKerberosForPasswordAuthentication": ["false"],
+          "startTls": ["false"],
+          "usePasswordModifyExtendedOp": ["false"]
+        }
+      }
+    ],
+    "org.keycloak.keys.KeyProvider": [
+      {
+        "id": "ff000006-0000-0000-0002-000000000001",
+        "name": "rsa-generated",
+        "providerId": "rsa-generated",
+        "subComponents": {},
+        "config": {
+          "priority": ["100"],
+          "enabled": ["true"],
+          "active": ["true"],
+          "keySize": ["2048"]
+        }
+      },
+      {
+        "id": "ff000006-0000-0000-0002-000000000002",
+        "name": "hmac-generated",
+        "providerId": "hmac-generated",
+        "subComponents": {},
+        "config": {
+          "priority": ["100"],
+          "enabled": ["true"],
+          "active": ["true"],
+          "secretSize": ["64"],
+          "algorithm": ["HS256"]
+        }
+      },
+      {
+        "id": "ff000006-0000-0000-0002-000000000003",
+        "name": "aes-generated",
+        "providerId": "aes-generated",
+        "subComponents": {},
+        "config": {
+          "priority": ["100"],
+          "enabled": ["true"],
+          "active": ["true"],
+          "secretSize": ["16"]
+        }
+      }
+    ]
+  },
+
+  "authenticationFlows": [
+    {
+      "id": "gg000007-0000-0000-0000-000000000001",
+      "alias": "bloodbank-browser",
+      "description": "BloodBank browser-based authentication with role-based MFA",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-cookie",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "identity-provider-redirector",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 25,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "flowAlias": "bloodbank-browser-forms",
+          "requirement": "ALTERNATIVE",
+          "priority": 30,
+          "autheticatorFlow": true,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000002",
+      "alias": "bloodbank-browser-forms",
+      "description": "Username/password with conditional role-based OTP",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-username-password-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "flowAlias": "bloodbank-mfa-required",
+          "requirement": "CONDITIONAL",
+          "priority": 20,
+          "autheticatorFlow": true,
+          "userSetupAllowed": false
+        },
+        {
+          "flowAlias": "bloodbank-mfa-optional",
+          "requirement": "CONDITIONAL",
+          "priority": 30,
+          "autheticatorFlow": true,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000003",
+      "alias": "bloodbank-mfa-required",
+      "description": "MFA required for admin and privileged roles (SUPER_ADMIN, REGIONAL_ADMIN, SYSTEM_ADMIN, AUDITOR, BRANCH_ADMIN)",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "condition-user-attribute",
+          "authenticatorConfig": "mfa-required-condition",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000004",
+      "alias": "bloodbank-mfa-optional",
+      "description": "MFA optional for clinical roles (DOCTOR, LAB_TECHNICIAN, NURSE) — prompted only if already configured",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "condition-user-attribute",
+          "authenticatorConfig": "mfa-optional-condition",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "conditional-user-configured",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 30,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000010",
+      "alias": "browser",
+      "description": "browser based authentication",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-cookie",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-spnego",
+          "authenticatorFlow": false,
+          "requirement": "DISABLED",
+          "priority": 20,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "identity-provider-redirector",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 25,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "flowAlias": "forms",
+          "requirement": "ALTERNATIVE",
+          "priority": 30,
+          "autheticatorFlow": true,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000011",
+      "alias": "forms",
+      "description": "Username, password, otp and other auth forms.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-username-password-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "flowAlias": "Browser - Conditional OTP",
+          "requirement": "CONDITIONAL",
+          "priority": 20,
+          "autheticatorFlow": true,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000012",
+      "alias": "Browser - Conditional OTP",
+      "description": "Flow to determine if the OTP is required for the authentication",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-user-configured",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000020",
+      "alias": "direct grant",
+      "description": "OpenID Connect Resource Owner Grant",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "direct-grant-validate-username",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "direct-grant-validate-password",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "flowAlias": "Direct Grant - Conditional OTP",
+          "requirement": "CONDITIONAL",
+          "priority": 30,
+          "autheticatorFlow": true,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000021",
+      "alias": "Direct Grant - Conditional OTP",
+      "description": "Flow to determine if the OTP is required for the authentication",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-user-configured",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "direct-grant-validate-otp",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000030",
+      "alias": "registration",
+      "description": "registration flow",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "registration-page-form",
+          "authenticatorFlow": true,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "flowAlias": "registration form",
+          "autheticatorFlow": true,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000031",
+      "alias": "registration form",
+      "description": "registration form",
+      "providerId": "form-flow",
+      "topLevel": false,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "registration-user-creation",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "registration-password-action",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 50,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "registration-recaptcha-action",
+          "authenticatorFlow": false,
+          "requirement": "DISABLED",
+          "priority": 60,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "registration-terms-and-conditions",
+          "authenticatorFlow": false,
+          "requirement": "DISABLED",
+          "priority": 70,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000040",
+      "alias": "reset credentials",
+      "description": "Reset credentials for a user if they forgot their password or something",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "reset-credentials-choose-user",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "reset-credential-email",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "reset-password",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 30,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "flowAlias": "Reset - Conditional OTP",
+          "requirement": "CONDITIONAL",
+          "priority": 40,
+          "autheticatorFlow": true,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000041",
+      "alias": "Reset - Conditional OTP",
+      "description": "Flow to determine if the OTP is required for the reset credentials",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-user-configured",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "reset-otp",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000050",
+      "alias": "clients",
+      "description": "Base authentication for clients",
+      "providerId": "client-flow",
+      "topLevel": true,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "client-secret",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "client-jwt",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 20,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "client-secret-jwt",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 30,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "client-x509",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 40,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000060",
+      "alias": "first broker login",
+      "description": "Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticatorConfig": "review profile config",
+          "authenticator": "idp-review-user-profile",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "flowAlias": "Handle Existing Account",
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "autheticatorFlow": true,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000061",
+      "alias": "Handle Existing Account",
+      "description": "Handle what to do if there is existing account with same email/username as identity provider account",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "idp-confirm-link",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "flowAlias": "Account verification options",
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "autheticatorFlow": true,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000062",
+      "alias": "Account verification options",
+      "description": "Method with which to verifiy the existing account",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "idp-email-verification",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "flowAlias": "Verify Existing Account by Re-authentication",
+          "requirement": "ALTERNATIVE",
+          "priority": 20,
+          "autheticatorFlow": true,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000063",
+      "alias": "Verify Existing Account by Re-authentication",
+      "description": "Reauthentication of existing account",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "idp-username-password-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "flowAlias": "First broker login - Conditional OTP",
+          "requirement": "CONDITIONAL",
+          "priority": 20,
+          "autheticatorFlow": true,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000064",
+      "alias": "First broker login - Conditional OTP",
+      "description": "Flow to determine if the OTP is required for the authentication",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-user-configured",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000070",
+      "alias": "saml ecp",
+      "description": "SAML ECP Profile Authentication Flow",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "http-basic-authenticator",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000080",
+      "alias": "http challenge",
+      "description": "An authentication flow based on challenge-response HTTP Authentication Schemes",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "no-cookie-redirect",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "flowAlias": "Authentication Options",
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "autheticatorFlow": true,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000081",
+      "alias": "Authentication Options",
+      "description": "Authentication options.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "basic-auth",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "basic-auth-otp",
+          "authenticatorFlow": false,
+          "requirement": "DISABLED",
+          "priority": 20,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-spnego",
+          "authenticatorFlow": false,
+          "requirement": "DISABLED",
+          "priority": 30,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        }
+      ]
+    }
+  ],
+
+  "authenticatorConfig": [
+    {
+      "id": "hh000008-0000-0000-0000-000000000001",
+      "alias": "mfa-required-condition",
+      "config": {
+        "attribute": "mfa_required",
+        "attributeValue": "true",
+        "attributeExpectedValue": "true",
+        "regex": "false",
+        "negate": "false"
+      }
+    },
+    {
+      "id": "hh000008-0000-0000-0000-000000000002",
+      "alias": "mfa-optional-condition",
+      "config": {
+        "attribute": "mfa_optional",
+        "attributeValue": "true",
+        "attributeExpectedValue": "true",
+        "regex": "false",
+        "negate": "false"
+      }
+    },
+    {
+      "id": "hh000008-0000-0000-0000-000000000003",
+      "alias": "review profile config",
+      "config": {
+        "update.profile.on.first.login": "missing"
+      }
+    }
+  ],
+
+  "requiredActions": [
+    {
+      "alias": "CONFIGURE_TOTP",
+      "name": "Configure OTP",
+      "providerId": "CONFIGURE_TOTP",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 10
+    },
+    {
+      "alias": "TERMS_AND_CONDITIONS",
+      "name": "Terms and Conditions",
+      "providerId": "TERMS_AND_CONDITIONS",
+      "enabled": false,
+      "defaultAction": false,
+      "priority": 20
+    },
+    {
+      "alias": "UPDATE_PASSWORD",
+      "name": "Update Password",
+      "providerId": "UPDATE_PASSWORD",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 30
+    },
+    {
+      "alias": "UPDATE_PROFILE",
+      "name": "Update Profile",
+      "providerId": "UPDATE_PROFILE",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 40
+    },
+    {
+      "alias": "VERIFY_EMAIL",
+      "name": "Verify Email",
+      "providerId": "VERIFY_EMAIL",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 50
+    },
+    {
+      "alias": "delete_account",
+      "name": "Delete Account",
+      "providerId": "delete_account",
+      "enabled": false,
+      "defaultAction": false,
+      "priority": 60
+    },
+    {
+      "alias": "webauthn-register",
+      "name": "Webauthn Register",
+      "providerId": "webauthn-register",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 70
+    },
+    {
+      "alias": "webauthn-register-passwordless",
+      "name": "Webauthn Register Passwordless",
+      "providerId": "webauthn-register-passwordless",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 80
+    },
+    {
+      "alias": "VERIFY_PROFILE",
+      "name": "Verify Profile",
+      "providerId": "VERIFY_PROFILE",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 90
+    },
+    {
+      "alias": "delete_credential",
+      "name": "Delete Credential",
+      "providerId": "delete_credential",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 100
+    },
+    {
+      "alias": "UPDATE_EMAIL",
+      "name": "Update Email",
+      "providerId": "UPDATE_EMAIL",
+      "enabled": false,
+      "defaultAction": false,
+      "priority": 110
+    }
+  ],
+
+  "browserFlow": "bloodbank-browser",
+  "registrationFlow": "registration",
+  "directGrantFlow": "direct grant",
+  "resetCredentialsFlow": "reset credentials",
+  "clientAuthenticationFlow": "clients",
+  "dockerAuthenticationFlow": "docker auth",
+  "firstBrokerLoginFlow": "first broker login",
+
+  "users": [
+    {
+      "id": "uu000009-0000-0000-0000-000000000001",
+      "username": "super_admin",
+      "email": "super.admin@bloodbank.internal",
+      "firstName": "Super",
+      "lastName": "Admin",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": [""],
+        "mfa_required": ["true"],
+        "phoneNumber": ["+91-9000000001"]
+      },
+      "realmRoles": ["SUPER_ADMIN", "default-roles-bloodbank"],
+      "groups": ["/global", "/mfa/mfa-required"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000002",
+      "username": "regional_admin",
+      "email": "regional.admin@bloodbank.internal",
+      "firstName": "Regional",
+      "lastName": "Admin",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": [""],
+        "mfa_required": ["true"],
+        "phoneNumber": ["+91-9000000002"]
+      },
+      "realmRoles": ["REGIONAL_ADMIN", "default-roles-bloodbank"],
+      "groups": ["/regions/north-india", "/mfa/mfa-required"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000003",
+      "username": "system_admin",
+      "email": "system.admin@bloodbank.internal",
+      "firstName": "System",
+      "lastName": "Admin",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": [""],
+        "mfa_required": ["true"],
+        "phoneNumber": ["+91-9000000003"]
+      },
+      "realmRoles": ["SYSTEM_ADMIN", "default-roles-bloodbank"],
+      "groups": ["/global", "/mfa/mfa-required"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000004",
+      "username": "auditor",
+      "email": "auditor@bloodbank.internal",
+      "firstName": "Compliance",
+      "lastName": "Auditor",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": [""],
+        "mfa_required": ["true"],
+        "phoneNumber": ["+91-9000000004"]
+      },
+      "realmRoles": ["AUDITOR", "default-roles-bloodbank"],
+      "groups": ["/global", "/mfa/mfa-required"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000005",
+      "username": "branch_admin",
+      "email": "branch.admin@bloodbank.internal",
+      "firstName": "Branch",
+      "lastName": "Admin",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
+        "mfa_required": ["true"],
+        "phoneNumber": ["+91-9000000005"]
+      },
+      "clientRoles": {
+        "bloodbank-api": ["BRANCH_ADMIN"]
+      },
+      "realmRoles": ["default-roles-bloodbank"],
+      "groups": ["/regions/north-india/delhi-branch", "/mfa/mfa-required"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000006",
+      "username": "branch_manager",
+      "email": "branch.manager@bloodbank.internal",
+      "firstName": "Branch",
+      "lastName": "Manager",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
+        "phoneNumber": ["+91-9000000006"]
+      },
+      "clientRoles": {
+        "bloodbank-api": ["BRANCH_MANAGER"]
+      },
+      "realmRoles": ["default-roles-bloodbank"],
+      "groups": ["/regions/north-india/delhi-branch"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000007",
+      "username": "doctor",
+      "email": "doctor@bloodbank.internal",
+      "firstName": "Medical",
+      "lastName": "Doctor",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
+        "mfa_optional": ["true"],
+        "phoneNumber": ["+91-9000000007"]
+      },
+      "clientRoles": {
+        "bloodbank-api": ["DOCTOR"]
+      },
+      "realmRoles": ["default-roles-bloodbank"],
+      "groups": ["/regions/north-india/delhi-branch", "/mfa/mfa-optional"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000008",
+      "username": "lab_tech",
+      "email": "lab.tech@bloodbank.internal",
+      "firstName": "Lab",
+      "lastName": "Technician",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
+        "mfa_optional": ["true"],
+        "phoneNumber": ["+91-9000000008"]
+      },
+      "clientRoles": {
+        "bloodbank-api": ["LAB_TECHNICIAN"]
+      },
+      "realmRoles": ["default-roles-bloodbank"],
+      "groups": ["/regions/north-india/delhi-branch", "/mfa/mfa-optional"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000009",
+      "username": "phlebotomist",
+      "email": "phlebotomist@bloodbank.internal",
+      "firstName": "Senior",
+      "lastName": "Phlebotomist",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
+        "phoneNumber": ["+91-9000000009"]
+      },
+      "clientRoles": {
+        "bloodbank-api": ["PHLEBOTOMIST"]
+      },
+      "realmRoles": ["default-roles-bloodbank"],
+      "groups": ["/regions/north-india/delhi-branch"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000010",
+      "username": "nurse",
+      "email": "nurse@bloodbank.internal",
+      "firstName": "Staff",
+      "lastName": "Nurse",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
+        "mfa_optional": ["true"],
+        "phoneNumber": ["+91-9000000010"]
+      },
+      "clientRoles": {
+        "bloodbank-api": ["NURSE"]
+      },
+      "realmRoles": ["default-roles-bloodbank"],
+      "groups": ["/regions/north-india/delhi-branch", "/mfa/mfa-optional"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000011",
+      "username": "inventory_mgr",
+      "email": "inventory.mgr@bloodbank.internal",
+      "firstName": "Inventory",
+      "lastName": "Manager",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
+        "phoneNumber": ["+91-9000000011"]
+      },
+      "clientRoles": {
+        "bloodbank-api": ["INVENTORY_MANAGER"]
+      },
+      "realmRoles": ["default-roles-bloodbank"],
+      "groups": ["/regions/north-india/delhi-branch"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000012",
+      "username": "billing_clerk",
+      "email": "billing.clerk@bloodbank.internal",
+      "firstName": "Billing",
+      "lastName": "Clerk",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
+        "phoneNumber": ["+91-9000000012"]
+      },
+      "clientRoles": {
+        "bloodbank-api": ["BILLING_CLERK"]
+      },
+      "realmRoles": ["default-roles-bloodbank"],
+      "groups": ["/regions/north-india/delhi-branch"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000013",
+      "username": "camp_coord",
+      "email": "camp.coord@bloodbank.internal",
+      "firstName": "Camp",
+      "lastName": "Coordinator",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
+        "phoneNumber": ["+91-9000000013"]
+      },
+      "clientRoles": {
+        "bloodbank-api": ["CAMP_COORDINATOR"]
+      },
+      "realmRoles": ["default-roles-bloodbank"],
+      "groups": ["/regions/north-india/delhi-branch"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000014",
+      "username": "receptionist",
+      "email": "receptionist@bloodbank.internal",
+      "firstName": "Front",
+      "lastName": "Receptionist",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
+        "phoneNumber": ["+91-9000000014"]
+      },
+      "clientRoles": {
+        "bloodbank-api": ["RECEPTIONIST"]
+      },
+      "realmRoles": ["default-roles-bloodbank"],
+      "groups": ["/regions/north-india/delhi-branch"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000015",
+      "username": "hospital_user",
+      "email": "hospital.user@city-hospital.example.com",
+      "firstName": "Hospital",
+      "lastName": "User",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": [""],
+        "phoneNumber": ["+91-9000000015"]
+      },
+      "clientRoles": {
+        "bloodbank-api": ["HOSPITAL_USER"]
+      },
+      "realmRoles": ["default-roles-bloodbank"],
+      "groups": ["/hospitals/city-general-hospital"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Portal@1234!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "uu000009-0000-0000-0000-000000000016",
+      "username": "donor_user",
+      "email": "donor.user@example.com",
+      "firstName": "Test",
+      "lastName": "Donor",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": {
+        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
+        "bloodGroup": ["O+"],
+        "phoneNumber": ["+91-9000000016"]
+      },
+      "clientRoles": {
+        "bloodbank-api": ["DONOR"]
+      },
+      "realmRoles": ["default-roles-bloodbank"],
+      "groups": ["/regions/north-india/delhi-branch"],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Donor@1234!",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}
