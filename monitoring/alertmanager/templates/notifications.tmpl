@@ -1,0 +1,92 @@
+{{ define "email.bloodbank.subject" }}
+[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .GroupLabels.SortedPairs.Values | join " " }} {{ if gt (len .CommonLabels) (len .GroupLabels) }}({{ with .CommonLabels.Remove .GroupLabels.Names }}{{ .Values | join " " }}{{ end }}){{ end }}
+{{ end }}
+
+{{ define "email.bloodbank.html" }}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 14px; color: #333; }
+    .header { background-color: #c0392b; color: white; padding: 16px; border-radius: 4px 4px 0 0; }
+    .header.resolved { background-color: #27ae60; }
+    .content { padding: 16px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 4px 4px; }
+    .alert { margin-bottom: 16px; padding: 12px; border-left: 4px solid #c0392b; background: #fdf2f2; }
+    .alert.resolved { border-left-color: #27ae60; background: #f0faf4; }
+    .label { display: inline-block; background: #eee; border-radius: 3px; padding: 2px 6px; margin: 2px; font-size: 12px; }
+    .label.critical { background: #fadbd8; color: #c0392b; }
+    .label.warning { background: #fef9e7; color: #d68910; }
+    .footer { font-size: 12px; color: #999; margin-top: 16px; }
+    a { color: #2980b9; }
+  </style>
+</head>
+<body>
+  <div class="header {{ if eq .Status "resolved" }}resolved{{ end }}">
+    <strong>BloodBank Alert — {{ .Status | toUpper }}</strong>
+  </div>
+  <div class="content">
+    {{ if gt (len .Alerts.Firing) 0 }}
+    <h3>🔴 Firing Alerts ({{ .Alerts.Firing | len }})</h3>
+    {{ range .Alerts.Firing }}
+    <div class="alert">
+      <strong>{{ .Annotations.summary }}</strong><br/>
+      <em>{{ .Annotations.description }}</em><br/>
+      <br/>
+      {{ range .Labels.SortedPairs }}
+      <span class="label {{ .Value }}">{{ .Name }}={{ .Value }}</span>
+      {{ end }}
+      <br/><br/>
+      {{ if .Annotations.runbook_url }}
+      <a href="{{ .Annotations.runbook_url }}">📖 Runbook</a> |
+      {{ end }}
+      <a href="http://grafana:3000">📊 Grafana</a>
+      <br/>
+      <small>Started: {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}</small>
+    </div>
+    {{ end }}
+    {{ end }}
+
+    {{ if gt (len .Alerts.Resolved) 0 }}
+    <h3>✅ Resolved Alerts ({{ .Alerts.Resolved | len }})</h3>
+    {{ range .Alerts.Resolved }}
+    <div class="alert resolved">
+      <strong>{{ .Annotations.summary }}</strong><br/>
+      {{ range .Labels.SortedPairs }}
+      <span class="label">{{ .Name }}={{ .Value }}</span>
+      {{ end }}
+      <br/>
+      <small>Resolved: {{ .EndsAt.Format "2006-01-02 15:04:05 UTC" }}</small>
+    </div>
+    {{ end }}
+    {{ end }}
+
+    <div class="footer">
+      BloodBank Monitoring System | <a href="http://alertmanager:9093">Alertmanager</a> | <a href="http://grafana:3000">Grafana</a>
+    </div>
+  </div>
+</body>
+</html>
+{{ end }}
+
+{{ define "slack.bloodbank.title" }}
+{{ if eq .Status "firing" }}🔴{{ else }}✅{{ end }} [{{ .Status | toUpper }}] {{ .CommonAnnotations.summary }}
+{{ end }}
+
+{{ define "slack.bloodbank.text" }}
+{{ .CommonAnnotations.description }}
+
+*Labels:*
+{{ range .CommonLabels.SortedPairs }}• `{{ .Name }}`: `{{ .Value }}`
+{{ end }}
+{{ if .CommonAnnotations.runbook_url }}
+*Runbook:* {{ .CommonAnnotations.runbook_url }}
+{{ end }}
+{{ if gt (len .Alerts.Firing) 1 }}*Affected instances ({{ .Alerts.Firing | len }}):*
+{{ range .Alerts.Firing }}• {{ .Labels.instance }} (since {{ .StartsAt.Format "15:04:05 UTC" }})
+{{ end }}{{ end }}
+{{ end }}
+
+{{ define "pagerduty.bloodbank.description" }}
+[BloodBank] {{ .CommonAnnotations.summary }} | Service: {{ .CommonLabels.service }} | Severity: {{ .CommonLabels.severity }}
+{{ end }}

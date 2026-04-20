@@ -1,0 +1,157 @@
+{
+  "title": "Business Metrics",
+  "uid": "bloodbank-business-metrics",
+  "tags": ["bloodbank", "business", "clinical"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "1m",
+  "time": { "from": "now-24h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "branch",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": "label_values(bloodbank_stock_units_available, branch)",
+        "multi": true,
+        "includeAll": true,
+        "current": { "text": "All", "value": "$__all" },
+        "refresh": 2
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Donations Today",
+      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short" } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(increase(bloodbank_donations_total{branch=~\"$branch\"}[24h]))", "legendFormat": "Donations" }]
+    },
+    {
+      "type": "stat",
+      "title": "Active Blood Stock",
+      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 50 }, { "color": "green", "value": 100 }] }
+        }
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(bloodbank_stock_units_available{status=\"available\",branch=~\"$branch\"})", "legendFormat": "Units" }]
+    },
+    {
+      "type": "stat",
+      "title": "Active Emergencies",
+      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] }
+        }
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(bloodbank_emergency_requests_pending{branch=~\"$branch\"}) or vector(0)", "legendFormat": "Emergencies" }]
+    },
+    {
+      "type": "stat",
+      "title": "Transfusions Today",
+      "gridPos": { "x": 12, "y": 0, "w": 4, "h": 4 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short" } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(increase(bloodbank_transfusions_total{branch=~\"$branch\"}[24h]))", "legendFormat": "Transfusions" }]
+    },
+    {
+      "type": "stat",
+      "title": "Expiring Units (24h)",
+      "gridPos": { "x": 16, "y": 0, "w": 4, "h": 4 },
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 5 }] }
+        }
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(bloodbank_units_expiring_soon{window=\"24h\",branch=~\"$branch\"}) or vector(0)", "legendFormat": "Expiring" }]
+    },
+    {
+      "type": "stat",
+      "title": "Active Blood Camps",
+      "gridPos": { "x": 20, "y": 0, "w": 4, "h": 4 },
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short" } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(bloodbank_camps_active{branch=~\"$branch\"}) or vector(0)", "legendFormat": "Camps" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Donations per Day",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "fieldConfig": { "defaults": { "unit": "short" } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (branch) (increase(bloodbank_donations_total{branch=~\"$branch\"}[$__interval]))", "legendFormat": "{{branch}}" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Blood Stock Level Over Time",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": [
+          { "matcher": { "id": "byType", "options": "number" }, "properties": [
+            { "id": "custom.thresholdsStyle", "value": { "mode": "area" } },
+            { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 20 }, { "color": "green", "value": 50 }] } }
+          ]}
+        ]
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (blood_group) (bloodbank_stock_units_available{status=\"available\",branch=~\"$branch\"})", "legendFormat": "{{blood_group}}" }]
+    },
+    {
+      "type": "bargauge",
+      "title": "Stock by Blood Group",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+      "options": {
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "displayMode": "lcd"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 10 }, { "color": "green", "value": 20 }] }
+        }
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (blood_group) (bloodbank_stock_units_available{status=\"available\",branch=~\"$branch\"})", "legendFormat": "{{blood_group}}" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Emergency Requests Over Time",
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
+      "fieldConfig": { "defaults": { "unit": "short" } },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (branch) (bloodbank_emergency_requests_pending{branch=~\"$branch\"})", "legendFormat": "Pending {{branch}}" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(increase(bloodbank_emergency_requests_total{branch=~\"$branch\"}[$__interval]))", "legendFormat": "New Requests" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Transfusion Reactions",
+      "gridPos": { "x": 0, "y": 20, "w": 12, "h": 8 },
+      "fieldConfig": { "defaults": { "unit": "short" } },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (reaction_type) (increase(bloodbank_transfusion_reactions_total{branch=~\"$branch\"}[$__interval]))", "legendFormat": "{{reaction_type}}" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Lab Test Results",
+      "gridPos": { "x": 12, "y": 20, "w": 12, "h": 8 },
+      "fieldConfig": { "defaults": { "unit": "short" } },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(increase(bloodbank_lab_tests_completed_total{branch=~\"$branch\"}[$__interval]))", "legendFormat": "Completed" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(increase(bloodbank_lab_tests_positive_total{branch=~\"$branch\"}[$__interval]))", "legendFormat": "Positive" }
+      ]
+    }
+  ]
+}

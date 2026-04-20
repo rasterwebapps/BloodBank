@@ -1,0 +1,227 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+  external_labels:
+    cluster: bloodbank
+    environment: production
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+rule_files:
+  - /etc/prometheus/alert-rules.yml
+
+scrape_configs:
+  # ─── Prometheus self-monitoring ──────────────────────────────────────────────
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - localhost:9090
+
+  # ─── API Gateway ─────────────────────────────────────────────────────────────
+  - job_name: api-gateway
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - api-gateway:8080
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service
+        replacement: api-gateway
+
+  # ─── Config Server ────────────────────────────────────────────────────────────
+  - job_name: config-server
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - config-server:8888
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service
+        replacement: config-server
+
+  # ─── Branch Service ───────────────────────────────────────────────────────────
+  - job_name: branch-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - branch-service:8081
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service
+        replacement: branch-service
+
+  # ─── Donor Service ────────────────────────────────────────────────────────────
+  - job_name: donor-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - donor-service:8082
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service
+        replacement: donor-service
+
+  # ─── Lab Service ─────────────────────────────────────────────────────────────
+  - job_name: lab-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - lab-service:8083
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service
+        replacement: lab-service
+
+  # ─── Inventory Service ────────────────────────────────────────────────────────
+  - job_name: inventory-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - inventory-service:8084
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service
+        replacement: inventory-service
+
+  # ─── Transfusion Service ──────────────────────────────────────────────────────
+  - job_name: transfusion-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - transfusion-service:8085
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service
+        replacement: transfusion-service
+
+  # ─── Hospital Service ─────────────────────────────────────────────────────────
+  - job_name: hospital-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - hospital-service:8086
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service
+        replacement: hospital-service
+
+  # ─── Request Matching Service ─────────────────────────────────────────────────
+  - job_name: request-matching-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - request-matching-service:8087
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service
+        replacement: request-matching-service
+
+  # ─── Billing Service ──────────────────────────────────────────────────────────
+  - job_name: billing-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - billing-service:8088
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service
+        replacement: billing-service
+
+  # ─── Notification Service ─────────────────────────────────────────────────────
+  - job_name: notification-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - notification-service:8089
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service
+        replacement: notification-service
+
+  # ─── Reporting Service ────────────────────────────────────────────────────────
+  - job_name: reporting-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - reporting-service:8090
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service
+        replacement: reporting-service
+
+  # ─── Document Service ─────────────────────────────────────────────────────────
+  - job_name: document-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - document-service:8091
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service
+        replacement: document-service
+
+  # ─── Compliance Service ───────────────────────────────────────────────────────
+  - job_name: compliance-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - compliance-service:8092
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - target_label: service
+        replacement: compliance-service
+
+  # ─── PostgreSQL ───────────────────────────────────────────────────────────────
+  - job_name: postgres
+    static_configs:
+      - targets:
+          - postgres-exporter:9187
+    relabel_configs:
+      - target_label: service
+        replacement: postgres
+
+  # ─── Redis ────────────────────────────────────────────────────────────────────
+  - job_name: redis
+    static_configs:
+      - targets:
+          - redis-exporter:9121
+    relabel_configs:
+      - target_label: service
+        replacement: redis
+
+  # ─── RabbitMQ ─────────────────────────────────────────────────────────────────
+  - job_name: rabbitmq
+    static_configs:
+      - targets:
+          - rabbitmq:15692
+    relabel_configs:
+      - target_label: service
+        replacement: rabbitmq
+
+  # ─── Node Exporter (host metrics) ────────────────────────────────────────────
+  - job_name: node-exporter
+    static_configs:
+      - targets:
+          - node-exporter:9100
+    relabel_configs:
+      - target_label: service
+        replacement: node-exporter

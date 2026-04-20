@@ -1,0 +1,171 @@
+{
+  "title": "API Performance",
+  "uid": "bloodbank-api-performance",
+  "tags": ["bloodbank", "api", "performance"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "service",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": "label_values(http_server_requests_seconds_count, job)",
+        "multi": false,
+        "includeAll": false,
+        "refresh": 2
+      },
+      {
+        "name": "uri",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": "label_values(http_server_requests_seconds_count{job=\"$service\"}, uri)",
+        "multi": true,
+        "includeAll": true,
+        "current": { "text": "All", "value": "$__all" },
+        "refresh": 2
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Total Requests (5m)",
+      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "reqps" } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))", "legendFormat": "req/s" }]
+    },
+    {
+      "type": "stat",
+      "title": "4xx Client Errors",
+      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
+      "options": { "colorMode": "background", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.5 }, { "color": "orange", "value": 2 }] }
+        }
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(http_server_requests_seconds_count{job=\"$service\",status=~\"4..\"}[5m]))", "legendFormat": "4xx/s" }]
+    },
+    {
+      "type": "stat",
+      "title": "5xx Server Errors",
+      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
+      "options": { "colorMode": "background", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 0.1 }] }
+        }
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(http_server_requests_seconds_count{job=\"$service\",status=~\"5..\"}[5m]))", "legendFormat": "5xx/s" }]
+    },
+    {
+      "type": "stat",
+      "title": "P50 Latency",
+      "gridPos": { "x": 12, "y": 0, "w": 3, "h": 4 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.50, sum by (le) (rate(http_server_requests_seconds_bucket{job=\"$service\"}[5m])))", "legendFormat": "P50" }]
+    },
+    {
+      "type": "stat",
+      "title": "P95 Latency",
+      "gridPos": { "x": 15, "y": 0, "w": 3, "h": 4 },
+      "options": { "colorMode": "background", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.2 }, { "color": "red", "value": 0.5 }] }
+        }
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_requests_seconds_bucket{job=\"$service\"}[5m])))", "legendFormat": "P95" }]
+    },
+    {
+      "type": "stat",
+      "title": "P99 Latency",
+      "gridPos": { "x": 18, "y": 0, "w": 3, "h": 4 },
+      "options": { "colorMode": "background", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.5 }, { "color": "red", "value": 1.0 }] }
+        }
+      },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.99, sum by (le) (rate(http_server_requests_seconds_bucket{job=\"$service\"}[5m])))", "legendFormat": "P99" }]
+    },
+    {
+      "type": "stat",
+      "title": "Max Latency",
+      "gridPos": { "x": 21, "y": 0, "w": 3, "h": 4 },
+      "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(1.0, sum by (le) (rate(http_server_requests_seconds_bucket{job=\"$service\"}[5m])))", "legendFormat": "Max" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Throughput by Endpoint",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "fieldConfig": { "defaults": { "unit": "reqps" } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (uri, method) (rate(http_server_requests_seconds_count{job=\"$service\",uri=~\"$uri\"}[5m]))", "legendFormat": "{{method}} {{uri}}" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Error Rate by HTTP Status",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "fieldConfig": { "defaults": { "unit": "reqps" } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (status) (rate(http_server_requests_seconds_count{job=\"$service\",status!~\"2..\",uri=~\"$uri\"}[5m]))", "legendFormat": "HTTP {{status}}" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Latency by Endpoint (P95)",
+      "gridPos": { "x": 0, "y": 12, "w": 24, "h": 8 },
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "histogram_quantile(0.95, sum by (uri, method, le) (rate(http_server_requests_seconds_bucket{job=\"$service\",uri=~\"$uri\"}[5m])))", "legendFormat": "P95 {{method}} {{uri}}" }]
+    },
+    {
+      "type": "table",
+      "title": "Slowest Endpoints (P95)",
+      "gridPos": { "x": 0, "y": 20, "w": 12, "h": 8 },
+      "options": { "sortBy": [{ "displayName": "P95 Latency", "desc": true }] },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "P95 Latency" }, "properties": [{ "id": "unit", "value": "s" }, { "id": "custom.displayMode", "value": "color-background" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.2 }, { "color": "red", "value": 0.5 }] } }] },
+          { "matcher": { "id": "byName", "options": "Request Rate" }, "properties": [{ "id": "unit", "value": "reqps" }] }
+        ]
+      },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "topk(10, histogram_quantile(0.95, sum by (uri, method, le) (rate(http_server_requests_seconds_bucket{job=\"$service\"}[5m]))))", "legendFormat": "{{method}} {{uri}}", "instant": true, "refId": "p95" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (uri, method) (rate(http_server_requests_seconds_count{job=\"$service\"}[5m]))", "legendFormat": "{{method}} {{uri}}", "instant": true, "refId": "rps" }
+      ],
+      "transformations": [
+        { "id": "merge", "options": {} },
+        { "id": "organize", "options": { "renameByName": { "Value #p95": "P95 Latency", "Value #rps": "Request Rate" } } }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Top Error Endpoints",
+      "gridPos": { "x": 12, "y": 20, "w": 12, "h": 8 },
+      "options": { "sortBy": [{ "displayName": "Error Rate", "desc": true }] },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Error Rate" }, "properties": [{ "id": "unit", "value": "percentunit" }, { "id": "custom.displayMode", "value": "color-background" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.01 }, { "color": "red", "value": 0.05 }] } }] }
+        ]
+      },
+      "targets": [
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "topk(10, sum by (uri, method) (rate(http_server_requests_seconds_count{job=\"$service\",status=~\"5..\"}[5m])) / sum by (uri, method) (rate(http_server_requests_seconds_count{job=\"$service\"}[5m])))", "legendFormat": "{{method}} {{uri}}", "instant": true }
+      ],
+      "transformations": [
+        { "id": "organize", "options": { "renameByName": { "Value": "Error Rate" } } }
+      ]
+    }
+  ]
+}
