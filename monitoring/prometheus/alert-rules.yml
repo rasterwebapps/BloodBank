@@ -273,7 +273,7 @@ groups:
           description: "PostgreSQL is using {{ $value | humanizePercentage }} of max connections."
 
       - alert: PostgresSlowQueries
-        expr: rate(pg_stat_activity_max_tx_duration{state="active"}[5m]) > 30
+        expr: pg_stat_activity_max_tx_duration{state="active"} > 30
         for: 5m
         labels:
           severity: warning
@@ -312,6 +312,8 @@ groups:
     interval: 30s
     rules:
       - alert: SLOErrorBudgetBurnRateHigh
+        # Burn rate > 14.4x means the monthly error budget (0.1% = 0.001) will be
+        # exhausted in less than 2 days if this rate continues.
         expr: |
           (
             sum(rate(http_server_requests_seconds_count{status=~"5.."}[1h]))
@@ -327,6 +329,8 @@ groups:
           description: "Error budget burn rate is {{ $value | humanize }}x the allowed rate. The monthly error budget will be exhausted in less than 2 days."
 
       - alert: SLOErrorBudgetBurnRateWarning
+        # Burn rate > 6x over 6h means the monthly error budget (0.1% = 0.001) will be
+        # exhausted in less than 5 days if this rate continues.
         expr: |
           (
             sum(rate(http_server_requests_seconds_count{status=~"5.."}[6h]))

@@ -65,6 +65,7 @@ scrape_configs:
       - labels:
           level:
           traceId:
+          spanId:
       - timestamp:
           source: timestamp
           format: RFC3339Nano
@@ -89,6 +90,7 @@ scrape_configs:
       - labels:
           level:
           traceId:
+          spanId:
       - timestamp:
           source: timestamp
           format: RFC3339Nano
@@ -113,6 +115,7 @@ scrape_configs:
       - labels:
           level:
           traceId:
+          spanId:
       - timestamp:
           source: timestamp
           format: RFC3339Nano
@@ -137,6 +140,7 @@ scrape_configs:
       - labels:
           level:
           traceId:
+          spanId:
       - timestamp:
           source: timestamp
           format: RFC3339Nano
@@ -161,6 +165,7 @@ scrape_configs:
       - labels:
           level:
           traceId:
+          spanId:
       - timestamp:
           source: timestamp
           format: RFC3339Nano
@@ -185,6 +190,7 @@ scrape_configs:
       - labels:
           level:
           traceId:
+          spanId:
       - timestamp:
           source: timestamp
           format: RFC3339Nano
@@ -209,6 +215,7 @@ scrape_configs:
       - labels:
           level:
           traceId:
+          spanId:
       - timestamp:
           source: timestamp
           format: RFC3339Nano
@@ -233,6 +240,7 @@ scrape_configs:
       - labels:
           level:
           traceId:
+          spanId:
       - timestamp:
           source: timestamp
           format: RFC3339Nano
@@ -257,6 +265,7 @@ scrape_configs:
       - labels:
           level:
           traceId:
+          spanId:
       - timestamp:
           source: timestamp
           format: RFC3339Nano
@@ -281,6 +290,7 @@ scrape_configs:
       - labels:
           level:
           traceId:
+          spanId:
       - timestamp:
           source: timestamp
           format: RFC3339Nano
@@ -305,6 +315,7 @@ scrape_configs:
       - labels:
           level:
           traceId:
+          spanId:
       - timestamp:
           source: timestamp
           format: RFC3339Nano
@@ -329,6 +340,7 @@ scrape_configs:
       - labels:
           level:
           traceId:
+          spanId:
       - timestamp:
           source: timestamp
           format: RFC3339Nano
