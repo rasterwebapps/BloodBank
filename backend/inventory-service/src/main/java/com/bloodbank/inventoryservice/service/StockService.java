@@ -17,6 +17,8 @@ import com.bloodbank.inventoryservice.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,6 +64,7 @@ public class StockService {
         this.eventPublisher = eventPublisher;
     }
 
+    @Cacheable(value = "stockLevels", key = "'' + #branchId + ':' + #bloodGroupId + ':' + #componentTypeId")
     public List<StockLevelResponse> getStockLevels(UUID branchId, UUID bloodGroupId, UUID componentTypeId) {
         log.info("Getting stock levels for branch: {}", branchId);
         List<StockLevelResponse> levels = new ArrayList<>();
@@ -80,6 +83,7 @@ public class StockService {
     }
 
     @Transactional
+    @CacheEvict(value = "stockLevels", allEntries = true)
     public BloodComponentResponse dispatchComponent(UUID componentTypeId, UUID bloodGroupId) {
         log.info("Dispatching component, type: {}, blood group: {}", componentTypeId, bloodGroupId);
         // FEFO: First Expiry, First Out
@@ -113,6 +117,7 @@ public class StockService {
     }
 
     @Transactional
+    @CacheEvict(value = "stockLevels", allEntries = true)
     public UnitDisposalResponse disposeUnit(UnitDisposalCreateRequest request) {
         log.info("Disposing unit, reason: {}", request.disposalReason());
 
@@ -138,6 +143,7 @@ public class StockService {
     }
 
     @Transactional
+    @CacheEvict(value = "stockLevels", allEntries = true)
     public UnitReservationResponse reserveComponent(UnitReservationCreateRequest request) {
         log.info("Reserving component: {} for: {}", request.componentId(), request.reservedFor());
         BloodComponent component = bloodComponentRepository.findById(request.componentId())

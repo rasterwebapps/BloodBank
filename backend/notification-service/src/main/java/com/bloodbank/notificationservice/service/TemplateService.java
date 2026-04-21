@@ -9,6 +9,8 @@ import com.bloodbank.notificationservice.repository.NotificationTemplateReposito
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ public class TemplateService {
     }
 
     @Transactional
+    @CacheEvict(value = "notificationTemplates", allEntries = true)
     public NotificationTemplateResponse create(NotificationTemplateCreateRequest request) {
         log.info("Creating notification template: code={}, name={}",
                 request.templateCode(), request.templateName());
@@ -40,6 +43,7 @@ public class TemplateService {
         return templateMapper.toResponse(template);
     }
 
+    @Cacheable(value = "notificationTemplates", key = "#id")
     public NotificationTemplateResponse getById(UUID id) {
         NotificationTemplate template = templateRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("NotificationTemplate", "id", id));
@@ -50,6 +54,7 @@ public class TemplateService {
         return templateMapper.toResponseList(templateRepository.findAll());
     }
 
+    @Cacheable(value = "notificationTemplates", key = "'active'")
     public List<NotificationTemplateResponse> getActiveTemplates() {
         return templateMapper.toResponseList(templateRepository.findByIsActiveTrue());
     }
@@ -59,6 +64,7 @@ public class TemplateService {
     }
 
     @Transactional
+    @CacheEvict(value = "notificationTemplates", key = "#id")
     public NotificationTemplateResponse deactivate(UUID id) {
         log.info("Deactivating notification template: id={}", id);
         NotificationTemplate template = templateRepository.findById(id)

@@ -10,14 +10,19 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.QueryHints;
+import jakarta.persistence.QueryHint;
 
 @Repository
 public interface SopDocumentRepository extends JpaRepository<SopDocument, UUID>,
                                                 JpaSpecificationExecutor<SopDocument> {
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     List<SopDocument> findByFrameworkId(UUID frameworkId);
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     List<SopDocument> findByStatus(SopStatusEnum status);
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     List<SopDocument> findByCategory(SopCategoryEnum category);
 }

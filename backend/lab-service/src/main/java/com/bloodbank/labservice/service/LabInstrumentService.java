@@ -10,6 +10,8 @@ import com.bloodbank.labservice.repository.LabInstrumentRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,10 +44,12 @@ public class LabInstrumentService {
         return labInstrumentMapper.toResponse(instrument);
     }
 
+    @Cacheable(value = "instruments", key = "#branchId")
     public List<LabInstrumentResponse> getInstrumentsByBranch(UUID branchId) {
         return labInstrumentMapper.toResponseList(labInstrumentRepository.findByBranchId(branchId));
     }
 
+    @Cacheable(value = "instruments", key = "#id")
     public LabInstrumentResponse getInstrumentById(UUID id) {
         LabInstrument instrument = labInstrumentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("LabInstrument", "id", id));
@@ -53,6 +57,7 @@ public class LabInstrumentService {
     }
 
     @Transactional
+    @CacheEvict(value = "instruments", key = "#id")
     public LabInstrumentResponse updateInstrumentStatus(UUID id, InstrumentStatusEnum status) {
         LabInstrument instrument = labInstrumentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("LabInstrument", "id", id));

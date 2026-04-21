@@ -12,16 +12,22 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.QueryHints;
+import jakarta.persistence.QueryHint;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, UUID>,
                                            JpaSpecificationExecutor<Invoice> {
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     Optional<Invoice> findByInvoiceNumber(String invoiceNumber);
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     List<Invoice> findByHospitalId(UUID hospitalId);
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     List<Invoice> findByStatus(InvoiceStatusEnum status);
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     Page<Invoice> findByBranchId(UUID branchId, Pageable pageable);
 }

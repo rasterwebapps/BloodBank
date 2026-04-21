@@ -12,6 +12,8 @@ import com.bloodbank.complianceservice.repository.SopDocumentRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,7 @@ public class SopService {
     }
 
     @Transactional
+    @CacheEvict(value = "sopDocuments", allEntries = true)
     public SopResponse create(SopCreateRequest request) {
         log.info("Creating SOP document: code={}, title={}", request.sopCode(), request.sopTitle());
         SopDocument sop = sopMapper.toEntity(request);
@@ -46,6 +49,7 @@ public class SopService {
         return sopMapper.toResponse(sop);
     }
 
+    @Cacheable(value = "sopDocuments", key = "#id")
     public SopResponse getById(UUID id) {
         SopDocument sop = sopRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SopDocument", "id", id));
@@ -65,6 +69,7 @@ public class SopService {
     }
 
     @Transactional
+    @CacheEvict(value = "sopDocuments", key = "#id")
     public SopResponse updateStatus(UUID id, SopStatusEnum newStatus) {
         SopDocument sop = sopRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SopDocument", "id", id));
@@ -77,6 +82,7 @@ public class SopService {
     }
 
     @Transactional
+    @CacheEvict(value = "sopDocuments", key = "#id")
     public SopResponse approve(UUID id, String approvedBy) {
         SopDocument sop = sopRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SopDocument", "id", id));
@@ -94,6 +100,7 @@ public class SopService {
     }
 
     @Transactional
+    @CacheEvict(value = "sopDocuments", key = "#id")
     public SopResponse retire(UUID id) {
         SopDocument sop = sopRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SopDocument", "id", id));

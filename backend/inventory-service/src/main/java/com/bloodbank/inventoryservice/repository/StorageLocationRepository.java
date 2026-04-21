@@ -9,13 +9,18 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.QueryHints;
+import jakarta.persistence.QueryHint;
 
 public interface StorageLocationRepository extends JpaRepository<StorageLocation, UUID>,
                                                    JpaSpecificationExecutor<StorageLocation> {
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     List<StorageLocation> findByLocationType(StorageLocationTypeEnum locationType);
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     List<StorageLocation> findByStatus(StorageLocationStatusEnum status);
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     Optional<StorageLocation> findByLocationCode(String locationCode);
 }

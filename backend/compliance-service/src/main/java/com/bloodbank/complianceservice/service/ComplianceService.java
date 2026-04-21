@@ -9,6 +9,8 @@ import com.bloodbank.complianceservice.repository.RegulatoryFrameworkRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ public class ComplianceService {
     }
 
     @Transactional
+    @CacheEvict(value = "regulatoryFrameworks", allEntries = true)
     public RegulatoryFrameworkResponse create(RegulatoryFrameworkCreateRequest request) {
         log.info("Creating regulatory framework: code={}, name={}", request.frameworkCode(), request.frameworkName());
         RegulatoryFramework framework = frameworkMapper.toEntity(request);
@@ -38,12 +41,14 @@ public class ComplianceService {
         return frameworkMapper.toResponse(framework);
     }
 
+    @Cacheable(value = "regulatoryFrameworks", key = "#id")
     public RegulatoryFrameworkResponse getById(UUID id) {
         RegulatoryFramework framework = frameworkRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("RegulatoryFramework", "id", id));
         return frameworkMapper.toResponse(framework);
     }
 
+    @Cacheable(value = "regulatoryFrameworks", key = "'all'")
     public List<RegulatoryFrameworkResponse> getAll() {
         return frameworkMapper.toResponseList(frameworkRepository.findAll());
     }
@@ -54,11 +59,13 @@ public class ComplianceService {
         return frameworkMapper.toResponse(framework);
     }
 
+    @Cacheable(value = "regulatoryFrameworks", key = "'active'")
     public List<RegulatoryFrameworkResponse> getActiveFrameworks() {
         return frameworkMapper.toResponseList(frameworkRepository.findByIsActive(true));
     }
 
     @Transactional
+    @CacheEvict(value = "regulatoryFrameworks", allEntries = true)
     public RegulatoryFrameworkResponse update(UUID id, RegulatoryFrameworkCreateRequest request) {
         RegulatoryFramework framework = frameworkRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("RegulatoryFramework", "id", id));
@@ -78,6 +85,7 @@ public class ComplianceService {
     }
 
     @Transactional
+    @CacheEvict(value = "regulatoryFrameworks", allEntries = true)
     public RegulatoryFrameworkResponse deactivate(UUID id) {
         RegulatoryFramework framework = frameworkRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("RegulatoryFramework", "id", id));

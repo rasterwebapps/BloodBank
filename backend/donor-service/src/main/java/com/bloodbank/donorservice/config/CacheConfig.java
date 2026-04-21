@@ -17,21 +17,24 @@ public class CacheConfig {
 
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        // Default TTL: 30 minutes for general data
         RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofHours(1))
+                .entryTtl(Duration.ofMinutes(30))
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
                                 new GenericJackson2JsonRedisSerializer()));
 
-        RedisCacheConfiguration longLivedConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofHours(4))
+        // 5 minutes for frequently-changing data (stock levels, eligibility)
+        RedisCacheConfiguration shortLivedConfig = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(5))
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
                                 new GenericJackson2JsonRedisSerializer()));
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultConfig)
-                .withCacheConfiguration("donors", longLivedConfig)
+                .withCacheConfiguration("donors", defaultConfig)
+                .withCacheConfiguration("donorEligibility", shortLivedConfig)
                 .withCacheConfiguration("collections", defaultConfig)
                 .withCacheConfiguration("bloodCamps", defaultConfig)
                 .build();

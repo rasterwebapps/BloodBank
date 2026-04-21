@@ -30,6 +30,8 @@ import com.bloodbank.donorservice.repository.DonorRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -111,6 +113,7 @@ public class DonorService {
     }
 
     @Transactional
+    @CacheEvict(value = "donors", key = "#id")
     public DonorResponse updateDonor(UUID id, DonorUpdateRequest request) {
         log.info("Updating donor: {}", id);
 
@@ -137,6 +140,7 @@ public class DonorService {
         return donorMapper.toResponse(donor);
     }
 
+    @Cacheable(value = "donors", key = "#id")
     public DonorResponse getDonorById(UUID id) {
         log.debug("Fetching donor by id: {}", id);
         Donor donor = donorRepository.findById(id)
@@ -188,6 +192,7 @@ public class DonorService {
         return deferralMapper.toResponse(deferral);
     }
 
+    @Cacheable(value = "donorEligibility", key = "#donorId")
     public DonorHealthRecordResponse checkEligibility(UUID donorId) {
         log.info("Checking eligibility for donor: {}", donorId);
 

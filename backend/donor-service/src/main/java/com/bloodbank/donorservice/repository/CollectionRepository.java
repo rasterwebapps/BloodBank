@@ -12,16 +12,22 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.QueryHints;
+import jakarta.persistence.QueryHint;
 
 @Repository
 public interface CollectionRepository extends JpaRepository<Collection, UUID>, JpaSpecificationExecutor<Collection> {
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     Optional<Collection> findByCollectionNumber(String collectionNumber);
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     List<Collection> findByDonorId(UUID donorId);
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     List<Collection> findByDonorIdOrderByCollectionDateDesc(UUID donorId);
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     Page<Collection> findByStatus(CollectionStatusEnum status, Pageable pageable);
 
     boolean existsByCollectionNumber(String collectionNumber);
