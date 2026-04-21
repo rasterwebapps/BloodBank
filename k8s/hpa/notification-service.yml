@@ -1,0 +1,30 @@
+# HPA for notification-service — min 2, max 8, CPU target 70%
+# Namespace options: bloodbank-dev | bloodbank-staging | bloodbank-uat | bloodbank-prod
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: notification-service-hpa
+  namespace: bloodbank-prod
+  labels:
+    app.kubernetes.io/name: notification-service
+    app.kubernetes.io/part-of: bloodbank
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: notification-service
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
