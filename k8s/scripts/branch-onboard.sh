@@ -359,11 +359,18 @@ create_admin_user() {
     -d "[{\"id\":\"${role_id}\",\"name\":\"BRANCH_ADMIN\"}]" >/dev/null
   log_success "Role BRANCH_ADMIN assigned to ${ADMIN_USERNAME}"
 
-  # Add user to the branch group — use subGroups traversal for precise path matching
+  # Add user to the branch group.
+  # Walk the group tree explicitly via .subGroups to avoid full-tree recursion:
+  #   top-level groups → subGroups (region level) → subGroups (branch level)
   local branch_group_id
   branch_group_id=$(kc_api GET "/groups?search=${BRANCH_SLUG}&exact=false" \
     | jq -r --arg p "${KC_GROUP_PATH}" '
-        [ .. | objects | select(has("path") and .path == $p) | .id ] | first // empty
+        [
+          .[] |
+          (.subGroups // [])[] |
+          (.subGroups // [])[] |
+          select(.path == $p)
+        ] | first | .id // empty
       ' 2>/dev/null | head -1)
 
   if [[ -n "${branch_group_id}" ]]; then

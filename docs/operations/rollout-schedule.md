@@ -330,7 +330,7 @@ This template is used for **each batch**. Adjust role counts and room assignment
 
 | Property | Value |
 |---|---|
-| URL | `https://training.bloodbank.example.com` |
+| URL | `https://training.bloodbank.<YOUR_DOMAIN>` (replace with actual training environment URL) |
 | Pre-loaded data | 500 synthetic donors, 200 synthetic blood units |
 | Nightly reset | 02:00 UTC (data reset to baseline each night) |
 | Access period | T−7 days through T+7 days post go-live |

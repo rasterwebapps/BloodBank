@@ -443,9 +443,9 @@ check_critical_workflows() {
     return
   fi
 
-  local branch_header=""
-  # branch_header is used as an explicit curl argument array element below
-  [[ -n "${BRANCH_UUID}" ]] && branch_header="X-Branch-Id: ${BRANCH_UUID}"
+  local branch_header_value=""
+  # branch_header_value holds the header string used in curl_args when BRANCH_UUID is set
+  [[ -n "${BRANCH_UUID}" ]] && branch_header_value="X-Branch-Id: ${BRANCH_UUID}"
 
   # Smoke test helper: check an endpoint returns expected HTTP status
   smoke_test() {
@@ -457,7 +457,7 @@ check_critical_workflows() {
     local curl_args=(-sS -o /dev/null -w "%{http_code}" --max-time 15
       "${url}"
       -H "Authorization: Bearer ${svc_token}")
-    [[ -n "${branch_header}" ]] && curl_args+=(-H "${branch_header}")
+    [[ -n "${branch_header_value}" ]] && curl_args+=(-H "${branch_header_value}")
 
     local actual_code
     actual_code=$(curl "${curl_args[@]}" 2>/dev/null || echo "000")

@@ -376,7 +376,9 @@ check_redis() {
   local hit_rate=0
   local hit_rate_display="0"
   if [[ ${total_ops} -gt 0 ]]; then
-    # Use bc for decimal precision if available, otherwise integer arithmetic
+    # Use bc for decimal precision if available, otherwise fall back to integer
+    # arithmetic. Note: integer division truncates (e.g. 75/100 → "75" not "75.0")
+    # — acceptable for threshold comparison; the unit is always whole-percent.
     if command -v bc &>/dev/null; then
       hit_rate_display=$(echo "scale=1; ${hits} * 100 / ${total_ops}" | bc 2>/dev/null || echo "0")
     else
