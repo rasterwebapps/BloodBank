@@ -1,0 +1,36 @@
+{
+  "name": "bloodbank-performance-tests",
+  "version": "1.0.0",
+  "description": "k6 performance test suite for the BloodBank platform",
+  "scripts": {
+    "test:donor-registration":   "k6 run tests/donor-registration.js",
+    "test:blood-request":        "k6 run tests/blood-request.js",
+    "test:inventory-search":     "k6 run tests/inventory-search.js",
+    "test:dashboard-load":       "k6 run tests/dashboard-load.js",
+    "test:report-generation":    "k6 run tests/report-generation.js",
+    "test:mixed-workload":       "k6 run tests/mixed-workload.js",
+
+    "stress:ramp":               "k6 run tests/stress-ramp.js",
+    "stress:spike":              "k6 run tests/stress-spike.js",
+    "stress:failure":            "k6 run tests/stress-failure.js",
+    "stress:connection-pool":    "k6 run tests/stress-connection-pool.js",
+
+    "endurance:4hr":             "k6 run tests/endurance-4hr.js",
+
+    "seed":                      "k6 run seed-database.js",
+
+    "test:all-load": "k6 run tests/donor-registration.js && k6 run tests/blood-request.js && k6 run tests/inventory-search.js && k6 run tests/dashboard-load.js && k6 run tests/report-generation.js && k6 run tests/mixed-workload.js",
+
+    "report": "k6 run --out json=results/output.json tests/mixed-workload.js"
+  },
+  "notes": {
+    "k6-installation": "k6 is NOT installed via npm. Install it separately: https://k6.io/docs/getting-started/installation/",
+    "linux":   "sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69 && echo 'deb https://dl.k6.io/deb stable main' | sudo tee /etc/apt/sources.list.d/k6.list && sudo apt-get update && sudo apt-get install k6",
+    "mac":     "brew install k6",
+    "docker":  "docker run --rm -i grafana/k6 run - <tests/mixed-workload.js",
+    "version": ">=0.47.0"
+  },
+  "devDependencies": {},
+  "keywords": ["k6", "performance", "load-testing", "bloodbank"],
+  "license": "MIT"
+}
