@@ -41,6 +41,14 @@ log_step()    { echo -e "\n${BOLD}${CYAN}=== $* ===${NC}"; }
 log_dry()     { echo -e "${YELLOW}[DRY-RUN]${NC} $(date '+%H:%M:%S') $*"; }
 
 # ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+# Convert a hyphenated/spaced string to Title Case (e.g. "central-city" → "Central City")
+titlecase_name() {
+  echo "$1" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)} 1'
+}
+
+# ---------------------------------------------------------------------------
 # Defaults
 # ---------------------------------------------------------------------------
 NAMESPACE="${BLOODBANK_NAMESPACE:-bloodbank-prod}"
@@ -310,7 +318,7 @@ create_admin_user() {
       \"username\":     \"${ADMIN_USERNAME}\",
       \"email\":        \"${ADMIN_EMAIL}\",
       \"firstName\":    \"Admin\",
-      \"lastName\":     \"$(echo "${BRANCH_NAME}" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2); print}')\",
+      \"lastName\":     \"$(titlecase_name "${BRANCH_NAME}")\",
       \"enabled\":      true,
       \"emailVerified\": true,
       \"requiredActions\": [\"UPDATE_PASSWORD\"],
@@ -351,11 +359,12 @@ create_admin_user() {
     -d "[{\"id\":\"${role_id}\",\"name\":\"BRANCH_ADMIN\"}]" >/dev/null
   log_success "Role BRANCH_ADMIN assigned to ${ADMIN_USERNAME}"
 
-  # Add user to the branch group
+  # Add user to the branch group — use subGroups traversal for precise path matching
   local branch_group_id
   branch_group_id=$(kc_api GET "/groups?search=${BRANCH_SLUG}&exact=false" \
-    | jq -r --arg p "${KC_GROUP_PATH}" '.[] | .. | objects | select(.path==$p) | .id // empty' \
-    2>/dev/null | head -1)
+    | jq -r --arg p "${KC_GROUP_PATH}" '
+        [ .. | objects | select(has("path") and .path == $p) | .id ] | first // empty
+      ' 2>/dev/null | head -1)
 
   if [[ -n "${branch_group_id}" ]]; then
     kc_api PUT "/users/${user_id}/groups/${branch_group_id}" >/dev/null

@@ -240,8 +240,9 @@ process_branch() {
   echo -e "${BOLD}  Region: ${region}  |  Admin: ${admin_email}  |  Priority: ${priority}${NC}"
   echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-  local dry_flag=""
-  [[ "${DRY_RUN}" == "true" ]] && dry_flag="--dry-run"
+  # Build optional flags array to avoid word-splitting issues with unquoted variables
+  local -a extra_flags=()
+  [[ "${DRY_RUN}" == "true" ]] && extra_flags+=("--dry-run")
 
   # -----------------------------------------------------------------------
   # Phase A: Onboarding
@@ -254,7 +255,7 @@ process_branch() {
       --region "${region}" \
       --admin-email "${admin_email}" \
       --namespace "${NAMESPACE}" \
-      ${dry_flag} 2>&1 | tee "${onboard_log}"; then
+      "${extra_flags[@]+"${extra_flags[@]}"}" 2>&1 | tee "${onboard_log}"; then
     ONBOARD_STATUS["${branch_name}"]="PASS"
     log_success "Onboarding PASSED: ${branch_name}"
   else
@@ -281,7 +282,7 @@ process_branch() {
       --branch "${branch_name}" \
       --region "${region}" \
       --namespace "${NAMESPACE}" \
-      ${dry_flag} 2>&1 | tee "${verify_log}"; then
+      "${extra_flags[@]+"${extra_flags[@]}"}" 2>&1 | tee "${verify_log}"; then
     VERIFY_STATUS["${branch_name}"]="PASS"
     log_success "Verification PASSED: ${branch_name}"
   else
@@ -302,7 +303,7 @@ process_branch() {
 
   if "${SCRIPT_DIR}/scaling-check.sh" \
       --namespace "${NAMESPACE}" \
-      ${dry_flag} 2>&1 | tee "${scaling_log}"; then
+      "${extra_flags[@]+"${extra_flags[@]}"}" 2>&1 | tee "${scaling_log}"; then
     SCALING_STATUS["${branch_name}"]="PASS"
     log_success "Scaling check PASSED"
   else

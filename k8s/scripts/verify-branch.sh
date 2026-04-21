@@ -444,7 +444,8 @@ check_critical_workflows() {
   fi
 
   local branch_header=""
-  [[ -n "${BRANCH_UUID}" ]] && branch_header="-H \"X-Branch-Id: ${BRANCH_UUID}\""
+  # branch_header is used as an explicit curl argument array element below
+  [[ -n "${BRANCH_UUID}" ]] && branch_header="X-Branch-Id: ${BRANCH_UUID}"
 
   # Smoke test helper: check an endpoint returns expected HTTP status
   smoke_test() {
@@ -452,12 +453,14 @@ check_critical_workflows() {
     local url="$2"
     local expected_codes="${3:-200}"  # comma-separated list e.g. "200,201,404"
 
+    # Build curl args dynamically to avoid unquoted variable expansion
+    local curl_args=(-sS -o /dev/null -w "%{http_code}" --max-time 15
+      "${url}"
+      -H "Authorization: Bearer ${svc_token}")
+    [[ -n "${branch_header}" ]] && curl_args+=(-H "${branch_header}")
+
     local actual_code
-    actual_code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 \
-      "${url}" \
-      -H "Authorization: Bearer ${svc_token}" \
-      ${BRANCH_UUID:+-H "X-Branch-Id: ${BRANCH_UUID}"} \
-      2>/dev/null || echo "000")
+    actual_code=$(curl "${curl_args[@]}" 2>/dev/null || echo "000")
 
     if echo "${expected_codes}" | tr ',' '\n' | grep -qx "${actual_code}"; then
       record_pass "${check_name}" "HTTP ${actual_code}"

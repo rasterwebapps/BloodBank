@@ -374,8 +374,15 @@ check_redis() {
 
   local total_ops=$((hits + misses))
   local hit_rate=0
+  local hit_rate_display="0"
   if [[ ${total_ops} -gt 0 ]]; then
-    hit_rate=$(echo "scale=1; ${hits} * 100 / ${total_ops}" | bc 2>/dev/null || echo "0")
+    # Use bc for decimal precision if available, otherwise integer arithmetic
+    if command -v bc &>/dev/null; then
+      hit_rate_display=$(echo "scale=1; ${hits} * 100 / ${total_ops}" | bc 2>/dev/null || echo "0")
+    else
+      hit_rate_display=$(( hits * 100 / total_ops ))
+    fi
+    hit_rate="${hit_rate_display}"
   fi
 
   log_info "  Keyspace hits:   ${hits}"
