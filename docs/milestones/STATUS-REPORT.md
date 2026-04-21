@@ -20,13 +20,13 @@
 | **M6** | ✅ COMPLETE | 100% | 30/30 | — |
 | **M7** | ✅ COMPLETE | 100% | 46/46 | #48, #49, #50, #51, #52, #53 |
 | **M8** | ✅ COMPLETE | 100% | 28/28 | — |
-| **M9** | 🔴 NOT STARTED | 0% | 0/40 | — |
+| **M9** | 🟡 IN PROGRESS | 40% auto / 24 manual READY | 16/40 auto + 24/40 manual READY | — |
 | **M10** | 🔴 NOT STARTED | 0% | 0/27 | — |
 | **M11** | 🔴 NOT STARTED | 0% | 0/34 | — |
 | **M12** | 🔴 NOT STARTED | 0% | 0/20 | — |
 | **M13** | 🔴 NOT STARTED | 0% | 0/33 | — |
 
-**Overall Progress: M8 COMPLETE (28/28), ~70% of total project (375/530)**
+**Overall Progress: M8 COMPLETE (28/28), M9 IN PROGRESS (16/40 auto + 24 manual READY), ~72% of total project (391/530)**
 
 ---
 
@@ -336,8 +336,36 @@
 - ✅ Hikari pool tuning in all `application.yml` files + prod profile
 - ✅ HPA for all 14 services in `k8s/hpa/`
 
-### M9: UAT + Compliance — 🔴 NOT STARTED (0%)
-**Blocked by:** M8 ✅ — now UNBLOCKED
+### M9: UAT + Compliance — 🟡 IN PROGRESS (40% automated, 24 manual READY)
+
+**Issues Completed (automated/docs):** 16/40
+**Issues READY (manual):** 24/40 — UAT execution sessions, accessibility testing, defect resolution
+**Unblocked:** M8 ✅ complete — M9 is now fully unblocked
+
+| Section | Issues | Status |
+|---|---|---|
+| UAT Preparation (M9-001–M9-005) | 5 | ✅ Done — environment config, 16 test scripts, 16 Keycloak test accounts, tracking doc, timeline |
+| UAT Execution (M9-006–M9-021) | 16 | ⚙️ READY (manual) — all test scripts written; awaiting UAT sessions with staff |
+| Compliance Validation (M9-022–M9-032) | 11 | ✅ Done — HIPAA, GDPR, FDA 21 CFR Part 11, AABB, WHO docs created |
+| Accessibility Testing (M9-033–M9-036) | 4 | ⚙️ READY (manual) — checklist in `docs/compliance/accessibility-report.md` |
+| Defect Resolution (M9-037–M9-040) | 4 | ⚙️ READY (manual) — awaiting UAT defects from execution phase |
+
+**Deliverables Verified:**
+- ✅ `docs/uat/README.md` — UAT process, environment, participants, timeline, entry/exit criteria, sign-off table
+- ✅ `docs/uat/test-scripts/` — 16 role test scripts (SUPER_ADMIN through DONOR, 185+ total scenarios)
+- ✅ `docs/uat/keycloak-test-users.md` — 16 UAT test accounts with roles, credentials, MFA config, JWT claim mappings
+- ✅ `docs/uat/uat-tracking.md` — session log, scenario tracking table, defect register
+- ✅ `docs/compliance/hipaa-validation.md` — M9-022/M9-023 (PHI protection, audit trail)
+- ✅ `docs/compliance/gdpr-validation.md` — M9-024/M9-025/M9-026 (consent, erasure, portability)
+- ✅ `docs/compliance/fda-21cfr11-validation.md` — M9-027/M9-028 (e-signatures, immutable audit trail)
+- ✅ `docs/compliance/aabb-validation.md` — M9-029/M9-030 (vein-to-vein traceability, chain of custody)
+- ✅ `docs/compliance/who-validation.md` — M9-031/M9-032 (mandatory test panels, blood safety protocols)
+- ✅ `docs/compliance/accessibility-report.md` — WCAG 2.1 AA checklist template (M9-033–M9-036, pending execution)
+
+**⚙️ MANUAL TASKS (not automatable — READY to execute):**
+- M9-006–M9-021: UAT execution with real staff testers in the UAT environment
+- M9-033–M9-036: Accessibility testing with axe-core Playwright, NVDA, VoiceOver, JAWS
+- M9-037–M9-040: Defect triage, fixing, regression testing, stakeholder sign-off
 
 ### M10: Pilot Deployment — 🔴 NOT STARTED (0%)
 **Blocked by:** M9
@@ -414,7 +442,15 @@
 
 ### 🟢 Recent Progress (2026-04-21)
 
-1. **M8 Performance Testing — COMPLETE** ✅ (28/28 issues, 100%)
+1. **M9 UAT + Compliance — IN PROGRESS** 🟡 (16/40 automated, 24 manual READY)
+   - ✅ UAT preparation complete: environment config, 16 role test scripts (185+ scenarios), 16 Keycloak test accounts, UAT tracking doc, session timeline
+   - ✅ Compliance validation docs complete: HIPAA, GDPR, FDA 21 CFR Part 11, AABB, WHO checklists in `docs/compliance/`
+   - ✅ Accessibility report template ready: WCAG 2.1 AA checklist in `docs/compliance/accessibility-report.md`
+   - ⚙️ M9-006–M9-021 (UAT execution): READY — awaiting UAT sessions with real blood bank staff
+   - ⚙️ M9-033–M9-040 (accessibility testing + defect resolution): READY — manual processes, cannot be automated
+   - **M10 (Pilot Deployment) remains blocked until M9 UAT sign-off**
+
+2. **M8 Performance Testing — COMPLETE** ✅ (28/28 issues, 100%)
    - ✅ k6 test framework: `k6.config.js` with `BASE_THRESHOLDS` (P95<200ms, P99<500ms, error<1%) and `THROUGHPUT_THRESHOLDS` (>500 req/s)
    - ✅ 3 data generators: `generators/donors.js`, `generators/blood-units.js`, `generators/hospitals.js`
    - ✅ Database seeder: `seed-database.js` — 100K donors, 500K blood units, 50 hospitals via batch HTTP API
