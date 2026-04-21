@@ -9,6 +9,8 @@ import com.bloodbank.common.exceptions.ConflictException;
 import com.bloodbank.common.exceptions.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -79,6 +81,7 @@ public class BranchService {
     }
 
     @Transactional
+    @CacheEvict(value = "branches", key = "#id")
     public BranchResponse updateBranch(UUID id, BranchUpdateRequest request) {
         log.info("Updating branch with id: {}", id);
 
@@ -127,6 +130,7 @@ public class BranchService {
         return branchMapper.toResponse(branch);
     }
 
+    @Cacheable(value = "branches", key = "#id")
     public BranchResponse getBranchById(UUID id) {
         log.debug("Fetching branch with id: {}", id);
         Branch branch = branchRepository.findById(id)
@@ -134,6 +138,7 @@ public class BranchService {
         return branchMapper.toResponse(branch);
     }
 
+    @Cacheable(value = "branches", key = "#code")
     public BranchResponse getBranchByCode(String code) {
         log.debug("Fetching branch with code: {}", code);
         Branch branch = branchRepository.findByBranchCode(code)
@@ -168,6 +173,7 @@ public class BranchService {
     }
 
     @Transactional
+    @CacheEvict(value = "branches", key = "#id")
     public BranchResponse activateBranch(UUID id) {
         log.info("Activating branch with id: {}", id);
         Branch branch = branchRepository.findById(id)
@@ -178,6 +184,7 @@ public class BranchService {
     }
 
     @Transactional
+    @CacheEvict(value = "branches", key = "#id")
     public BranchResponse deactivateBranch(UUID id) {
         log.info("Deactivating branch with id: {}", id);
         Branch branch = branchRepository.findById(id)

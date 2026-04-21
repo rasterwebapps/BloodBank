@@ -9,6 +9,8 @@ import com.bloodbank.labservice.repository.TestPanelRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ public class TestPanelService {
     }
 
     @Transactional
+    @CacheEvict(value = "testPanels", allEntries = true)
     public TestPanelResponse createPanel(TestPanelCreateRequest request) {
         log.info("Creating test panel: code={}, name={}", request.panelCode(), request.panelName());
         TestPanel panel = testPanelMapper.toEntity(request);
@@ -39,14 +42,17 @@ public class TestPanelService {
         return testPanelMapper.toResponse(panel);
     }
 
+    @Cacheable(value = "testPanels", key = "'active'")
     public List<TestPanelResponse> getActivePanels() {
         return testPanelMapper.toResponseList(testPanelRepository.findByIsActiveTrue());
     }
 
+    @Cacheable(value = "testPanels", key = "'mandatory'")
     public List<TestPanelResponse> getMandatoryPanels() {
         return testPanelMapper.toResponseList(testPanelRepository.findByIsMandatoryTrue());
     }
 
+    @Cacheable(value = "testPanels", key = "#id")
     public TestPanelResponse getPanelById(UUID id) {
         TestPanel panel = testPanelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("TestPanel", "id", id));

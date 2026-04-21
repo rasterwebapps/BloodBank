@@ -12,16 +12,22 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.QueryHints;
+import jakarta.persistence.QueryHint;
 
 @Repository
 public interface LicenseRepository extends JpaRepository<License, UUID>,
                                             JpaSpecificationExecutor<License> {
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     Optional<License> findByLicenseNumber(String licenseNumber);
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     List<License> findByStatus(LicenseStatusEnum status);
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     List<License> findByLicenseType(LicenseTypeEnum licenseType);
 
+    @QueryHints({@QueryHint(name = "org.hibernate.readOnly", value = "true")})
     List<License> findByExpiryDateBefore(LocalDate date);
 }

@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +52,7 @@ public class HospitalService {
     }
 
     @Transactional
+    @CacheEvict(value = "hospitals", key = "#id")
     public HospitalResponse updateHospital(UUID id, HospitalCreateRequest request) {
         log.info("Updating hospital: {}", id);
 
@@ -73,6 +76,7 @@ public class HospitalService {
         return hospitalMapper.toResponse(hospital);
     }
 
+    @Cacheable(value = "hospitals", key = "#id")
     public HospitalResponse getHospitalById(UUID id) {
         log.debug("Fetching hospital by id: {}", id);
         Hospital hospital = hospitalRepository.findById(id)
@@ -80,6 +84,7 @@ public class HospitalService {
         return hospitalMapper.toResponse(hospital);
     }
 
+    @Cacheable(value = "hospitals", key = "#hospitalCode")
     public HospitalResponse getHospitalByCode(String hospitalCode) {
         log.debug("Fetching hospital by code: {}", hospitalCode);
         Hospital hospital = hospitalRepository.findByHospitalCode(hospitalCode)
@@ -106,6 +111,7 @@ public class HospitalService {
     }
 
     @Transactional
+    @CacheEvict(value = "hospitals", key = "#id")
     public HospitalResponse updateHospitalStatus(UUID id, HospitalStatusEnum status) {
         log.info("Updating hospital {} status to: {}", id, status);
         Hospital hospital = hospitalRepository.findById(id)

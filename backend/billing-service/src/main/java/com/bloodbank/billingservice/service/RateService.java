@@ -9,6 +9,8 @@ import com.bloodbank.billingservice.repository.RateRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ public class RateService {
     }
 
     @Transactional
+    @CacheEvict(value = "rateMaster", allEntries = true)
     public RateResponse createRate(RateCreateRequest request) {
         log.info("Creating rate: serviceCode={}, serviceName={}", request.serviceCode(), request.serviceName());
         RateMaster rate = rateMapper.toEntity(request);
@@ -41,17 +44,20 @@ public class RateService {
         return rateMapper.toResponse(rate);
     }
 
+    @Cacheable(value = "rateMaster", key = "#id")
     public RateResponse getRateById(UUID id) {
         RateMaster rate = rateRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Rate", "id", id));
         return rateMapper.toResponse(rate);
     }
 
+    @Cacheable(value = "rateMaster", key = "#branchId")
     public List<RateResponse> getActiveRatesByBranch(UUID branchId) {
         return rateMapper.toResponseList(rateRepository.findByBranchIdAndActiveTrue(branchId));
     }
 
     @Transactional
+    @CacheEvict(value = "rateMaster", key = "#id")
     public RateResponse updateRate(UUID id, RateCreateRequest request) {
         RateMaster rate = rateRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Rate", "id", id));
@@ -71,6 +77,7 @@ public class RateService {
     }
 
     @Transactional
+    @CacheEvict(value = "rateMaster", key = "#id")
     public void deactivateRate(UUID id) {
         RateMaster rate = rateRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Rate", "id", id));

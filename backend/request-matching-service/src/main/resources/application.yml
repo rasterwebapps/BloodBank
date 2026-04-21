@@ -4,11 +4,20 @@ server:
 spring:
   application:
     name: request-matching-service
+  threads:
+    virtual:
+      enabled: true
   datasource:
     url: jdbc:postgresql://localhost:5432/bloodbank_db
     username: bloodbank
     password: bloodbank
     driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      idle-timeout: 600000
+      leak-detection-threshold: 60000
   jpa:
     hibernate:
       ddl-auto: validate

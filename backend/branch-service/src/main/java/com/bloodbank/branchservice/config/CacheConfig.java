@@ -17,12 +17,14 @@ public class CacheConfig {
 
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        // Default TTL: 30 minutes for general data
         RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofHours(1))
+                .entryTtl(Duration.ofMinutes(30))
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
                                 new GenericJackson2JsonRedisSerializer()));
 
+        // 24 hours for master / reference data (blood groups, component types, countries, etc.)
         RedisCacheConfiguration masterDataConfig = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofHours(24))
                 .serializeValuesWith(
@@ -31,6 +33,7 @@ public class CacheConfig {
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultConfig)
+                .withCacheConfiguration("branches", defaultConfig)
                 .withCacheConfiguration("bloodGroups", masterDataConfig)
                 .withCacheConfiguration("componentTypes", masterDataConfig)
                 .withCacheConfiguration("countries", masterDataConfig)
