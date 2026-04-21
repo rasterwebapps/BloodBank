@@ -21,12 +21,12 @@
 | **M7** | ✅ COMPLETE | 100% | 46/46 | #48, #49, #50, #51, #52, #53 |
 | **M8** | ✅ COMPLETE | 100% | 28/28 | — |
 | **M9** | 🟡 IN PROGRESS | 40% auto / 24 manual READY | 16/40 auto + 24/40 manual READY | — |
-| **M10** | 🔴 NOT STARTED | 0% | 0/27 | — |
+| **M10** | 🟡 READY | 41% infra + 59% ops READY | 11/27 infra + 16/27 ops READY | — |
 | **M11** | 🔴 NOT STARTED | 0% | 0/34 | — |
 | **M12** | 🔴 NOT STARTED | 0% | 0/20 | — |
 | **M13** | 🔴 NOT STARTED | 0% | 0/33 | — |
 
-**Overall Progress: M8 COMPLETE (28/28), M9 IN PROGRESS (16/40 auto + 24 manual READY), ~72% of total project (391/530)**
+**Overall Progress: M8 COMPLETE (28/28), M9 IN PROGRESS (16/40 auto + 24 manual READY), M10 READY (11/27 infra + 16/27 ops READY), ~72% of total project (391/530)**
 
 ---
 
@@ -367,8 +367,39 @@
 - M9-033–M9-036: Accessibility testing with axe-core Playwright, NVDA, VoiceOver, JAWS
 - M9-037–M9-040: Defect triage, fixing, regression testing, stakeholder sign-off
 
-### M10: Pilot Deployment — 🔴 NOT STARTED (0%)
-**Blocked by:** M9
+### M10: Pilot Deployment — 🟡 READY — Infrastructure Prepared (11/27 infra + 16/27 ops READY)
+
+**Issues with infrastructure/docs in place:** 11/27
+**Issues READY (operational — executed during actual pilot):** 16/27
+**Still blocked by:** M9 UAT sign-off (gate condition)
+
+| Section | Issues | Status |
+|---|---|---|
+| Pilot Preparation (M10-001–M10-008) | 8 | ✅ 5 infra done / ⚙️ 3 operational READY |
+| Production Deployment (M10-009–M10-015) | 7 | ✅ 6 infra done / ⚙️ 1 operational READY |
+| Hypercare (M10-016–M10-022) | 7 | ⚙️ READY — plans in `docs/operations/hypercare-plan.md` |
+| Pilot Validation (M10-023–M10-027) | 5 | ⚙️ READY — criteria in `docs/operations/pilot-plan.md` |
+
+**Infrastructure/Docs Verified (11 issues complete):**
+- ✅ M10-003: `k8s/namespaces/bloodbank-prod.yml` + configmaps/ingress targeting `bloodbank-prod`
+- ✅ M10-005: M7 monitoring stack (Prometheus, 6 Grafana dashboards, Loki, Alertmanager, SRE/SLO)
+- ✅ M10-006: Jenkinsfile Blue-Green + Canary rollback strategies; go/no-go criteria in pilot-plan.md
+- ✅ M10-007: Full training schedule in `docs/operations/pilot-plan.md` (Day 1–2, competency assessment)
+- ✅ M10-008: `docs/operations/user-guides/` — 7 quick-reference guides (admin, clinical, lab, reception, inventory, donor, hospital)
+- ✅ M10-009: `k8s/jobs/flyway-migration.yml` — Flyway Job (20 migrations in `shared-libs/db-migration/`)
+- ✅ M10-010: M7 Keycloak realm-export.json (16 roles, LDAP federation, MFA); K8s deployment exists
+- ✅ M10-011: All 14 K8s deployment manifests in `k8s/deployments/` with probes, resource limits, HPA
+- ✅ M10-012: `k8s/deployments/frontend.yml` + `k8s/services/frontend.yml`
+- ✅ M10-013: `k8s/ingress/bloodbank-ingress.yml` — TLS block + ssl-redirect for `bloodbank-tls` secret
+- ✅ M10-014: Ingress rule for `bloodbank.example.com` defined
+
+**⚙️ OPERATIONAL TASKS (READY — not automatable, executed during pilot):**
+- M10-001: Select pilot branch — selection criteria and scoring matrix in pilot-plan.md
+- M10-002: Migrate historical data — step-by-step procedures in `docs/operations/data-migration-guide.md`
+- M10-004: Provision production secrets — `shared-config.yml` env vars defined; secrets via `kubectl create secret`
+- M10-015: Verify all health checks — K8s probes configured; verification runs at go-live
+- M10-016–M10-022: Hypercare monitoring, support, daily reviews, SLO review, feedback, issue SLA — plans in `docs/operations/hypercare-plan.md`
+- M10-023–M10-027: Blood lifecycle verification, branch isolation check, notifications, reports, pilot sign-off — criteria in `docs/operations/pilot-plan.md`
 
 ### M11: Regional Rollout — 🔴 NOT STARTED (0%)
 **Blocked by:** M10
@@ -442,7 +473,17 @@
 
 ### 🟢 Recent Progress (2026-04-21)
 
-1. **M9 UAT + Compliance — IN PROGRESS** 🟡 (16/40 automated, 24 manual READY)
+1. **M10 Pilot Deployment — READY** 🟡 (11/27 infra + 16/27 ops READY)
+   - ✅ Production K8s namespace, configmaps, ingress (TLS), all deployment/service/HPA manifests already in place from M7
+   - ✅ Flyway migration Job (`k8s/jobs/flyway-migration.yml`) and Keycloak realm-export.json ready
+   - ✅ `docs/operations/pilot-plan.md` — branch selection criteria, 2-day training schedule, go/no-go decision criteria
+   - ✅ `docs/operations/hypercare-plan.md` — 14-day hypercare plan, on-call rota, SLO review template, escalation matrix
+   - ✅ `docs/operations/data-migration-guide.md` — full data migration procedures
+   - ✅ `docs/operations/user-guides/` — 7 quick-reference guides for all staff roles
+   - ⚙️ M10-016–M10-027 (hypercare + pilot validation): READY — operational processes, execution during actual pilot
+   - **M10 remains gated on M9 UAT sign-off**
+
+2. **M9 UAT + Compliance — IN PROGRESS** 🟡 (16/40 automated, 24 manual READY)
    - ✅ UAT preparation complete: environment config, 16 role test scripts (185+ scenarios), 16 Keycloak test accounts, UAT tracking doc, session timeline
    - ✅ Compliance validation docs complete: HIPAA, GDPR, FDA 21 CFR Part 11, AABB, WHO checklists in `docs/compliance/`
    - ✅ Accessibility report template ready: WCAG 2.1 AA checklist in `docs/compliance/accessibility-report.md`
