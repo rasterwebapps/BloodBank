@@ -43,23 +43,23 @@ User acceptance testing with real blood bank staff and comprehensive regulatory 
 - [ ] **M9-021**: UAT: SYSTEM_ADMIN — monitoring, feature flags, scheduled jobs
 
 ### Compliance Validation
-- [ ] **M9-022**: HIPAA: Verify PHI protection, access controls, encryption at rest/transit
-- [ ] **M9-023**: HIPAA: Verify audit trail captures all PHI access
-- [ ] **M9-024**: GDPR: Verify consent management workflow
-- [ ] **M9-025**: GDPR: Verify data erasure/anonymization workflow
-- [ ] **M9-026**: GDPR: Verify data portability export
-- [ ] **M9-027**: FDA 21 CFR Part 11: Verify electronic signatures
-- [ ] **M9-028**: FDA 21 CFR Part 11: Verify immutable audit trail
-- [ ] **M9-029**: AABB: Verify vein-to-vein traceability (donor → recipient)
-- [ ] **M9-030**: AABB: Verify chain of custody logging
-- [ ] **M9-031**: WHO: Verify mandatory test panel enforcement
-- [ ] **M9-032**: WHO: Verify blood safety protocols
+- [x] **M9-022**: HIPAA: Verify PHI protection, access controls, encryption at rest/transit — `docs/compliance/hipaa-validation.md`
+- [x] **M9-023**: HIPAA: Verify audit trail captures all PHI access — `docs/compliance/hipaa-validation.md`
+- [x] **M9-024**: GDPR: Verify consent management workflow — `docs/compliance/gdpr-validation.md`
+- [x] **M9-025**: GDPR: Verify data erasure/anonymization workflow — `docs/compliance/gdpr-validation.md`
+- [x] **M9-026**: GDPR: Verify data portability export — `docs/compliance/gdpr-validation.md`
+- [x] **M9-027**: FDA 21 CFR Part 11: Verify electronic signatures — `docs/compliance/fda-21cfr11-validation.md`
+- [x] **M9-028**: FDA 21 CFR Part 11: Verify immutable audit trail — `docs/compliance/fda-21cfr11-validation.md`
+- [x] **M9-029**: AABB: Verify vein-to-vein traceability (donor → recipient) — `docs/compliance/aabb-validation.md`
+- [x] **M9-030**: AABB: Verify chain of custody logging — `docs/compliance/aabb-validation.md`
+- [x] **M9-031**: WHO: Verify mandatory test panel enforcement — `docs/compliance/who-validation.md`
+- [x] **M9-032**: WHO: Verify blood safety protocols — `docs/compliance/who-validation.md`
 
 ### Accessibility Testing
-- [ ] **M9-033**: WCAG 2.1 AA compliance testing with axe-core
-- [ ] **M9-034**: Keyboard navigation testing for all features
-- [ ] **M9-035**: Screen reader compatibility testing
-- [ ] **M9-036**: Color contrast validation
+- [x] **M9-033**: WCAG 2.1 AA compliance testing with axe-core — `docs/compliance/accessibility-report.md`
+- [x] **M9-034**: Keyboard navigation testing for all features — `docs/compliance/accessibility-report.md`
+- [x] **M9-035**: Screen reader compatibility testing — `docs/compliance/accessibility-report.md`
+- [x] **M9-036**: Color contrast validation — `docs/compliance/accessibility-report.md`
 
 ### Defect Resolution
 - [ ] **M9-037**: Triage and prioritize UAT defects
