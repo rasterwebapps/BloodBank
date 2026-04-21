@@ -1,6 +1,6 @@
 # 🩸 BloodBank — Development Status Report
 
-**Report Date:** 2026-04-20
+**Report Date:** 2026-04-21
 **Data Source:** GitHub Pull Requests #1–#52 (descriptions, reviews, merge status, codebase verification)
 **Total PRs Reviewed:** 52 (all merged)
 **PR Review Comments:** 0 (no reviewer comments or review threads found on any PR)
@@ -18,7 +18,7 @@
 | **M4** | ✅ COMPLETE | 100% | 66/66 | #12+ |
 | **M5** | 🟡 NEARLY COMPLETE | 98% | 51/52 | #15+ |
 | **M6** | ✅ COMPLETE | 100% | 30/30 | — |
-| **M7** | 🟡 IN PROGRESS | 72% | 33/46 | #48, #49, #50, #51, #52 |
+| **M7** | 🟡 NEARLY COMPLETE | 98% | 45/46 | #48, #49, #50, #51, #52, #53 |
 | **M8** | 🔴 NOT STARTED | 0% | 0/28 | — |
 | **M9** | 🔴 NOT STARTED | 0% | 0/40 | — |
 | **M10** | 🔴 NOT STARTED | 0% | 0/27 | — |
@@ -26,7 +26,7 @@
 | **M12** | 🔴 NOT STARTED | 0% | 0/20 | — |
 | **M13** | 🔴 NOT STARTED | 0% | 0/33 | — |
 
-**Overall Progress: ~72% of DevOps milestone (M7: 33/46), ~63% of total project (334/530)**
+**Overall Progress: ~98% of DevOps milestone (M7: 45/46), ~66% of total project (346/530)**
 
 ---
 
@@ -293,36 +293,36 @@
 - ✅ `PagedResponseContractTest` (15 tests) — M6-029
 - ✅ `RateLimitingContractTest` (13 tests) — M6-030
 
-### M7: Infrastructure — 🟡 IN PROGRESS (72%)
+### M7: Infrastructure — 🟡 NEARLY COMPLETE (98%)
 
-**Issues Completed:** 33/46 | **PRs:** #48, #49, #50, #51, #52
+**Issues Completed:** 45/46 | **PRs:** #48, #49, #50, #51, #52, #53
 
 | Section | Issues | Status | PR |
 |---|---|---|---|
 | Docker (M7-001 to M7-006) | 6 | ✅ Done — 14 multi-stage Dockerfiles, frontend Dockerfile, .dockerignore per service, full docker-compose | #48, #49 |
 | Kubernetes (M7-007 to M7-018) | 12 | ✅ Done (11/12) — 4 namespaces, 15 deployments, 15 services, ingress, configmaps, secrets refs, StatefulSets, Flyway Job, probes, resources ⚠️ M7-013 HPA partial (3/14 services) | #50 |
-| Jenkins CI/CD (M7-019 to M7-031) | 13 | ❌ NOT STARTED — Jenkinsfile does not exist | — |
+| Jenkins CI/CD (M7-019 to M7-031) | 13 | ✅ Done — `Jenkinsfile` with 11 stages, Blue-Green + Canary (10%→50%→100%) deployment strategies | #53 |
 | Keycloak (M7-032 to M7-040) | 9 | ✅ Done — realm-export.json with 2 clients, 16 roles, group hierarchy, LDAP, MFA, session/password policies, 16 test users | #51 |
 | Monitoring (M7-041 to M7-046) | 6 | ✅ Done — Prometheus, 6 Grafana dashboards, Loki/Promtail, Tempo, Alertmanager, SRE/SLO dashboard | #52 |
 
-#### 🔧 FIX REQUIRED
+#### 🔧 REMAINING WORK
 
 | # | Issue | Severity | Description |
 |---|---|---|---|
-| 1 | **M7-019 to M7-031** | 🔴 CRITICAL | Jenkins CI/CD Pipeline — `Jenkinsfile` is completely absent from the repository. 13 issues remain pending. Required for exit gate: "Jenkins pipeline deploys all services to DEV environment." |
-| 2 | **M7-013** | 🟡 PARTIAL | HPA exists only for `api-gateway`, `donor-service`, `inventory-service`. 11 production services lack HPA manifests in `k8s/hpa/`. |
+| 1 | **M7-013** | 🟡 MEDIUM | HPA exists only for `api-gateway`, `donor-service`, `inventory-service`. 11 production services lack HPA manifests in `k8s/hpa/`. |
 
 **Deliverables Verified:**
 - ✅ 14 multi-stage Dockerfiles (Gradle builder → eclipse-temurin:21-jre-alpine, non-root user, health checks)
 - ✅ Angular frontend Dockerfile (Node 22 builder → nginx:alpine-slim)
 - ✅ docker-compose.yml: 14 backend services, frontend, PostgreSQL 17, Redis 7, RabbitMQ 3.13, Keycloak 26, MinIO, full monitoring stack
 - ✅ K8s: 4 namespaces, 15 deployments (all with probes + resource limits), 15 services, ingress, configmaps, StatefulSets, Flyway Job
-- ❌ Jenkinsfile — not found anywhere in repository
+- ✅ Jenkinsfile — 11-stage pipeline (Checkout → Build → Test → SonarQube → Security Scan → Docker → Flyway → DEV → Integration Tests → Staging → Production) with Blue-Green + Canary helpers
 - ✅ Keycloak realm: 16 roles (4 realm + 12 client), LDAP federation, MFA required/optional flows, password policy, 16 test users
 - ✅ Monitoring: Prometheus scrape configs, Grafana dashboards, Loki, Tempo, Alertmanager, SRE/SLO dashboard
+- ⚠️ HPA: 3/14 services complete
 
 ### M8: Performance Testing — 🔴 NOT STARTED (0%)
-**Blocked by:** M6 ✅, M7 🟡 (partially — awaiting Jenkinsfile)
+**Blocked by:** M6 ✅, M7 🟡 (nearly complete — only HPA M7-013 remaining)
 
 ### M9: UAT + Compliance — 🔴 NOT STARTED (0%)
 **Blocked by:** M8
