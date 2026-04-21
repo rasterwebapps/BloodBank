@@ -52,7 +52,7 @@ public class HospitalService {
     }
 
     @Transactional
-    @CacheEvict(value = "hospitals", key = "#id")
+    @CacheEvict(value = "hospitals", allEntries = true)
     public HospitalResponse updateHospital(UUID id, HospitalCreateRequest request) {
         log.info("Updating hospital: {}", id);
 
@@ -111,7 +111,7 @@ public class HospitalService {
     }
 
     @Transactional
-    @CacheEvict(value = "hospitals", key = "#id")
+    @CacheEvict(value = "hospitals", allEntries = true)
     public HospitalResponse updateHospitalStatus(UUID id, HospitalStatusEnum status) {
         log.info("Updating hospital {} status to: {}", id, status);
         Hospital hospital = hospitalRepository.findById(id)

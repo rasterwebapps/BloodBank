@@ -57,7 +57,7 @@ public class RateService {
     }
 
     @Transactional
-    @CacheEvict(value = "rateMaster", key = "#id")
+    @CacheEvict(value = "rateMaster", allEntries = true)
     public RateResponse updateRate(UUID id, RateCreateRequest request) {
         RateMaster rate = rateRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Rate", "id", id));
@@ -77,7 +77,7 @@ public class RateService {
     }
 
     @Transactional
-    @CacheEvict(value = "rateMaster", key = "#id")
+    @CacheEvict(value = "rateMaster", allEntries = true)
     public void deactivateRate(UUID id) {
         RateMaster rate = rateRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Rate", "id", id));

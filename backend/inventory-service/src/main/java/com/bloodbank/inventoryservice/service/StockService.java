@@ -64,7 +64,7 @@ public class StockService {
         this.eventPublisher = eventPublisher;
     }
 
-    @Cacheable(value = "stockLevels", key = "T(java.util.Objects).hash(#branchId, #bloodGroupId, #componentTypeId)")
+    @Cacheable(value = "stockLevels", key = "'' + #branchId + ':' + #bloodGroupId + ':' + #componentTypeId")
     public List<StockLevelResponse> getStockLevels(UUID branchId, UUID bloodGroupId, UUID componentTypeId) {
         log.info("Getting stock levels for branch: {}", branchId);
         List<StockLevelResponse> levels = new ArrayList<>();

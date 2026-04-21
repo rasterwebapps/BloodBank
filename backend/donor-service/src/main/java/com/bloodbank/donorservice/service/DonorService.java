@@ -88,7 +88,6 @@ public class DonorService {
     }
 
     @Transactional
-    @CacheEvict(value = "donors", key = "#result.id")
     public DonorResponse registerDonor(DonorCreateRequest request) {
         log.info("Registering new donor: {} {}", request.firstName(), request.lastName());
 

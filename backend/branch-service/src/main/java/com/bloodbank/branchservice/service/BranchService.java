@@ -81,7 +81,7 @@ public class BranchService {
     }
 
     @Transactional
-    @CacheEvict(value = "branches", key = "#id")
+    @CacheEvict(value = "branches", allEntries = true)
     public BranchResponse updateBranch(UUID id, BranchUpdateRequest request) {
         log.info("Updating branch with id: {}", id);
 
@@ -173,7 +173,7 @@ public class BranchService {
     }
 
     @Transactional
-    @CacheEvict(value = "branches", key = "#id")
+    @CacheEvict(value = "branches", allEntries = true)
     public BranchResponse activateBranch(UUID id) {
         log.info("Activating branch with id: {}", id);
         Branch branch = branchRepository.findById(id)
@@ -184,7 +184,7 @@ public class BranchService {
     }
 
     @Transactional
-    @CacheEvict(value = "branches", key = "#id")
+    @CacheEvict(value = "branches", allEntries = true)
     public BranchResponse deactivateBranch(UUID id) {
         log.info("Deactivating branch with id: {}", id);
         Branch branch = branchRepository.findById(id)

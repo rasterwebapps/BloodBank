@@ -65,7 +65,7 @@ public class ComplianceService {
     }
 
     @Transactional
-    @CacheEvict(value = "regulatoryFrameworks", key = "#id")
+    @CacheEvict(value = "regulatoryFrameworks", allEntries = true)
     public RegulatoryFrameworkResponse update(UUID id, RegulatoryFrameworkCreateRequest request) {
         RegulatoryFramework framework = frameworkRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("RegulatoryFramework", "id", id));
@@ -85,7 +85,7 @@ public class ComplianceService {
     }
 
     @Transactional
-    @CacheEvict(value = "regulatoryFrameworks", key = "#id")
+    @CacheEvict(value = "regulatoryFrameworks", allEntries = true)
     public RegulatoryFrameworkResponse deactivate(UUID id) {
         RegulatoryFramework framework = frameworkRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("RegulatoryFramework", "id", id));
