@@ -21,6 +21,7 @@
 
 import http  from 'k6/http';
 import { check, sleep } from 'k6';
+import exec from 'k6/execution';
 import {
   BASE_URL,
   BASE_THRESHOLDS,

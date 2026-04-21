@@ -119,9 +119,13 @@ export function rampingRateScenario(stages, preAllocated = 50, maxVUs = 500) {
 
 // ---------------------------------------------------------------------------
 // Utility: random item from an array
+//
+// NOTE: Math.random() is intentionally used here. This is a performance-test
+// data generator producing synthetic, non-sensitive test data. Cryptographic
+// randomness is unnecessary and would add overhead.
 // ---------------------------------------------------------------------------
 export function randomItem(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+  return arr[Math.floor(Math.random() * arr.length)]; // test data only — not security-sensitive
 }
 
 // ---------------------------------------------------------------------------

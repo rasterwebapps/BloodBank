@@ -156,7 +156,6 @@ export default function () {
     `${BASE_URL}/api/v1/blood-units/batch`,
     (count, startIndex) => {
       // Pass captured donor IDs so blood units reference real donors
-      const { generateBloodUnits: gen } = { generateBloodUnits };
       return generateBloodUnits(count, startIndex, resolvedDonorIds);
     },
     BLOOD_UNIT_COUNT,

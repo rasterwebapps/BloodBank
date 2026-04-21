@@ -45,7 +45,7 @@ export const options = {
     ...BASE_THRESHOLDS,
     'http_req_duration{name:POST /api/v1/hospital-requests}':      ['p(95)<300'],
     'http_req_duration{name:GET  /api/v1/hospital-requests}':      ['p(95)<200'],
-    'http_req_duration{name:GET  /api/v1/hospital-requests/{id}}'  : ['p(95)<150'],
+    'http_req_duration{name:GET  /api/v1/hospital-requests/{id}}': ['p(95)<150'],
   },
 };
 

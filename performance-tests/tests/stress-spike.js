@@ -63,21 +63,14 @@ const HEADERS      = defaultHeaders();
 const HOSPITAL_IDS = Array.from({ length: 50 }, (_, i) => `hospital-${String(i + 1).padStart(3, '0')}`);
 
 // ---------------------------------------------------------------------------
-// Determine current phase from __ITER and timing
-// (k6 exposes __VU and __ITER but not wall-clock; use VU count heuristic)
+// Phase detection — tracks elapsed seconds from the moment the first VU starts.
+// Boundaries:
+//   0–40 s  → warmup  (baseline ramp)
+//   40–110 s → spike   (5 000 VUs)
+//   >110 s  → recovery (back to 100 VUs + observation)
 // ---------------------------------------------------------------------------
-function currentPhase() {
-  // During the spike, VU count > 500; during recovery it returns to ~100
-  // k6 doesn't expose live VU count per VU, so we tag based on iteration time.
-  // We use a rough timing approach: read the scenario start time via Date.
-  // This is a best-effort approximation for tagging.
-  const elapsed = (Date.now() - __ENV._SPIKE_START_MS) / 1000;
-  if (elapsed > 110) return 'recovery';   // after spike + 10s ramp-down
-  if (elapsed > 40)  return 'spike';
-  return 'warmup';
-}
 
-// Store start time as env var (set externally or default to 0)
+// Record the test start time once per VU (module-level, evaluated on first import).
 const SPIKE_START = parseInt(__ENV._SPIKE_START_MS || String(Date.now()), 10);
 
 // ---------------------------------------------------------------------------

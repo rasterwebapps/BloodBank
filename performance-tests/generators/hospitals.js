@@ -190,6 +190,9 @@ export function generateHospitals(count, startIndex = 0) {
  * Generates a blood request payload from a hospital.
  * Used in blood-request load tests.
  *
+ * NOTE: Math.random() calls in this function produce synthetic test data only;
+ * they are not used in a security context.
+ *
  * @param {string} hospitalId  UUID of the requesting hospital.
  * @returns {Object}
  */
