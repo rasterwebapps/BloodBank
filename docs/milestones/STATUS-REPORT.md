@@ -1,6 +1,6 @@
 # 🩸 BloodBank — Development Status Report
 
-**Report Date:** 2026-04-21
+**Report Date:** 2026-04-22
 **Data Source:** GitHub Pull Requests #1–#53 (descriptions, reviews, merge status, codebase verification)
 **Total PRs Reviewed:** 53 (all merged)
 **PR Review Comments:** 0 (no reviewer comments or review threads found on any PR)
@@ -22,11 +22,11 @@
 | **M8** | ✅ COMPLETE | 100% | 28/28 | — |
 | **M9** | 🟡 IN PROGRESS | 40% auto / 24 manual READY | 16/40 auto + 24/40 manual READY | — |
 | **M10** | 🟡 READY | 41% infra + 59% ops READY | 11/27 infra + 16/27 ops READY | — |
-| **M11** | 🔴 NOT STARTED | 0% | 0/34 | — |
+| **M11** | 🟡 READY | 15% planning + 85% ops READY | 5/34 planning + 29 ops READY | — |
 | **M12** | 🔴 NOT STARTED | 0% | 0/20 | — |
 | **M13** | 🔴 NOT STARTED | 0% | 0/33 | — |
 
-**Overall Progress: M8 COMPLETE (28/28), M9 IN PROGRESS (16/40 auto + 24 manual READY), M10 READY (11/27 infra + 16/27 ops READY), ~72% of total project (391/530)**
+**Overall Progress: M8 COMPLETE (28/28), M9 IN PROGRESS (16/40 auto + 24 manual READY), M10 READY (11/27 infra + 16/27 ops READY), M11 READY (5/34 planning + 29/34 ops READY), ~72% of total project (396/530)**
 
 ---
 
@@ -401,8 +401,24 @@
 - M10-016–M10-022: Hypercare monitoring, support, daily reviews, SLO review, feedback, issue SLA — plans in `docs/operations/hypercare-plan.md`
 - M10-023–M10-027: Blood lifecycle verification, branch isolation check, notifications, reports, pilot sign-off — criteria in `docs/operations/pilot-plan.md`
 
-### M11: Regional Rollout — 🔴 NOT STARTED (0%)
-**Blocked by:** M10
+### M11: Regional Rollout — 🟡 READY — Planning Complete (5/34 complete, 29 operational READY)
+**Blocked by:** M10 (Pilot Deployment sign-off) for execution
+
+**✅ What's In Place (5/34 planning issues complete):**
+- ✅ `k8s/scripts/branch-onboard.sh` (M11-001) — end-to-end branch provisioning: Keycloak group, BRANCH_ADMIN user, data migration Job, branch isolation check
+- ✅ `k8s/scripts/batch-rollout.sh` (M11-002) — batch orchestrator: reads JSON config → onboard → verify → scaling check → HTML/text report
+- ✅ `k8s/scripts/verify-branch.sh` (M11-004) — post-onboarding verification: auth, branch isolation, service health, end-to-end workflow smoke tests
+- ✅ `k8s/scripts/scaling-check.sh` (M11-005) — infrastructure health: HPA replicas/CPU, DB connection pool, Redis hit rate, RabbitMQ queue depths
+- ✅ `docs/operations/rollout-schedule.md` (M11-001–M11-003, M11-005) — batch grouping strategy (risk tiers, composition rules), 4-week timeline, per-branch T−2w/T−1w/T−0/T+3d checklist, Day 1–3 training schedule template with competency assessment
+- ✅ `docs/operations/data-migration-guide.md` (M11-004) — step-by-step migration import/validation/rollback procedures
+- ✅ `docs/operations/cross-branch-validation.md` (M11-026–M11-030) — inter-branch transfer, regional dashboard, emergency broadcast, REGIONAL_ADMIN test procedures
+- ✅ `docs/operations/scaling-validation.md` (M11-031–M11-034) — HPA, DB pool, Redis, RabbitMQ formal validation procedures and pass/fail thresholds
+- ✅ `docs/operations/regional-signoff-template.md` (M11-030) — formal regional management sign-off record template
+
+**⚙️ OPERATIONAL TASKS (READY — batch execution, executed during actual regional rollout):**
+- M11-006–M11-025: Batch 1–4 data migration, Keycloak provisioning, staff training, go-live, hypercare, sign-off — automated by `batch-rollout.sh`, `branch-onboard.sh`; procedures in `rollout-schedule.md`, `hypercare-plan.md`
+- M11-026–M11-030: Cross-branch validation (inter-branch transfers, regional dashboard, emergency broadcasts, REGIONAL_ADMIN view, regional sign-off) — procedures in `cross-branch-validation.md`, `regional-signoff-template.md`
+- M11-031–M11-034: Scaling validation (HPA, DB, Redis, alerting thresholds) — automated by `scaling-check.sh`; formal procedures in `scaling-validation.md`
 
 ### M12: Worldwide Launch — 🔴 NOT STARTED (0%)
 **Blocked by:** M11
