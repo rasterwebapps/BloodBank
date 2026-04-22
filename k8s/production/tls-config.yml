@@ -1,0 +1,328 @@
+# =============================================================================
+# tls-config.yml
+# BloodBank — Production TLS Configuration
+#
+# Applies:
+#   1. cert-manager ClusterIssuer (Let's Encrypt production ACME)
+#   2. cert-manager Certificate  (bloodbank.example.com + *.bloodbank.example.com)
+#   3. Production Ingress with full TLS termination and security headers
+#
+# Prerequisites:
+#   - cert-manager >= 1.14 installed:
+#       kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.4/cert-manager.yaml
+#   - nginx-ingress-controller installed
+#   - DNS A records pointing bloodbank.example.com and *.bloodbank.example.com
+#     to the cluster load-balancer IP
+#
+# Usage:
+#   kubectl apply -f tls-config.yml
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 1. ClusterIssuer — Let's Encrypt Production (ACME HTTP-01 challenge)
+# -----------------------------------------------------------------------------
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+  labels:
+    app.kubernetes.io/name: letsencrypt-prod
+    app.kubernetes.io/component: cluster-issuer
+    app.kubernetes.io/part-of: bloodbank
+spec:
+  acme:
+    # Let's Encrypt production endpoint
+    server: https://acme-v02.api.letsencrypt.org/directory
+
+    # Email for expiry notifications — update before deploying
+    email: ops@bloodbank.example.com
+
+    # Store the ACME account key in this Secret
+    privateKeySecretRef:
+      name: letsencrypt-prod-account-key
+
+    solvers:
+      # HTTP-01 challenge via nginx ingress (works for apex + wildcard via DNS-01)
+      - http01:
+          ingress:
+            class: nginx
+            podTemplate:
+              spec:
+                nodeSelector:
+                  kubernetes.io/os: linux
+
+      # DNS-01 challenge — required for wildcard (*.bloodbank.example.com)
+      # Uncomment and configure the appropriate DNS provider below.
+      #
+      # --- Route 53 (AWS) ---
+      # - dns01:
+      #     route53:
+      #       region: us-east-1
+      #       hostedZoneID: YOUR_HOSTED_ZONE_ID
+      #       accessKeyIDSecretRef:
+      #         name: route53-credentials
+      #         key: access-key-id
+      #       secretAccessKeySecretRef:
+      #         name: route53-credentials
+      #         key: secret-access-key
+      #   selector:
+      #     dnsNames:
+      #       - "*.bloodbank.example.com"
+      #
+      # --- Cloudflare ---
+      # - dns01:
+      #     cloudflare:
+      #       email: ops@bloodbank.example.com
+      #       apiTokenSecretRef:
+      #         name: cloudflare-api-token
+      #         key: api-token
+      #   selector:
+      #     dnsNames:
+      #       - "*.bloodbank.example.com"
+
+---
+# -----------------------------------------------------------------------------
+# 2. Certificate — apex domain + wildcard SAN
+# -----------------------------------------------------------------------------
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bloodbank-tls-cert
+  namespace: bloodbank-prod
+  labels:
+    app.kubernetes.io/name: bloodbank-tls
+    app.kubernetes.io/component: certificate
+    app.kubernetes.io/part-of: bloodbank
+spec:
+  # The TLS secret that will be created (referenced by Ingress)
+  secretName: bloodbank-tls
+
+  # cert-manager issues a new certificate 30 days before expiry
+  renewBefore: 720h   # 30 days
+
+  # Domain names covered by this certificate
+  dnsNames:
+    - bloodbank.example.com
+    - "*.bloodbank.example.com"
+    - api.bloodbank.example.com
+    - admin.bloodbank.example.com
+
+  # Reference the ClusterIssuer above
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+    group: cert-manager.io
+
+  # TLS 1.2+ — strong cipher suites
+  # (actual cipher negotiation is done by nginx; cert-manager just issues the cert)
+  usages:
+    - digital signature
+    - key encipherment
+    - server auth
+
+  # Key algorithm: RSA-2048 (widely supported) or ECDSA P-256 (faster handshake)
+  privateKey:
+    algorithm: RSA
+    size: 2048
+    rotationPolicy: Always
+
+---
+# -----------------------------------------------------------------------------
+# 3. Production Ingress — all services with full TLS + security headers
+# -----------------------------------------------------------------------------
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bloodbank-production-ingress
+  namespace: bloodbank-prod
+  labels:
+    app.kubernetes.io/name: bloodbank-ingress
+    app.kubernetes.io/component: ingress
+    app.kubernetes.io/part-of: bloodbank
+    environment: production
+  annotations:
+    # ── Ingress class ────────────────────────────────────────────────────────
+    kubernetes.io/ingress.class: "nginx"
+
+    # ── TLS / SSL ────────────────────────────────────────────────────────────
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
+    # TLS 1.2 minimum — TLS 1.0 and 1.1 are disabled
+    nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.2 TLSv1.3"
+
+    # Strong cipher suites only (ECDHE for forward secrecy, AES-GCM/CHACHA20)
+    nginx.ingress.kubernetes.io/ssl-ciphers: >-
+      ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:
+      ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:
+      ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:
+      DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+
+    # Prefer server cipher order (avoids client negotiating weak ciphers)
+    nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"
+
+    # OCSP stapling for faster TLS handshake
+    nginx.ingress.kubernetes.io/enable-ocsp-stapling: "true"
+
+    # ── Security headers ─────────────────────────────────────────────────────
+    # HSTS: 1 year + includeSubDomains + preload
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload";
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+      more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
+      more_set_headers "Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), accelerometer=()";
+      # NOTE: 'unsafe-inline' is required for Angular's initial render if the
+      # application is not yet configured with CSP nonces (Angular v17+ supports
+      # nonces via provideClientHydration() + a server-side nonce provider).
+      # Before enabling strict-dynamic or removing unsafe-inline, update the
+      # Angular build to generate a nonce and pass it via the server response.
+      # Tracked in: https://angular.dev/guide/security#content-security-policy
+      more_set_headers "Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.bloodbank.example.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
+      more_set_headers "Cross-Origin-Embedder-Policy: require-corp";
+      more_set_headers "Cross-Origin-Opener-Policy: same-origin";
+      more_set_headers "Cross-Origin-Resource-Policy: same-origin";
+
+    # ── Proxy settings ───────────────────────────────────────────────────────
+    nginx.ingress.kubernetes.io/proxy-body-size:       "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout:    "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout:    "300"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-buffering:       "on"
+    nginx.ingress.kubernetes.io/proxy-buffer-size:     "128k"
+
+    # ── Rate limiting ────────────────────────────────────────────────────────
+    nginx.ingress.kubernetes.io/limit-rps:          "100"
+    nginx.ingress.kubernetes.io/limit-rpm:          "1000"
+    nginx.ingress.kubernetes.io/limit-connections:  "20"
+
+    # ── Upstream keepalive ───────────────────────────────────────────────────
+    nginx.ingress.kubernetes.io/upstream-keepalive-connections: "32"
+    nginx.ingress.kubernetes.io/upstream-keepalive-timeout:     "60"
+
+    # ── Use regex paths ──────────────────────────────────────────────────────
+    nginx.ingress.kubernetes.io/use-regex: "true"
+
+spec:
+  ingressClassName: nginx
+
+  # ── TLS termination ────────────────────────────────────────────────────────
+  tls:
+    - hosts:
+        - bloodbank.example.com
+        - api.bloodbank.example.com
+        - admin.bloodbank.example.com
+      secretName: bloodbank-tls
+
+  # ── Routing rules ──────────────────────────────────────────────────────────
+  rules:
+    # Main application domain — bloodbank.example.com
+    - host: bloodbank.example.com
+      http:
+        paths:
+          # API traffic → api-gateway
+          - path: /api/
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8080
+          # Actuator (internal monitoring — restrict via network policy)
+          - path: /actuator/health
+            pathType: Exact
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8080
+          # Angular SPA → frontend
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+
+    # API subdomain — api.bloodbank.example.com
+    - host: api.bloodbank.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8080
+
+    # Admin subdomain — admin.bloodbank.example.com
+    - host: admin.bloodbank.example.com
+      http:
+        paths:
+          # Donor management
+          - path: /donors
+            pathType: Prefix
+            backend:
+              service:
+                name: donor-service
+                port:
+                  number: 8082
+          # Branch management
+          - path: /branches
+            pathType: Prefix
+            backend:
+              service:
+                name: branch-service
+                port:
+                  number: 8081
+          # Reporting
+          - path: /reports
+            pathType: Prefix
+            backend:
+              service:
+                name: reporting-service
+                port:
+                  number: 8090
+          # Fallback → frontend (admin SPA)
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+
+---
+# -----------------------------------------------------------------------------
+# 4. NetworkPolicy — enforce TLS ingress only from nginx controller
+# -----------------------------------------------------------------------------
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-controller-only
+  namespace: bloodbank-prod
+  labels:
+    app.kubernetes.io/name: network-policy
+    app.kubernetes.io/component: tls-enforcement
+    app.kubernetes.io/part-of: bloodbank
+spec:
+  podSelector: {}   # applies to ALL pods in bloodbank-prod
+  policyTypes:
+    - Ingress
+  ingress:
+    # Allow traffic only from the nginx ingress controller namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+    # Allow intra-namespace communication
+    - from:
+        - podSelector: {}
+    # Allow monitoring from monitoring namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
