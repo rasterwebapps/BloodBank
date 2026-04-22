@@ -69,5 +69,6 @@ Roll out to all branches in batches, with data migration and staff training for 
 
 1. All regional branches live on BloodBank
 2. Per-batch migration and training reports
-3. Cross-branch feature validation report
-4. Regional management sign-off
+3. Cross-branch feature validation report — [`docs/operations/cross-branch-validation.md`](../operations/cross-branch-validation.md) (M11-026–029)
+4. Scaling and performance validation report — [`docs/operations/scaling-validation.md`](../operations/scaling-validation.md) (M11-031–034)
+5. Regional management sign-off — [`docs/operations/regional-signoff-template.md`](../operations/regional-signoff-template.md) (M11-030)
