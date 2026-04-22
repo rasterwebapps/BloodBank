@@ -23,10 +23,10 @@
 | **M9** | 🟡 IN PROGRESS | 40% auto / 24 manual READY | 16/40 auto + 24/40 manual READY | — |
 | **M10** | 🟡 READY | 41% infra + 59% ops READY | 11/27 infra + 16/27 ops READY | — |
 | **M11** | 🟡 READY | 15% planning + 85% ops READY | 5/34 planning + 29 ops READY | — |
-| **M12** | 🔴 NOT STARTED | 0% | 0/20 | — |
+| **M12** | 🟡 IN PROGRESS | 65% | 13/20 | — |
 | **M13** | 🔴 NOT STARTED | 0% | 0/33 | — |
 
-**Overall Progress: M8 COMPLETE (28/28), M9 IN PROGRESS (16/40 auto + 24 manual READY), M10 READY (11/27 infra + 16/27 ops READY), M11 READY (5/34 planning + 29/34 ops READY), ~72% of total project (396/530)**
+**Overall Progress: M8 COMPLETE (28/28), M9 IN PROGRESS (16/40 auto + 24 manual READY), M10 READY (11/27 infra + 16/27 ops READY), M11 READY (5/34 planning + 29/34 ops READY), M12 IN PROGRESS (13/20), ~73% of total project (409/530)**
 
 ---
 
@@ -420,8 +420,21 @@
 - M11-026–M11-030: Cross-branch validation (inter-branch transfers, regional dashboard, emergency broadcasts, REGIONAL_ADMIN view, regional sign-off) — procedures in `cross-branch-validation.md`, `regional-signoff-template.md`
 - M11-031–M11-034: Scaling validation (HPA, DB, Redis, alerting thresholds) — automated by `scaling-check.sh`; formal procedures in `scaling-validation.md`
 
-### M12: Worldwide Launch — 🔴 NOT STARTED (0%)
-**Blocked by:** M11
+### M12: Worldwide Launch — 🟡 IN PROGRESS (65%)
+**Issues Completed:** 13/20
+**Blocked by:** M11 (remaining deployment items)
+
+- M12-001: Branch verification — `launch-checklist.md` Part 1
+- M12-006: SLA documentation — `launch-checklist.md` Part 5
+- M12-007: Public Donor Portal access — **operational**
+- M12-008: Public Hospital Portal access — **operational**
+- M12-012–M12-016: Operations handover, runbooks, on-call, monitoring, incident response — `on-call-guide.md`, `runbooks/` (6 runbooks), `incident-response.md`
+- M12-017: Executive go-live approval — `launch-checklist.md` Part 7, `go-live-announcement.md`
+- M12-018: DNS switch — **operational** (`k8s/scripts/dns-switch.sh`)
+- M12-019: First 24h monitoring — **operational** (`hypercare-plan.md`, `on-call-guide.md`)
+- M12-020: Go-live announcement — `go-live-announcement.md` (7 templates)
+
+**Pending:** M12-002 (security scan), M12-003 (performance validation), M12-004 (DR test), M12-005 (backup/restore), M12-009 (CDN activation), M12-010 (TLS verification), M12-011 (search engine submission)
 
 ### M13: Post-Launch — 🔴 NOT STARTED (0%)
 **Blocked by:** M12
