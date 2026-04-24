@@ -1,15 +1,16 @@
 <mat-toolbar class="topbar">
   <!-- Hamburger menu -->
-  <button mat-icon-button (click)="onToggleSidenav()" aria-label="Toggle navigation">
+  <button mat-icon-button (click)="onToggleSidenav()"
+    [attr.aria-label]="'TOPBAR.TOGGLE_NAVIGATION' | translate">
     <mat-icon>menu</mat-icon>
   </button>
 
   <!-- Branch selector -->
   @if (branches().length > 1) {
     <button mat-button [matMenuTriggerFor]="branchMenu" class="branch-selector"
-      [attr.aria-label]="'Select branch: ' + (currentBranch()?.name ?? 'No branch selected')">
+      [attr.aria-label]="('TOPBAR.SELECT_BRANCH_ARIA' | translate:{ name: currentBranch()?.name ?? ('APP.UNKNOWN' | translate) })">
       <mat-icon>business</mat-icon>
-      <span>{{ currentBranch()?.name ?? 'Select Branch' }}</span>
+      <span>{{ currentBranch()?.name ?? ('TOPBAR.SELECT_BRANCH' | translate) }}</span>
       <mat-icon>arrow_drop_down</mat-icon>
     </button>
     <mat-menu #branchMenu="matMenu">
@@ -26,17 +27,35 @@
   <span class="topbar-spacer"></span>
 
   <!-- Theme toggle -->
-  <button mat-icon-button (click)="onToggleTheme()" [attr.aria-label]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'">
+  <button mat-icon-button (click)="onToggleTheme()"
+    [attr.aria-label]="(isDark() ? 'TOPBAR.SWITCH_LIGHT_MODE' : 'TOPBAR.SWITCH_DARK_MODE') | translate">
     <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
   </button>
 
+  <!-- Language switcher -->
+  <button mat-icon-button [matMenuTriggerFor]="langMenu"
+    [matTooltip]="'LANGUAGE.SELECT' | translate"
+    [attr.aria-label]="'LANGUAGE.SELECT' | translate">
+    <mat-icon>translate</mat-icon>
+  </button>
+  <mat-menu #langMenu="matMenu">
+    @for (lang of languageService.supportedLanguages; track lang.code) {
+      <button mat-menu-item (click)="onSelectLanguage(lang.code)"
+        [class.font-bold]="languageService.currentLocale() === lang.code">
+        {{ lang.nativeLabel }}
+      </button>
+    }
+  </mat-menu>
+
   <!-- Notifications -->
-  <button mat-icon-button aria-label="Notifications" matBadge="3" matBadgeColor="warn" matBadgeSize="small">
+  <button mat-icon-button [attr.aria-label]="'TOPBAR.NOTIFICATIONS' | translate"
+    matBadge="3" matBadgeColor="warn" matBadgeSize="small">
     <mat-icon>notifications</mat-icon>
   </button>
 
   <!-- User menu -->
-  <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="User menu">
+  <button mat-icon-button [matMenuTriggerFor]="userMenu"
+    [attr.aria-label]="'TOPBAR.USER_MENU' | translate">
     <mat-icon>account_circle</mat-icon>
   </button>
   <mat-menu #userMenu="matMenu">
@@ -47,11 +66,11 @@
     <mat-divider />
     <button mat-menu-item (click)="onManageAccount()">
       <mat-icon>person</mat-icon>
-      <span>My Account</span>
+      <span>{{ 'TOPBAR.MY_ACCOUNT' | translate }}</span>
     </button>
     <button mat-menu-item (click)="onLogout()">
       <mat-icon>logout</mat-icon>
-      <span>Sign Out</span>
+      <span>{{ 'TOPBAR.SIGN_OUT' | translate }}</span>
     </button>
   </mat-menu>
 </mat-toolbar>
