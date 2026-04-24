@@ -8,13 +8,13 @@
   [class.sidenav-mobile]="isMobile()"
   [class.sidenav-mobile-open]="isMobile() && !collapsed()"
   role="navigation"
-  aria-label="Main navigation">
+  [attr.aria-label]="'NAV.MAIN_NAVIGATION' | translate">
 
   <!-- Brand -->
   <div class="sidenav-brand">
     <mat-icon class="brand-icon">bloodtype</mat-icon>
     @if (!collapsed()) {
-      <span class="brand-text">BloodBank</span>
+      <span class="brand-text">{{ 'APP.NAME' | translate }}</span>
     }
   </div>
 
@@ -25,12 +25,12 @@
         mat-list-item
         [routerLink]="item.route"
         routerLinkActive="active-link"
-        [matTooltip]="collapsed() ? item.label : ''"
+        [matTooltip]="collapsed() ? (item.labelKey | translate) : ''"
         matTooltipPosition="right"
         (click)="onBackdropClick()">
         <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
         @if (!collapsed()) {
-          <span matListItemTitle>{{ item.label }}</span>
+          <span matListItemTitle>{{ item.labelKey | translate }}</span>
         }
       </a>
     }
