@@ -166,8 +166,8 @@ services:
 
   flyway-migration:
     build:
-      context: .
-      dockerfile: shared-libs/db-migration/Dockerfile
+      context: shared-libs/db-migration
+      dockerfile: Dockerfile
     image: bloodbank/db-migration:latest
     container_name: bloodbank-flyway-migration
     environment:
