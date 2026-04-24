@@ -372,3 +372,45 @@ groups:
           summary: "Transfusion reaction reported at {{ $labels.branch }}"
           description: "A transfusion reaction has been reported. Immediate hemovigilance protocol must be initiated."
           runbook_url: "https://wiki.bloodbank.internal/runbooks/transfusion-reaction"
+
+  # ─── Audit Log ────────────────────────────────────────────────────────────────
+  - name: audit_log
+    interval: 30s
+    rules:
+      - alert: AuditLogWriteFailures
+        expr: |
+          (
+            sum by (service) (
+              rate(bloodbank_audit_log_writes_total{result="failure"}[5m])
+            )
+            /
+            (
+              sum by (service) (
+                rate(bloodbank_audit_log_writes_total[5m])
+              ) > 0
+            )
+          ) > 0.01
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+          domain: compliance
+        annotations:
+          summary: "Audit log write failures on {{ $labels.service }}"
+          description: "More than 1% of audit log writes are failing for {{ $labels.service }} (current rate: {{ $value | humanizePercentage }}). Regulatory compliance is at risk — audit trail may be incomplete."
+          runbook_url: "https://wiki.bloodbank.internal/runbooks/audit-log-failures"
+
+      - alert: AuditLogWriteFailuresAbsolute
+        expr: |
+          sum by (service) (
+            increase(bloodbank_audit_log_writes_total{result="failure"}[5m])
+          ) > 0
+        for: 1m
+        labels:
+          severity: warning
+          team: platform
+          domain: compliance
+        annotations:
+          summary: "Audit log write failures detected on {{ $labels.service }}"
+          description: "{{ $value }} audit log write failure(s) detected in the last 5 minutes for {{ $labels.service }}. Check reporting-service health and database connectivity."
+          runbook_url: "https://wiki.bloodbank.internal/runbooks/audit-log-failures"
