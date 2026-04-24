@@ -64,7 +64,7 @@
   "TOPBAR": {
     "TOGGLE_NAVIGATION": "Toggle navigation",
     "SELECT_BRANCH": "Select Branch",
-    "SELECT_BRANCH_ARIA": "Select branch: {{name}}",
+    "SELECT_BRANCH_ARIA": "Select branch: {name}",
     "SWITCH_LIGHT_MODE": "Switch to light mode",
     "SWITCH_DARK_MODE": "Switch to dark mode",
     "NOTIFICATIONS": "Notifications",
@@ -90,7 +90,7 @@
   },
   "DASHBOARD": {
     "TITLE": "Dashboard",
-    "WELCOME": "Welcome back, {{name}}",
+    "WELCOME": "Welcome back, {name}",
     "KPI_TOTAL_DONORS": "Total Donors",
     "KPI_ACTIVE_DONORS": "Active Donors",
     "KPI_COLLECTIONS_TODAY": "Collections Today",

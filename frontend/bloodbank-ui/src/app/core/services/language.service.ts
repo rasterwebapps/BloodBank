@@ -1,6 +1,7 @@
 import { Injectable, PLATFORM_ID, inject, signal, computed } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 
 /**
  * Supported application locales.
@@ -71,7 +72,7 @@ export class LanguageService {
   // ── Private helpers ────────────────────────────────────────────
 
   private applyLocale(code: AppLocale): void {
-    this.translate.use(code).subscribe();
+    void firstValueFrom(this.translate.use(code));
     this._currentLocale.set(code);
     if (isPlatformBrowser(this.platformId)) {
       document.documentElement.lang = code;

@@ -64,7 +64,7 @@
   "TOPBAR": {
     "TOGGLE_NAVIGATION": "Alternar navegación",
     "SELECT_BRANCH": "Seleccionar sede",
-    "SELECT_BRANCH_ARIA": "Seleccionar sede: {{name}}",
+    "SELECT_BRANCH_ARIA": "Seleccionar sede: {name}",
     "SWITCH_LIGHT_MODE": "Cambiar a modo claro",
     "SWITCH_DARK_MODE": "Cambiar a modo oscuro",
     "NOTIFICATIONS": "Notificaciones",
@@ -90,7 +90,7 @@
   },
   "DASHBOARD": {
     "TITLE": "Panel de control",
-    "WELCOME": "Bienvenido, {{name}}",
+    "WELCOME": "Bienvenido, {name}",
     "KPI_TOTAL_DONORS": "Total de donantes",
     "KPI_ACTIVE_DONORS": "Donantes activos",
     "KPI_COLLECTIONS_TODAY": "Colectas hoy",
