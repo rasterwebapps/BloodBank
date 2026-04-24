@@ -32,6 +32,19 @@ CONTROLLER_NAMESPACE="kube-system"
 SECRET_NAME="bloodbank-secrets"
 
 # ---------------------------------------------------------------------------
+# Cleanup trap — clear all plaintext credential variables on exit or error
+# ---------------------------------------------------------------------------
+cleanup() {
+  # Overwrite variables holding plaintext credentials before they go out of scope.
+  # This limits the window in which secrets are readable in the process environment.
+  DB_USERNAME="" DB_PASSWORD=""
+  RABBITMQ_USERNAME="" RABBITMQ_PASSWORD=""
+  MINIO_ACCESS_KEY="" MINIO_SECRET_KEY=""
+  ENCRYPT_KEY=""
+}
+trap cleanup EXIT ERR INT TERM
+
+# ---------------------------------------------------------------------------
 # Argument validation
 # ---------------------------------------------------------------------------
 NAMESPACE="${1:-}"
@@ -136,19 +149,19 @@ echo ""
 # Database
 echo "── PostgreSQL ──────────────────────────────────────────────"
 DB_USERNAME=$(prompt_secret "DB_USERNAME" "DB_USERNAME (PostgreSQL username)")
-DB_PASSWORD=$(prompt_secret "DB_PASSWORD" "DB_PASSWORD (PostgreSQL password)" "$(openssl rand -base64 32)")
+DB_PASSWORD=$(prompt_secret "DB_PASSWORD" "DB_PASSWORD (PostgreSQL password)" "$(openssl rand -hex 32)")
 
 # RabbitMQ
 echo ""
 echo "── RabbitMQ ────────────────────────────────────────────────"
 RABBITMQ_USERNAME=$(prompt_secret "RABBITMQ_USERNAME" "RABBITMQ_USERNAME")
-RABBITMQ_PASSWORD=$(prompt_secret "RABBITMQ_PASSWORD" "RABBITMQ_PASSWORD" "$(openssl rand -base64 32)")
+RABBITMQ_PASSWORD=$(prompt_secret "RABBITMQ_PASSWORD" "RABBITMQ_PASSWORD" "$(openssl rand -hex 32)")
 
 # MinIO
 echo ""
 echo "── MinIO (document-service) ────────────────────────────────"
 MINIO_ACCESS_KEY=$(prompt_secret "MINIO_ACCESS_KEY" "MINIO_ACCESS_KEY" "bloodbank-$(openssl rand -hex 8)")
-MINIO_SECRET_KEY=$(prompt_secret "MINIO_SECRET_KEY" "MINIO_SECRET_KEY" "$(openssl rand -base64 40)")
+MINIO_SECRET_KEY=$(prompt_secret "MINIO_SECRET_KEY" "MINIO_SECRET_KEY" "$(openssl rand -hex 40)")
 
 # Spring Cloud Config encryption key
 echo ""
