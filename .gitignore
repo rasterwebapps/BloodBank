@@ -60,8 +60,12 @@ dist/
 # Docker
 docker-compose.override.yml
 
-# Kubernetes secrets
-k8s/secrets/
+# Kubernetes — never commit plain (unencrypted) Secret manifests.
+# SealedSecret manifests (k8s/secrets/bloodbank-sealed-secret-*.yml) ARE safe
+# to commit because they contain kubeseal-encrypted ciphertext, not plaintext.
+# The cluster public key (sealed-secrets-pub.pem) is also safe to commit.
+k8s/secrets/*-plain-secret*.yml
+k8s/secrets/*-values*.yml
 
 # Temporary files
 *.swp
