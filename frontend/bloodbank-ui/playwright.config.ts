@@ -18,7 +18,12 @@ export default defineConfig({
   testDir: './e2e',
   testMatch: '**/*.e2e.ts',
 
-  /* Maximum time one test can run. */
+  /**
+   * Maximum time one test can run.
+   * 60 s accommodates the Keycloak redirect round-trip (~2–5 s), Angular
+   * lazy-loading of feature modules (~1–3 s), and API response times in CI
+   * where cold-start latency can reach 10–20 s per service.
+   */
   timeout: 60_000,
 
   /* Retry failed tests once in CI. */

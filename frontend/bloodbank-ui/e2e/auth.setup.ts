@@ -23,9 +23,9 @@ setup('authenticate as staff user', async ({ page }) => {
   // Wait for the Keycloak login form
   await page.waitForURL(/\/auth\/realms\/bloodbank\//);
 
-  // Fill credentials
-  await page.getByLabel('Username or email').fill(username);
-  await page.getByLabel('Password').fill(password);
+  // Fill credentials — use role-based selectors to avoid fragility from Keycloak UI text changes
+  await page.getByRole('textbox', { name: /username|email/i }).fill(username);
+  await page.getByRole('textbox', { name: /password/i }).fill(password);
   await page.getByRole('button', { name: /sign in/i }).click();
 
   // After login Keycloak redirects back to the app
