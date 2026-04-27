@@ -41,8 +41,6 @@ subprojects {
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(21))
         }
-        // Keep parameter names — required by Spring (DI, MVC), MapStruct, and
-        // Jackson. Production-grade default.
         withSourcesJar()
     }
 
@@ -56,6 +54,8 @@ subprojects {
     }
 
     // ─── Compiler defaults (apply to every subproject) ──────────────────────
+    // `-parameters` keeps method parameter names in bytecode, which is required
+    // by Spring (DI, MVC), MapStruct, and Jackson — production-grade default.
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
         options.compilerArgs.addAll(listOf(

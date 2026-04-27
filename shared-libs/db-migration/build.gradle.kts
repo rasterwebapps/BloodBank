@@ -64,11 +64,6 @@ flyway {
 }
 
 // Skip Jacoco coverage threshold for this module — it ships SQL, not Java logic.
-tasks.named("check") {
-    setDependsOn(dependsOn.filterNot {
-        (it as? TaskProvider<*>)?.name == "jacocoTestCoverageVerification"
-    })
-}
 tasks.matching { it.name == "jacocoTestCoverageVerification" }.configureEach {
     enabled = false
 }
