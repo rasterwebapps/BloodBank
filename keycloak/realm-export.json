@@ -60,12 +60,19 @@
   "adminTheme": "keycloak.v2",
   "emailTheme": "keycloak",
   "internationalizationEnabled": true,
-  "supportedLocales": ["en", "fr", "es", "ar"],
+  "supportedLocales": [
+    "en",
+    "fr",
+    "es",
+    "ar"
+  ],
   "defaultLocale": "en",
   "smtpServer": {},
   "eventsEnabled": true,
   "eventsExpiration": 2592000,
-  "eventsListeners": ["jboss-logging"],
+  "eventsListeners": [
+    "jboss-logging"
+  ],
   "enabledEventTypes": [
     "LOGIN",
     "LOGIN_ERROR",
@@ -93,7 +100,6 @@
     "xXSSProtection": "1; mode=block",
     "strictTransportSecurity": "max-age=31536000; includeSubDomains"
   },
-
   "roles": {
     "realm": [
       {
@@ -104,8 +110,12 @@
         "clientRole": false,
         "containerId": "bloodbank",
         "attributes": {
-          "session_idle_timeout": ["900"],
-          "session_max_lifetime": ["28800"]
+          "session_idle_timeout": [
+            "900"
+          ],
+          "session_max_lifetime": [
+            "28800"
+          ]
         }
       },
       {
@@ -116,8 +126,12 @@
         "clientRole": false,
         "containerId": "bloodbank",
         "attributes": {
-          "session_idle_timeout": ["900"],
-          "session_max_lifetime": ["28800"]
+          "session_idle_timeout": [
+            "900"
+          ],
+          "session_max_lifetime": [
+            "28800"
+          ]
         }
       },
       {
@@ -128,8 +142,12 @@
         "clientRole": false,
         "containerId": "bloodbank",
         "attributes": {
-          "session_idle_timeout": ["900"],
-          "session_max_lifetime": ["28800"]
+          "session_idle_timeout": [
+            "900"
+          ],
+          "session_max_lifetime": [
+            "28800"
+          ]
         }
       },
       {
@@ -140,8 +158,12 @@
         "clientRole": false,
         "containerId": "bloodbank",
         "attributes": {
-          "session_idle_timeout": ["900"],
-          "session_max_lifetime": ["28800"]
+          "session_idle_timeout": [
+            "900"
+          ],
+          "session_max_lifetime": [
+            "28800"
+          ]
         }
       },
       {
@@ -150,9 +172,15 @@
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
-          "realm": ["offline_access", "uma_authorization"],
+          "realm": [
+            "offline_access",
+            "uma_authorization"
+          ],
           "client": {
-            "account": ["manage-account", "view-profile"]
+            "account": [
+              "manage-account",
+              "view-profile"
+            ]
           }
         },
         "clientRole": false,
@@ -260,7 +288,6 @@
       ]
     }
   },
-
   "groups": [
     {
       "id": "cc000003-0000-0000-0000-000000000001",
@@ -283,7 +310,9 @@
               "name": "delhi-branch",
               "path": "/regions/north-india/delhi-branch",
               "attributes": {
-                "branch_id": ["bb000000-0000-0000-0000-000000000001"]
+                "branch_id": [
+                  "bb000000-0000-0000-0000-000000000001"
+                ]
               },
               "subGroups": []
             },
@@ -292,7 +321,9 @@
               "name": "punjab-branch",
               "path": "/regions/north-india/punjab-branch",
               "attributes": {
-                "branch_id": ["bb000000-0000-0000-0000-000000000002"]
+                "branch_id": [
+                  "bb000000-0000-0000-0000-000000000002"
+                ]
               },
               "subGroups": []
             }
@@ -308,7 +339,9 @@
               "name": "chennai-branch",
               "path": "/regions/south-india/chennai-branch",
               "attributes": {
-                "branch_id": ["bb000000-0000-0000-0000-000000000003"]
+                "branch_id": [
+                  "bb000000-0000-0000-0000-000000000003"
+                ]
               },
               "subGroups": []
             },
@@ -317,7 +350,9 @@
               "name": "bangalore-branch",
               "path": "/regions/south-india/bangalore-branch",
               "attributes": {
-                "branch_id": ["bb000000-0000-0000-0000-000000000004"]
+                "branch_id": [
+                  "bb000000-0000-0000-0000-000000000004"
+                ]
               },
               "subGroups": []
             }
@@ -333,7 +368,9 @@
               "name": "mumbai-branch",
               "path": "/regions/west-india/mumbai-branch",
               "attributes": {
-                "branch_id": ["bb000000-0000-0000-0000-000000000005"]
+                "branch_id": [
+                  "bb000000-0000-0000-0000-000000000005"
+                ]
               },
               "subGroups": []
             }
@@ -386,7 +423,6 @@
       ]
     }
   ],
-
   "clients": [
     {
       "id": "dd000004-0000-0000-0000-000000000001",
@@ -401,8 +437,12 @@
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "bloodbank-api-secret-change-in-production",
-      "redirectUris": ["http://localhost:8080/*"],
-      "webOrigins": ["http://localhost:8080"],
+      "redirectUris": [
+        "http://localhost:8080/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8080"
+      ],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
@@ -622,7 +662,6 @@
       ]
     }
   ],
-
   "components": {
     "org.keycloak.storage.UserStorageProvider": [
       {
@@ -637,11 +676,21 @@
               "providerId": "user-attribute-ldap-mapper",
               "subComponents": {},
               "config": {
-                "ldap.attribute": ["uid"],
-                "is.mandatory.in.ldap": ["true"],
-                "always.read.value.from.ldap": ["false"],
-                "read.only": ["true"],
-                "user.model.attribute": ["username"]
+                "ldap.attribute": [
+                  "uid"
+                ],
+                "is.mandatory.in.ldap": [
+                  "true"
+                ],
+                "always.read.value.from.ldap": [
+                  "false"
+                ],
+                "read.only": [
+                  "true"
+                ],
+                "user.model.attribute": [
+                  "username"
+                ]
               }
             },
             {
@@ -650,11 +699,21 @@
               "providerId": "user-attribute-ldap-mapper",
               "subComponents": {},
               "config": {
-                "ldap.attribute": ["mail"],
-                "is.mandatory.in.ldap": ["false"],
-                "always.read.value.from.ldap": ["false"],
-                "read.only": ["true"],
-                "user.model.attribute": ["email"]
+                "ldap.attribute": [
+                  "mail"
+                ],
+                "is.mandatory.in.ldap": [
+                  "false"
+                ],
+                "always.read.value.from.ldap": [
+                  "false"
+                ],
+                "read.only": [
+                  "true"
+                ],
+                "user.model.attribute": [
+                  "email"
+                ]
               }
             },
             {
@@ -663,11 +722,21 @@
               "providerId": "user-attribute-ldap-mapper",
               "subComponents": {},
               "config": {
-                "ldap.attribute": ["givenName"],
-                "is.mandatory.in.ldap": ["true"],
-                "always.read.value.from.ldap": ["true"],
-                "read.only": ["true"],
-                "user.model.attribute": ["firstName"]
+                "ldap.attribute": [
+                  "givenName"
+                ],
+                "is.mandatory.in.ldap": [
+                  "true"
+                ],
+                "always.read.value.from.ldap": [
+                  "true"
+                ],
+                "read.only": [
+                  "true"
+                ],
+                "user.model.attribute": [
+                  "firstName"
+                ]
               }
             },
             {
@@ -676,11 +745,21 @@
               "providerId": "user-attribute-ldap-mapper",
               "subComponents": {},
               "config": {
-                "ldap.attribute": ["sn"],
-                "is.mandatory.in.ldap": ["true"],
-                "always.read.value.from.ldap": ["true"],
-                "read.only": ["true"],
-                "user.model.attribute": ["lastName"]
+                "ldap.attribute": [
+                  "sn"
+                ],
+                "is.mandatory.in.ldap": [
+                  "true"
+                ],
+                "always.read.value.from.ldap": [
+                  "true"
+                ],
+                "read.only": [
+                  "true"
+                ],
+                "user.model.attribute": [
+                  "lastName"
+                ]
               }
             },
             {
@@ -689,11 +768,21 @@
               "providerId": "user-attribute-ldap-mapper",
               "subComponents": {},
               "config": {
-                "ldap.attribute": ["bloodbankBranchId"],
-                "is.mandatory.in.ldap": ["false"],
-                "always.read.value.from.ldap": ["true"],
-                "read.only": ["true"],
-                "user.model.attribute": ["branch_id"]
+                "ldap.attribute": [
+                  "bloodbankBranchId"
+                ],
+                "is.mandatory.in.ldap": [
+                  "false"
+                ],
+                "always.read.value.from.ldap": [
+                  "true"
+                ],
+                "read.only": [
+                  "true"
+                ],
+                "user.model.attribute": [
+                  "branch_id"
+                ]
               }
             },
             {
@@ -702,66 +791,168 @@
               "providerId": "group-ldap-mapper",
               "subComponents": {},
               "config": {
-                "mode": ["READ_ONLY"],
-                "membership.attribute.type": ["DN"],
-                "user.roles.retrieve.strategy": ["LOAD_GROUPS_BY_MEMBER_ATTRIBUTE"],
-                "group.name.ldap.attribute": ["cn"],
-                "membership.ldap.attribute": ["member"],
-                "preserve.group.inheritance": ["true"],
-                "ignore.missing.groups": ["false"],
-                "group.object.classes": ["groupOfNames"],
-                "groups.dn": ["ou=groups,dc=bloodbank,dc=internal"],
-                "drop.non.existing.groups.during.sync": ["false"]
+                "mode": [
+                  "READ_ONLY"
+                ],
+                "membership.attribute.type": [
+                  "DN"
+                ],
+                "user.roles.retrieve.strategy": [
+                  "LOAD_GROUPS_BY_MEMBER_ATTRIBUTE"
+                ],
+                "group.name.ldap.attribute": [
+                  "cn"
+                ],
+                "membership.ldap.attribute": [
+                  "member"
+                ],
+                "preserve.group.inheritance": [
+                  "true"
+                ],
+                "ignore.missing.groups": [
+                  "false"
+                ],
+                "group.object.classes": [
+                  "groupOfNames"
+                ],
+                "groups.dn": [
+                  "ou=groups,dc=bloodbank,dc=internal"
+                ],
+                "drop.non.existing.groups.during.sync": [
+                  "false"
+                ]
               }
             }
           ]
         },
         "config": {
-          "enabled": ["true"],
-          "priority": ["0"],
-          "editMode": ["READ_ONLY"],
-          "importEnabled": ["true"],
-          "syncRegistrations": ["false"],
-          "vendor": ["other"],
-          "usernameLDAPAttribute": ["uid"],
-          "rdnLDAPAttribute": ["uid"],
-          "uuidLDAPAttribute": ["entryUUID"],
-          "userObjectClasses": ["inetOrgPerson, organizationalPerson"],
-          "connectionUrl": ["ldaps://ldap.bloodbank.internal:636"],
-          "usersDn": ["ou=users,dc=bloodbank,dc=internal"],
-          "authType": ["simple"],
-          "bindDn": ["cn=keycloak,ou=service-accounts,dc=bloodbank,dc=internal"],
-          "bindCredential": ["**CHANGE_IN_PRODUCTION**"],
-          "customUserSearchFilter": [""],
-          "searchScope": ["2"],
-          "validatePasswordPolicy": ["false"],
-          "trustEmail": ["true"],
-          "useTruststoreSpi": ["ldapsOnly"],
-          "connectionPooling": ["true"],
-          "connectionPoolingAuthentication": ["none simple"],
-          "connectionPoolingDebug": ["false"],
-          "connectionPoolingInitSize": ["1"],
-          "connectionPoolingMaxSize": ["1000"],
-          "connectionPoolingPrefSize": ["5"],
-          "connectionPoolingProtocol": ["plain"],
-          "connectionPoolingTimeout": ["300000"],
-          "connectionPoolingType": ["none"],
-          "connectionTimeout": ["5000"],
-          "readTimeout": ["10000"],
-          "pagination": ["true"],
-          "batchSizeForSync": ["1000"],
-          "fullSyncPeriod": ["86400"],
-          "changedSyncPeriod": ["900"],
-          "cachePolicy": ["DEFAULT"],
+          "enabled": [
+            "true"
+          ],
+          "priority": [
+            "0"
+          ],
+          "editMode": [
+            "READ_ONLY"
+          ],
+          "importEnabled": [
+            "true"
+          ],
+          "syncRegistrations": [
+            "false"
+          ],
+          "vendor": [
+            "other"
+          ],
+          "usernameLDAPAttribute": [
+            "uid"
+          ],
+          "rdnLDAPAttribute": [
+            "uid"
+          ],
+          "uuidLDAPAttribute": [
+            "entryUUID"
+          ],
+          "userObjectClasses": [
+            "inetOrgPerson, organizationalPerson"
+          ],
+          "connectionUrl": [
+            "ldaps://ldap.bloodbank.internal:636"
+          ],
+          "usersDn": [
+            "ou=users,dc=bloodbank,dc=internal"
+          ],
+          "authType": [
+            "simple"
+          ],
+          "bindDn": [
+            "cn=keycloak,ou=service-accounts,dc=bloodbank,dc=internal"
+          ],
+          "bindCredential": [
+            "**CHANGE_IN_PRODUCTION**"
+          ],
+          "customUserSearchFilter": [
+            ""
+          ],
+          "searchScope": [
+            "2"
+          ],
+          "validatePasswordPolicy": [
+            "false"
+          ],
+          "trustEmail": [
+            "true"
+          ],
+          "useTruststoreSpi": [
+            "ldapsOnly"
+          ],
+          "connectionPooling": [
+            "true"
+          ],
+          "connectionPoolingAuthentication": [
+            "none simple"
+          ],
+          "connectionPoolingDebug": [
+            "false"
+          ],
+          "connectionPoolingInitSize": [
+            "1"
+          ],
+          "connectionPoolingMaxSize": [
+            "1000"
+          ],
+          "connectionPoolingPrefSize": [
+            "5"
+          ],
+          "connectionPoolingProtocol": [
+            "plain"
+          ],
+          "connectionPoolingTimeout": [
+            "300000"
+          ],
+          "connectionPoolingType": [
+            "none"
+          ],
+          "connectionTimeout": [
+            "5000"
+          ],
+          "readTimeout": [
+            "10000"
+          ],
+          "pagination": [
+            "true"
+          ],
+          "batchSizeForSync": [
+            "1000"
+          ],
+          "fullSyncPeriod": [
+            "86400"
+          ],
+          "changedSyncPeriod": [
+            "900"
+          ],
+          "cachePolicy": [
+            "DEFAULT"
+          ],
           "evictionDay": [],
           "evictionHour": [],
           "evictionMinute": [],
           "maxLifespan": [],
-          "allowKerberosAuthentication": ["false"],
-          "debug": ["false"],
-          "useKerberosForPasswordAuthentication": ["false"],
-          "startTls": ["false"],
-          "usePasswordModifyExtendedOp": ["false"]
+          "allowKerberosAuthentication": [
+            "false"
+          ],
+          "debug": [
+            "false"
+          ],
+          "useKerberosForPasswordAuthentication": [
+            "false"
+          ],
+          "startTls": [
+            "false"
+          ],
+          "usePasswordModifyExtendedOp": [
+            "false"
+          ]
         }
       }
     ],
@@ -772,10 +963,18 @@
         "providerId": "rsa-generated",
         "subComponents": {},
         "config": {
-          "priority": ["100"],
-          "enabled": ["true"],
-          "active": ["true"],
-          "keySize": ["2048"]
+          "priority": [
+            "100"
+          ],
+          "enabled": [
+            "true"
+          ],
+          "active": [
+            "true"
+          ],
+          "keySize": [
+            "2048"
+          ]
         }
       },
       {
@@ -784,11 +983,21 @@
         "providerId": "hmac-generated",
         "subComponents": {},
         "config": {
-          "priority": ["100"],
-          "enabled": ["true"],
-          "active": ["true"],
-          "secretSize": ["64"],
-          "algorithm": ["HS256"]
+          "priority": [
+            "100"
+          ],
+          "enabled": [
+            "true"
+          ],
+          "active": [
+            "true"
+          ],
+          "secretSize": [
+            "64"
+          ],
+          "algorithm": [
+            "HS256"
+          ]
         }
       },
       {
@@ -797,15 +1006,22 @@
         "providerId": "aes-generated",
         "subComponents": {},
         "config": {
-          "priority": ["100"],
-          "enabled": ["true"],
-          "active": ["true"],
-          "secretSize": ["16"]
+          "priority": [
+            "100"
+          ],
+          "enabled": [
+            "true"
+          ],
+          "active": [
+            "true"
+          ],
+          "secretSize": [
+            "16"
+          ]
         }
       }
     ]
   },
-
   "authenticationFlows": [
     {
       "id": "gg000007-0000-0000-0000-000000000001",
@@ -902,7 +1118,7 @@
     {
       "id": "gg000007-0000-0000-0000-000000000004",
       "alias": "bloodbank-mfa-optional",
-      "description": "MFA optional for clinical roles (DOCTOR, LAB_TECHNICIAN, NURSE) — prompted only if already configured",
+      "description": "MFA optional for clinical roles (DOCTOR, LAB_TECHNICIAN, NURSE) \u2014 prompted only if already configured",
       "providerId": "basic-flow",
       "topLevel": false,
       "builtIn": false,
@@ -1458,16 +1674,32 @@
           "userSetupAllowed": false
         }
       ]
+    },
+    {
+      "id": "gg000007-0000-0000-0000-000000000090",
+      "alias": "docker auth",
+      "description": "Used by Docker clients to authenticate against the IDP",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": true,
+      "authenticationExecutions": [
+        {
+          "authenticator": "docker-http-basic-authenticator",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        }
+      ]
     }
   ],
-
   "authenticatorConfig": [
     {
       "id": "hh000008-0000-0000-0000-000000000001",
       "alias": "mfa-required-condition",
       "config": {
         "attribute": "mfa_required",
-        "attributeValue": "true",
         "attributeExpectedValue": "true",
         "regex": "false",
         "negate": "false"
@@ -1478,7 +1710,6 @@
       "alias": "mfa-optional-condition",
       "config": {
         "attribute": "mfa_optional",
-        "attributeValue": "true",
         "attributeExpectedValue": "true",
         "regex": "false",
         "negate": "false"
@@ -1492,7 +1723,6 @@
       }
     }
   ],
-
   "requiredActions": [
     {
       "alias": "CONFIGURE_TOTP",
@@ -1583,7 +1813,6 @@
       "priority": 110
     }
   ],
-
   "browserFlow": "bloodbank-browser",
   "registrationFlow": "registration",
   "directGrantFlow": "direct grant",
@@ -1591,7 +1820,6 @@
   "clientAuthenticationFlow": "clients",
   "dockerAuthenticationFlow": "docker auth",
   "firstBrokerLoginFlow": "first broker login",
-
   "users": [
     {
       "id": "uu000009-0000-0000-0000-000000000001",
@@ -1602,12 +1830,24 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": [""],
-        "mfa_required": ["true"],
-        "phoneNumber": ["+91-9000000001"]
+        "branch_id": [
+          ""
+        ],
+        "mfa_required": [
+          "true"
+        ],
+        "phoneNumber": [
+          "+91-9000000001"
+        ]
       },
-      "realmRoles": ["SUPER_ADMIN", "default-roles-bloodbank"],
-      "groups": ["/global", "/mfa/mfa-required"],
+      "realmRoles": [
+        "SUPER_ADMIN",
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/global",
+        "/mfa/mfa-required"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1625,12 +1865,24 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": [""],
-        "mfa_required": ["true"],
-        "phoneNumber": ["+91-9000000002"]
+        "branch_id": [
+          ""
+        ],
+        "mfa_required": [
+          "true"
+        ],
+        "phoneNumber": [
+          "+91-9000000002"
+        ]
       },
-      "realmRoles": ["REGIONAL_ADMIN", "default-roles-bloodbank"],
-      "groups": ["/regions/north-india", "/mfa/mfa-required"],
+      "realmRoles": [
+        "REGIONAL_ADMIN",
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/regions/north-india",
+        "/mfa/mfa-required"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1648,12 +1900,24 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": [""],
-        "mfa_required": ["true"],
-        "phoneNumber": ["+91-9000000003"]
+        "branch_id": [
+          ""
+        ],
+        "mfa_required": [
+          "true"
+        ],
+        "phoneNumber": [
+          "+91-9000000003"
+        ]
       },
-      "realmRoles": ["SYSTEM_ADMIN", "default-roles-bloodbank"],
-      "groups": ["/global", "/mfa/mfa-required"],
+      "realmRoles": [
+        "SYSTEM_ADMIN",
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/global",
+        "/mfa/mfa-required"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1671,12 +1935,24 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": [""],
-        "mfa_required": ["true"],
-        "phoneNumber": ["+91-9000000004"]
+        "branch_id": [
+          ""
+        ],
+        "mfa_required": [
+          "true"
+        ],
+        "phoneNumber": [
+          "+91-9000000004"
+        ]
       },
-      "realmRoles": ["AUDITOR", "default-roles-bloodbank"],
-      "groups": ["/global", "/mfa/mfa-required"],
+      "realmRoles": [
+        "AUDITOR",
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/global",
+        "/mfa/mfa-required"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1694,15 +1970,28 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
-        "mfa_required": ["true"],
-        "phoneNumber": ["+91-9000000005"]
+        "branch_id": [
+          "bb000000-0000-0000-0000-000000000001"
+        ],
+        "mfa_required": [
+          "true"
+        ],
+        "phoneNumber": [
+          "+91-9000000005"
+        ]
       },
       "clientRoles": {
-        "bloodbank-api": ["BRANCH_ADMIN"]
+        "bloodbank-api": [
+          "BRANCH_ADMIN"
+        ]
       },
-      "realmRoles": ["default-roles-bloodbank"],
-      "groups": ["/regions/north-india/delhi-branch", "/mfa/mfa-required"],
+      "realmRoles": [
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/regions/north-india/delhi-branch",
+        "/mfa/mfa-required"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1720,14 +2009,24 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
-        "phoneNumber": ["+91-9000000006"]
+        "branch_id": [
+          "bb000000-0000-0000-0000-000000000001"
+        ],
+        "phoneNumber": [
+          "+91-9000000006"
+        ]
       },
       "clientRoles": {
-        "bloodbank-api": ["BRANCH_MANAGER"]
+        "bloodbank-api": [
+          "BRANCH_MANAGER"
+        ]
       },
-      "realmRoles": ["default-roles-bloodbank"],
-      "groups": ["/regions/north-india/delhi-branch"],
+      "realmRoles": [
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/regions/north-india/delhi-branch"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1745,15 +2044,28 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
-        "mfa_optional": ["true"],
-        "phoneNumber": ["+91-9000000007"]
+        "branch_id": [
+          "bb000000-0000-0000-0000-000000000001"
+        ],
+        "mfa_optional": [
+          "true"
+        ],
+        "phoneNumber": [
+          "+91-9000000007"
+        ]
       },
       "clientRoles": {
-        "bloodbank-api": ["DOCTOR"]
+        "bloodbank-api": [
+          "DOCTOR"
+        ]
       },
-      "realmRoles": ["default-roles-bloodbank"],
-      "groups": ["/regions/north-india/delhi-branch", "/mfa/mfa-optional"],
+      "realmRoles": [
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/regions/north-india/delhi-branch",
+        "/mfa/mfa-optional"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1771,15 +2083,28 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
-        "mfa_optional": ["true"],
-        "phoneNumber": ["+91-9000000008"]
+        "branch_id": [
+          "bb000000-0000-0000-0000-000000000001"
+        ],
+        "mfa_optional": [
+          "true"
+        ],
+        "phoneNumber": [
+          "+91-9000000008"
+        ]
       },
       "clientRoles": {
-        "bloodbank-api": ["LAB_TECHNICIAN"]
+        "bloodbank-api": [
+          "LAB_TECHNICIAN"
+        ]
       },
-      "realmRoles": ["default-roles-bloodbank"],
-      "groups": ["/regions/north-india/delhi-branch", "/mfa/mfa-optional"],
+      "realmRoles": [
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/regions/north-india/delhi-branch",
+        "/mfa/mfa-optional"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1797,14 +2122,24 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
-        "phoneNumber": ["+91-9000000009"]
+        "branch_id": [
+          "bb000000-0000-0000-0000-000000000001"
+        ],
+        "phoneNumber": [
+          "+91-9000000009"
+        ]
       },
       "clientRoles": {
-        "bloodbank-api": ["PHLEBOTOMIST"]
+        "bloodbank-api": [
+          "PHLEBOTOMIST"
+        ]
       },
-      "realmRoles": ["default-roles-bloodbank"],
-      "groups": ["/regions/north-india/delhi-branch"],
+      "realmRoles": [
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/regions/north-india/delhi-branch"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1822,15 +2157,28 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
-        "mfa_optional": ["true"],
-        "phoneNumber": ["+91-9000000010"]
+        "branch_id": [
+          "bb000000-0000-0000-0000-000000000001"
+        ],
+        "mfa_optional": [
+          "true"
+        ],
+        "phoneNumber": [
+          "+91-9000000010"
+        ]
       },
       "clientRoles": {
-        "bloodbank-api": ["NURSE"]
+        "bloodbank-api": [
+          "NURSE"
+        ]
       },
-      "realmRoles": ["default-roles-bloodbank"],
-      "groups": ["/regions/north-india/delhi-branch", "/mfa/mfa-optional"],
+      "realmRoles": [
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/regions/north-india/delhi-branch",
+        "/mfa/mfa-optional"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1848,14 +2196,24 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
-        "phoneNumber": ["+91-9000000011"]
+        "branch_id": [
+          "bb000000-0000-0000-0000-000000000001"
+        ],
+        "phoneNumber": [
+          "+91-9000000011"
+        ]
       },
       "clientRoles": {
-        "bloodbank-api": ["INVENTORY_MANAGER"]
+        "bloodbank-api": [
+          "INVENTORY_MANAGER"
+        ]
       },
-      "realmRoles": ["default-roles-bloodbank"],
-      "groups": ["/regions/north-india/delhi-branch"],
+      "realmRoles": [
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/regions/north-india/delhi-branch"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1873,14 +2231,24 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
-        "phoneNumber": ["+91-9000000012"]
+        "branch_id": [
+          "bb000000-0000-0000-0000-000000000001"
+        ],
+        "phoneNumber": [
+          "+91-9000000012"
+        ]
       },
       "clientRoles": {
-        "bloodbank-api": ["BILLING_CLERK"]
+        "bloodbank-api": [
+          "BILLING_CLERK"
+        ]
       },
-      "realmRoles": ["default-roles-bloodbank"],
-      "groups": ["/regions/north-india/delhi-branch"],
+      "realmRoles": [
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/regions/north-india/delhi-branch"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1898,14 +2266,24 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
-        "phoneNumber": ["+91-9000000013"]
+        "branch_id": [
+          "bb000000-0000-0000-0000-000000000001"
+        ],
+        "phoneNumber": [
+          "+91-9000000013"
+        ]
       },
       "clientRoles": {
-        "bloodbank-api": ["CAMP_COORDINATOR"]
+        "bloodbank-api": [
+          "CAMP_COORDINATOR"
+        ]
       },
-      "realmRoles": ["default-roles-bloodbank"],
-      "groups": ["/regions/north-india/delhi-branch"],
+      "realmRoles": [
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/regions/north-india/delhi-branch"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1923,14 +2301,24 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
-        "phoneNumber": ["+91-9000000014"]
+        "branch_id": [
+          "bb000000-0000-0000-0000-000000000001"
+        ],
+        "phoneNumber": [
+          "+91-9000000014"
+        ]
       },
       "clientRoles": {
-        "bloodbank-api": ["RECEPTIONIST"]
+        "bloodbank-api": [
+          "RECEPTIONIST"
+        ]
       },
-      "realmRoles": ["default-roles-bloodbank"],
-      "groups": ["/regions/north-india/delhi-branch"],
+      "realmRoles": [
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/regions/north-india/delhi-branch"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1948,14 +2336,24 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": [""],
-        "phoneNumber": ["+91-9000000015"]
+        "branch_id": [
+          ""
+        ],
+        "phoneNumber": [
+          "+91-9000000015"
+        ]
       },
       "clientRoles": {
-        "bloodbank-api": ["HOSPITAL_USER"]
+        "bloodbank-api": [
+          "HOSPITAL_USER"
+        ]
       },
-      "realmRoles": ["default-roles-bloodbank"],
-      "groups": ["/hospitals/city-general-hospital"],
+      "realmRoles": [
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/hospitals/city-general-hospital"
+      ],
       "credentials": [
         {
           "type": "password",
@@ -1973,15 +2371,27 @@
       "emailVerified": true,
       "enabled": true,
       "attributes": {
-        "branch_id": ["bb000000-0000-0000-0000-000000000001"],
-        "bloodGroup": ["O+"],
-        "phoneNumber": ["+91-9000000016"]
+        "branch_id": [
+          "bb000000-0000-0000-0000-000000000001"
+        ],
+        "bloodGroup": [
+          "O+"
+        ],
+        "phoneNumber": [
+          "+91-9000000016"
+        ]
       },
       "clientRoles": {
-        "bloodbank-api": ["DONOR"]
+        "bloodbank-api": [
+          "DONOR"
+        ]
       },
-      "realmRoles": ["default-roles-bloodbank"],
-      "groups": ["/regions/north-india/delhi-branch"],
+      "realmRoles": [
+        "default-roles-bloodbank"
+      ],
+      "groups": [
+        "/regions/north-india/delhi-branch"
+      ],
       "credentials": [
         {
           "type": "password",
