@@ -34,6 +34,10 @@
     "tailwindcss": "^4.2.2",
     "tslib": "^2.3.0"
   },
+  "overrides": {
+    "hono": ">=4.12.14",
+    "postcss": ">=8.5.10"
+  },
   "devDependencies": {
     "@angular/build": "^21.2.7",
     "@angular/cli": "^21.2.7",
