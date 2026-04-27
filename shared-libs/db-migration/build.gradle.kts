@@ -4,10 +4,6 @@ plugins {
 }
 
 dependencies {
-    // These two are needed by the Flyway Gradle plugin's own classloader (separate from runtimeOnly)
-    "flyway"("org.postgresql:postgresql")
-    "flyway"("org.flywaydb:flyway-database-postgresql")
-
     api("org.flywaydb:flyway-core")
     api("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
