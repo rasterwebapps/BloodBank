@@ -10,7 +10,7 @@ RUN addgroup -S bloodbank && adduser -S bloodbank -G bloodbank
 WORKDIR /app
 COPY --from=builder /workspace/backend/config-server/build/libs/*.jar app.jar
 # Copy config-repo for native profile
-COPY --from=builder /workspace/config-repo /config-repo
+COPY --from=builder /workspace/config-repo /app/config-repo
 RUN apk add --no-cache wget
 USER bloodbank
 EXPOSE 8888
