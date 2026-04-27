@@ -14,7 +14,7 @@ spring:
       routes:
         # Branch Service (port 8081)
         - id: branch-service
-          uri: http://localhost:8081
+          uri: ${BRANCH_SERVICE_URL:http://localhost:8081}
           predicates:
             - Path=/api/v1/branches/**,/api/v1/blood-groups/**,/api/v1/component-types/**,/api/v1/deferral-reasons/**,/api/v1/reaction-types/**,/api/v1/countries/**,/api/v1/regions/**,/api/v1/cities/**,/api/v1/icd-codes/**
           filters:
@@ -30,7 +30,7 @@ spring:
 
         # Donor Service (port 8082)
         - id: donor-service
-          uri: http://localhost:8082
+          uri: ${DONOR_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/v1/donors/**,/api/v1/collections/**,/api/v1/blood-camps/**,/api/v1/donor-health-records/**,/api/v1/donor-deferrals/**,/api/v1/donor-consents/**
           filters:
@@ -46,7 +46,7 @@ spring:
 
         # Lab Service (port 8083)
         - id: lab-service
-          uri: http://localhost:8083
+          uri: ${LAB_SERVICE_URL:http://localhost:8083}
           predicates:
             - Path=/api/v1/test-orders/**,/api/v1/test-results/**,/api/v1/test-panels/**,/api/v1/lab-instruments/**,/api/v1/quality-control/**
           filters:
@@ -62,7 +62,7 @@ spring:
 
         # Inventory Service (port 8084)
         - id: inventory-service
-          uri: http://localhost:8084
+          uri: ${INVENTORY_SERVICE_URL:http://localhost:8084}
           predicates:
             - Path=/api/v1/blood-units/**,/api/v1/blood-components/**,/api/v1/storage-locations/**,/api/v1/stock-transfers/**,/api/v1/transport-requests/**,/api/v1/cold-chain-logs/**
           filters:
@@ -78,7 +78,7 @@ spring:
 
         # Transfusion Service (port 8085)
         - id: transfusion-service
-          uri: http://localhost:8085
+          uri: ${TRANSFUSION_SERVICE_URL:http://localhost:8085}
           predicates:
             - Path=/api/v1/crossmatch-requests/**,/api/v1/crossmatch-results/**,/api/v1/blood-issues/**,/api/v1/transfusions/**,/api/v1/transfusion-reactions/**,/api/v1/hemovigilance-reports/**
           filters:
@@ -94,7 +94,7 @@ spring:
 
         # Hospital Service (port 8086)
         - id: hospital-service
-          uri: http://localhost:8086
+          uri: ${HOSPITAL_SERVICE_URL:http://localhost:8086}
           predicates:
             - Path=/api/v1/hospitals/**,/api/v1/hospital-contracts/**,/api/v1/hospital-requests/**,/api/v1/hospital-feedback/**
           filters:
@@ -110,7 +110,7 @@ spring:
 
         # Request Matching Service (port 8087)
         - id: request-matching-service
-          uri: http://localhost:8087
+          uri: ${REQUEST_MATCHING_SERVICE_URL:http://localhost:8087}
           predicates:
             - Path=/api/v1/emergency-requests/**,/api/v1/disaster-events/**,/api/v1/donor-mobilizations/**
           filters:
@@ -126,7 +126,7 @@ spring:
 
         # Billing Service (port 8088)
         - id: billing-service
-          uri: http://localhost:8088
+          uri: ${BILLING_SERVICE_URL:http://localhost:8088}
           predicates:
             - Path=/api/v1/invoices/**,/api/v1/payments/**,/api/v1/rate-master/**,/api/v1/credit-notes/**
           filters:
@@ -142,7 +142,7 @@ spring:
 
         # Notification Service (port 8089)
         - id: notification-service
-          uri: http://localhost:8089
+          uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8089}
           predicates:
             - Path=/api/v1/notifications/**,/api/v1/notification-templates/**,/api/v1/notification-preferences/**,/api/v1/campaigns/**
           filters:
@@ -158,7 +158,7 @@ spring:
 
         # Reporting Service (port 8090)
         - id: reporting-service
-          uri: http://localhost:8090
+          uri: ${REPORTING_SERVICE_URL:http://localhost:8090}
           predicates:
             - Path=/api/v1/reports/**,/api/v1/audit-logs/**,/api/v1/dashboards/**
           filters:
@@ -174,7 +174,7 @@ spring:
 
         # Document Service (port 8091)
         - id: document-service
-          uri: http://localhost:8091
+          uri: ${DOCUMENT_SERVICE_URL:http://localhost:8091}
           predicates:
             - Path=/api/v1/documents/**
           filters:
@@ -190,7 +190,7 @@ spring:
 
         # Compliance Service (port 8092)
         - id: compliance-service
-          uri: http://localhost:8092
+          uri: ${COMPLIANCE_SERVICE_URL:http://localhost:8092}
           predicates:
             - Path=/api/v1/regulatory-frameworks/**,/api/v1/sop-documents/**,/api/v1/licenses/**,/api/v1/deviations/**,/api/v1/recalls/**
           filters:

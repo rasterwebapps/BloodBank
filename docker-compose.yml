@@ -189,6 +189,18 @@ services:
     container_name: bloodbank-api-gateway
     environment:
       <<: *backend-env
+      BRANCH_SERVICE_URL: http://branch-service:8081
+      DONOR_SERVICE_URL: http://donor-service:8082
+      LAB_SERVICE_URL: http://lab-service:8083
+      INVENTORY_SERVICE_URL: http://inventory-service:8084
+      TRANSFUSION_SERVICE_URL: http://transfusion-service:8085
+      HOSPITAL_SERVICE_URL: http://hospital-service:8086
+      REQUEST_MATCHING_SERVICE_URL: http://request-matching-service:8087
+      BILLING_SERVICE_URL: http://billing-service:8088
+      NOTIFICATION_SERVICE_URL: http://notification-service:8089
+      REPORTING_SERVICE_URL: http://reporting-service:8090
+      DOCUMENT_SERVICE_URL: http://document-service:8091
+      COMPLIANCE_SERVICE_URL: http://compliance-service:8092
     ports:
       - "8080:8080"
     depends_on:
