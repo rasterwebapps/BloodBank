@@ -25,6 +25,47 @@ Keycloak is available at **http://localhost:8180**.
 Admin console: **http://localhost:8180/admin** (admin / admin).  
 Realm: **http://localhost:8180/realms/bloodbank**.
 
+### Management interface (health & metrics)
+
+Since Keycloak 25 the `/health/*` and `/metrics` endpoints are served on a
+separate **management port** (default `9000`), not on `KC_HTTP_PORT`. The
+docker-compose file publishes it so docker healthchecks and Prometheus can
+reach it:
+
+| Endpoint | Container URL | Host URL |
+|---|---|---|
+| Liveness | `http://keycloak:9000/health/live` | `http://localhost:9180/health/live` |
+| Readiness | `http://keycloak:9000/health/ready` | `http://localhost:9180/health/ready` |
+| Metrics | `http://keycloak:9000/metrics` | `http://localhost:9180/metrics` |
+
+### Database schema
+
+The compose stack pins `currentSchema=keycloak` on `KC_DB_URL` so that runtime
+JDBC connections find the tables Liquibase creates in the `keycloak` schema.
+The schema itself is created by `postgres/init/01-create-schemas.sql` on first
+boot of the postgres container.
+
+> **If you ever change `KC_DB_SCHEMA`, you must also update the
+> `currentSchema=…` parameter on `KC_DB_URL` — they have to match.**
+
+### Production hardening
+
+This compose definition uses `start-dev` for local convenience only. In
+Kubernetes / production we run:
+
+```bash
+kc.sh build --db=postgres --health-enabled=true --metrics-enabled=true
+kc.sh start --optimized \
+  --hostname=https://auth.bloodbank.example.com \
+  --proxy-headers=xforwarded \
+  --https-certificate-file=/tls/tls.crt \
+  --https-certificate-key-file=/tls/tls.key
+```
+
+Production also requires: bootstrap admin secret rotation, externalised DB
+credentials (Vault/Secret), TLS termination, HA cache (`cache=ispn` with JDBC
+ping), and resource requests/limits in the Deployment.
+
 ---
 
 ## Clients
@@ -272,22 +313,22 @@ All test users share the password format below. **Never use these in staging or 
 
 | Username | Password | Role(s) | branch_id |
 |---|---|---|---|
-| `super_admin` | `Admin@1234!` | SUPER_ADMIN | — |
-| `regional_admin` | `Admin@1234!` | REGIONAL_ADMIN | — |
-| `system_admin` | `Admin@1234!` | SYSTEM_ADMIN | — |
-| `auditor` | `Admin@1234!` | AUDITOR | — |
-| `branch_admin` | `Admin@1234!` | BRANCH_ADMIN | delhi-branch |
-| `branch_manager` | `Admin@1234!` | BRANCH_MANAGER | delhi-branch |
-| `doctor` | `Admin@1234!` | DOCTOR | delhi-branch |
-| `lab_tech` | `Admin@1234!` | LAB_TECHNICIAN | delhi-branch |
-| `phlebotomist` | `Admin@1234!` | PHLEBOTOMIST | delhi-branch |
-| `nurse` | `Admin@1234!` | NURSE | delhi-branch |
-| `inventory_mgr` | `Admin@1234!` | INVENTORY_MANAGER | delhi-branch |
-| `billing_clerk` | `Admin@1234!` | BILLING_CLERK | delhi-branch |
-| `camp_coord` | `Admin@1234!` | CAMP_COORDINATOR | delhi-branch |
-| `receptionist` | `Admin@1234!` | RECEPTIONIST | delhi-branch |
+| `super_admin` | `Admin@12345!` | SUPER_ADMIN | — |
+| `regional_admin` | `Admin@12345!` | REGIONAL_ADMIN | — |
+| `system_admin` | `Admin@12345!` | SYSTEM_ADMIN | — |
+| `auditor` | `Admin@12345!` | AUDITOR | — |
+| `branch_admin` | `Admin@12345!` | BRANCH_ADMIN | delhi-branch |
+| `branch_manager` | `Admin@12345!` | BRANCH_MANAGER | delhi-branch |
+| `doctor` | `Admin@12345!` | DOCTOR | delhi-branch |
+| `lab_tech` | `Admin@12345!` | LAB_TECHNICIAN | delhi-branch |
+| `phlebotomist` | `Admin@12345!` | PHLEBOTOMIST | delhi-branch |
+| `nurse` | `Admin@12345!` | NURSE | delhi-branch |
+| `inventory_mgr` | `Admin@12345!` | INVENTORY_MANAGER | delhi-branch |
+| `billing_clerk` | `Admin@12345!` | BILLING_CLERK | delhi-branch |
+| `camp_coord` | `Admin@12345!` | CAMP_COORDINATOR | delhi-branch |
+| `receptionist` | `Admin@12345!` | RECEPTIONIST | delhi-branch |
 | `hospital_user` | `Portal@1234!` | HOSPITAL_USER | — |
-| `donor_user` | `Donor@1234!` | DONOR | delhi-branch |
+| `donor_user` | `Donor@12345!` | DONOR | delhi-branch |
 
 ---
 
