@@ -103,6 +103,20 @@
   "roles": {
     "realm": [
       {
+        "name": "offline_access",
+        "description": "${role_offline-access}",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "bloodbank"
+      },
+      {
+        "name": "uma_authorization",
+        "description": "${role_uma_authorization}",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "bloodbank"
+      },
+      {
         "id": "aa000001-0000-0000-0000-000000000001",
         "name": "SUPER_ADMIN",
         "description": "Super administrator with full system access across all branches and regions",
@@ -593,7 +607,7 @@
         "display.on.consent.screen": "false"
       },
       "authenticationFlowBindingOverrides": {
-        "browser": "bloodbank-browser"
+        "browser": "gg000007-0000-0000-0000-000000000001"
       },
       "fullScopeAllowed": false,
       "nodeReRegistrationTimeout": -1,
