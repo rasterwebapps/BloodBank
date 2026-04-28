@@ -1,13 +1,35 @@
+// API Gateway is reactive (WebFlux) — it deliberately does NOT opt in to the
+// JPA-microservice convention from the root build, so we declare its full
+// dependency set here.
 plugins {
     id("org.springframework.boot")
 }
 
+val resilience4jVersion: String by project
+
 dependencies {
+    // Spring Cloud Gateway (reactive)
     implementation("org.springframework.cloud:spring-cloud-starter-gateway")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
+    implementation("org.springframework.cloud:spring-cloud-starter-config")
+    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
     implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j")
+
+    // Security: JWT validation against Keycloak
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+
+    // Reactive Redis for rate-limiting / caching
+    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
+
+    // Operational essentials
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+
+    // Shared cross-cutting libs (security configs, exception handlers, DTOs)
+    implementation(project(":shared-libs:common-dto"))
+    implementation(project(":shared-libs:common-exceptions"))
+    implementation(project(":shared-libs:common-security"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
@@ -15,14 +37,8 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-// API Gateway is reactive — exclude servlet/JPA starters inherited from parent
-configurations {
-    all {
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-web")
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-data-jpa")
-        exclude(group = "org.mapstruct", module = "mapstruct")
-        exclude(group = "org.mapstruct", module = "mapstruct-processor")
-        exclude(group = "org.testcontainers", module = "junit-jupiter")
-        exclude(group = "org.testcontainers", module = "postgresql")
-    }
+// Coverage gate: gateway is mostly routing config and filters — keep reporting
+// on but do not enforce the 80 % rule (no domain logic here).
+tasks.matching { it.name == "jacocoTestCoverageVerification" }.configureEach {
+    enabled = false
 }

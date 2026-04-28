@@ -1,3 +1,5 @@
+// Cross-service integration tests. Pulls Spring Boot test infra + Testcontainers
+// but does NOT package as a bootable JAR. No coverage gate here.
 plugins {
     id("org.springframework.boot") apply false
     id("io.spring.dependency-management")
@@ -10,23 +12,17 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-amqp")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.security:spring-security-oauth2-jose")
     testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:rabbitmq")
     testImplementation("com.fasterxml.jackson.core:jackson-databind")
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    // Security integration test dependencies
-    testImplementation("org.springframework.security:spring-security-oauth2-jose")
     testRuntimeOnly("org.postgresql:postgresql")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-// Integration tests do not produce a bootable JAR
-tasks.getByName("jar") {
-    enabled = true
-}
-
-// Disable JaCoCo coverage verification — these are cross-service integration tests
-tasks.jacocoTestCoverageVerification {
+tasks.matching { it.name == "jacocoTestCoverageVerification" }.configureEach {
     enabled = false
 }
