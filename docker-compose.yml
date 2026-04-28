@@ -83,31 +83,76 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     container_name: bloodbank-keycloak
+    # NOTE: `start-dev` is intentional for local docker-compose only.
+    # In production (k8s) we run `start --optimized` with KC_HOSTNAME, TLS,
+    # and a build step that bakes in db=postgres, health-enabled, metrics-enabled.
     command: start-dev --import-realm
     environment:
+      # ── Database ───────────────────────────────────────────────────────────
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/bloodbank_db
+      # IMPORTANT: `currentSchema=keycloak` MUST be on the JDBC URL.
+      # Liquibase honours KC_DB_SCHEMA when running migrations, but at runtime
+      # JPA queries follow the JDBC connection's search_path. Without this
+      # parameter the runtime falls back to the `public` schema, fails to find
+      # the freshly-migrated tables, Agroal logs a warning and the container
+      # exits right after the Liquibase "UPDATE SUMMARY" line.
+      KC_DB_URL: jdbc:postgresql://postgres:5432/bloodbank_db?currentSchema=keycloak
       KC_DB_USERNAME: bloodbank
       KC_DB_PASSWORD: bloodbank
       KC_DB_SCHEMA: keycloak
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HTTP_PORT: 8180
+      KC_DB_POOL_INITIAL_SIZE: "2"
+      KC_DB_POOL_MIN_SIZE: "2"
+      KC_DB_POOL_MAX_SIZE: "10"
+      # ── Bootstrap admin (Keycloak 26 env names) ────────────────────────────
+      # `KEYCLOAK_ADMIN` / `KEYCLOAK_ADMIN_PASSWORD` are deprecated since 26.0.
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      # ── HTTP / hostname ────────────────────────────────────────────────────
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_PORT: "8180"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_PROXY_HEADERS: xforwarded
+      # ── Health & metrics ───────────────────────────────────────────────────
+      # In Keycloak 25+ /health/* and /metrics are served on the dedicated
+      # management interface (default port 9000), NOT on KC_HTTP_PORT.
       KC_HEALTH_ENABLED: "true"
       KC_METRICS_ENABLED: "true"
+      # ── JVM tuning (avoid OOM on small dev hosts) ──────────────────────────
+      JAVA_OPTS_KC_HEAP: "-Xms512m -Xmx1024m"
+      KC_LOG_LEVEL: INFO
     ports:
       - "8180:8180"
+      # Expose the management interface so docker healthchecks / Prometheus
+      # can reach /health/ready and /metrics from the host. Mapped to host
+      # port 9180 to avoid colliding with MinIO on host port 9000.
+      - "9180:9000"
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
     depends_on:
       postgres:
         condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
+        reservations:
+          memory: 768M
     healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8180; echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3; cat <&3 | grep -q '200 OK'"]
+      # /health/ready lives on the management port (9000), not 8180.
+      # The keycloak:26.0 image is based on UBI9 which ships /bin/bash, so the
+      # bash /dev/tcp redirect works as a curl-less HTTP probe.
+      test:
+        - CMD-SHELL
+        - >-
+          exec 3<>/dev/tcp/127.0.0.1/9000 &&
+          printf 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
+          cat <&3 | grep -q '"status": "UP"'
       interval: 15s
       timeout: 10s
-      retries: 10
-      start_period: 60s
+      retries: 20
+      start_period: 90s
 
   minio:
     image: minio/minio:latest
