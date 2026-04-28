@@ -81,9 +81,12 @@
             (click)="upload()">
             @if (uploading()) {
               <mat-icon>hourglass_empty</mat-icon>
-              Uploading...
             } @else {
               <mat-icon>upload</mat-icon>
+            }
+            @if (uploading()) {
+              Uploading...
+            } @else {
               Upload
             }
           </button>

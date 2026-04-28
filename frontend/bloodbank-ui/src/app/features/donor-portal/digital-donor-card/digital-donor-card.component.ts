@@ -11,7 +11,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
-import { BloodGroupBadgeComponent } from '@shared/components/blood-group-badge/blood-group-badge.component';
 import { LoadingSkeletonComponent } from '@shared/components/loading-skeleton/loading-skeleton.component';
 import { ErrorCardComponent } from '@shared/components/error-card/error-card.component';
 import { DonorPortalService } from '../services/donor-portal.service';
@@ -26,7 +25,6 @@ import { DonorProfile, LoyaltyTier } from '../models/donor-portal.models';
     MatIconModule,
     MatChipsModule,
     MatDividerModule,
-    BloodGroupBadgeComponent,
     LoadingSkeletonComponent,
     ErrorCardComponent,
   ],

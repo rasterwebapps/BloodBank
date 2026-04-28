@@ -181,6 +181,8 @@
               <mat-spinner diameter="20" role="status" aria-label="Submitting emergency request" />
             } @else {
               <mat-icon>emergency</mat-icon>
+            }
+            @if (!saving()) {
               Submit Emergency Request
             }
           </button>

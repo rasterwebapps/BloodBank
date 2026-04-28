@@ -22,7 +22,6 @@ import { PageEvent } from '@angular/material/paginator';
 
 import { DataTableComponent } from '@shared/components/data-table/data-table.component';
 import { SearchBarComponent } from '@shared/components/search-bar/search-bar.component';
-import { StatusBadgeComponent } from '@shared/components/status-badge/status-badge.component';
 import { LoadingSkeletonComponent } from '@shared/components/loading-skeleton/loading-skeleton.component';
 import { ErrorCardComponent } from '@shared/components/error-card/error-card.component';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
@@ -49,7 +48,6 @@ import { Document, DocumentCategoryEnum, formatFileSize } from '../models/docume
     RouterLink,
     DataTableComponent,
     SearchBarComponent,
-    StatusBadgeComponent,
     LoadingSkeletonComponent,
     ErrorCardComponent,
     EmptyStateComponent,
