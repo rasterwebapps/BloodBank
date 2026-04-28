@@ -152,6 +152,8 @@
                   <mat-spinner diameter="20" role="status" aria-label="Creating disaster event" />
                 } @else {
                   <mat-icon>public</mat-icon>
+                }
+                @if (!saving()) {
                   Declare Disaster Event
                 }
               </button>

@@ -77,9 +77,12 @@
             (click)="submit()">
             @if (submitting()) {
               <mat-icon>hourglass_empty</mat-icon>
-              Saving...
             } @else {
               <mat-icon>payments</mat-icon>
+            }
+            @if (submitting()) {
+              Saving...
+            } @else {
               Record Payment
             }
           </button>
